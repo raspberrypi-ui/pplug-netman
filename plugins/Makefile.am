@@ -38,7 +38,7 @@ netman_la_CFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
 	-DNMALOCALEDIR=\""$(datadir)/locale"\" \
 	-DBINDIR=\""$(bindir)"\" \
-	-DICONDIR=\""$(datadir)/icons"\" \
+	-DICONDIR=\""$(datadir)/lxpanel/data/icons"\" \
 	-DHAVE_LIBNOTIFY_07 \
 	-D_GNU_SOURCE=1 \
 	-I/usr/include/lxpanel \
