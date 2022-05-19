@@ -2749,7 +2749,7 @@ applet_update_icon (gpointer user_data)
 		break;
 	}
 
-	foo_set_icon (applet, ICON_LAYER_LINK, pixbuf, icon_name);
+    lxpanel_plugin_set_taskbar_icon (applet->panel, applet->tray_icon, icon_name);
 
 	icon_name = NULL;
 	g_clear_pointer (&icon_name_free, g_free);
@@ -2787,7 +2787,7 @@ applet_update_icon (gpointer user_data)
 			vpn_tip = tmp;
 		}
 	}
-	foo_set_icon (applet, ICON_LAYER_VPN, NULL, icon_name);
+    lxpanel_plugin_set_taskbar_icon (applet->panel, applet->tray_icon, icon_name);
 
 	/* update tooltip */
 	g_free (applet->tip);
@@ -3191,7 +3191,7 @@ status_icon_size_changed_cb (GtkStatusIcon *icon,
 	return TRUE;
 }
 
-static void
+void
 status_icon_activate_cb (GtkStatusIcon *icon, NMApplet *applet)
 {
 	/* Have clicking on the applet act also as acknowledgement
@@ -3220,7 +3220,7 @@ status_icon_activate_cb (GtkStatusIcon *icon, NMApplet *applet)
 	                1, gtk_get_current_event_time ());
 }
 
-static void
+void
 status_icon_popup_menu_cb (GtkStatusIcon *icon,
                            guint button,
                            guint32 activate_time,
@@ -3344,22 +3344,15 @@ applet_activate (GApplication *app, gpointer user_data)
 	/* Nothing to do, but glib requires this handler */
 }
 
-static void
-applet_startup (GApplication *app, gpointer user_data)
+void
+applet_startup (NMApplet *applet, gpointer user_data)
 {
-	NMApplet *applet = NM_APPLET (app);
 	gs_free_error GError *error = NULL;
 
 	g_set_application_name (_("NetworkManager Applet"));
 	gtk_window_set_default_icon_name ("network-workgroup");
 
-	applet->info_dialog_ui = gtk_builder_new ();
-
-	if (!gtk_builder_add_from_resource (applet->info_dialog_ui, "/org/freedesktop/network-manager-applet/info.ui", &error)) {
-		g_warning ("Could not load info dialog UI file: %s", error->message);
-		g_application_quit (app);
-		return;
-	}
+	applet->info_dialog_ui = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/info.ui");
 
 	applet->gsettings = g_settings_new (APPLET_PREFS_SCHEMA);
 	applet->visible = g_settings_get_boolean (applet->gsettings, PREF_SHOW_APPLET);
@@ -3371,7 +3364,6 @@ applet_startup (GApplication *app, gpointer user_data)
 	/* Load pixmaps and create applet widgets */
 	if (!setup_widgets (applet)) {
 		g_warning ("Could not initialize applet widgets.");
-		g_application_quit (app);
 		return;
 	}
 	g_assert (INDICATOR_ENABLED (applet) || applet->status_icon);
@@ -3415,8 +3407,6 @@ applet_startup (GApplication *app, gpointer user_data)
 
 	if (with_agent)
 		register_agent (applet);
-
-	g_application_hold (G_APPLICATION (applet));
 }
 
 static void finalize (GObject *object)

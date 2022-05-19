@@ -28,6 +28,7 @@
 #include <NetworkManager.h>
 
 #include "applet-agent.h"
+#include "plugin.h"
 
 #if WITH_WWAN
 #include <libmm-glib.h>
@@ -69,6 +70,11 @@ typedef struct NMADeviceClass NMADeviceClass;
  *
  */
 typedef struct {
+    GtkWidget *plugin;              /* Back pointer to the widget */
+    LXPanel *panel;                 /* Back pointer to panel */
+    GtkWidget *tray_icon;           /* Displayed image */
+    config_setting_t *settings;     /* Plugin settings */
+
 	GApplication parent;
 
 	NMClient *nm_client;

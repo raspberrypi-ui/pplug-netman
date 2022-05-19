@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <glib/gi18n.h>
 
 #include "plugin.h"
+#include "nm-default.h"
+#include "applet.h"
 
 gboolean shell_debug = FALSE;
 gboolean with_agent = TRUE;
@@ -53,10 +55,14 @@ typedef struct
     config_setting_t *settings;     /* Plugin settings */
 } NetManPlugin;
 
+extern void status_icon_activate_cb (GtkStatusIcon *icon, NMApplet *applet);
+extern void status_icon_popup_menu_cb (GtkStatusIcon *icon, guint button, guint32 activate_time, NMApplet *applet);
+extern void applet_startup (NMApplet *applet, gpointer user_data);
+
 /* Handler for configure_event on drawing area. */
 static void nm_configuration_changed (LXPanel *panel, GtkWidget *p)
 {
-    NetManPlugin *nm = lxpanel_plugin_get_data (p);
+    NMApplet *nm = lxpanel_plugin_get_data (p);
     if (nm->tray_icon)
         lxpanel_plugin_set_taskbar_icon (panel, nm->tray_icon, "system-search");
 }
@@ -64,7 +70,7 @@ static void nm_configuration_changed (LXPanel *panel, GtkWidget *p)
 /* Handler for menu button click */
 static gboolean nm_button_press_event (GtkWidget *widget, GdkEventButton *event, LXPanel *panel)
 {
-    NetManPlugin *nm = lxpanel_plugin_get_data (widget);
+    NMApplet *nm = lxpanel_plugin_get_data (widget);
 
 #ifdef ENABLE_NLS
     textdomain (GETTEXT_PACKAGE);
@@ -72,6 +78,12 @@ static gboolean nm_button_press_event (GtkWidget *widget, GdkEventButton *event,
 
     if (event->button == 1)
     {
+        status_icon_activate_cb (widget, nm);
+        return TRUE;
+    }
+    else if (event->button == 3)
+    {
+        status_icon_popup_menu_cb (widget, 2, gtk_get_current_event_time (), nm);
         return TRUE;
     }
     else return FALSE;
@@ -80,7 +92,7 @@ static gboolean nm_button_press_event (GtkWidget *widget, GdkEventButton *event,
 /* Plugin destructor. */
 static void nm_destructor (gpointer user_data)
 {
-    NetManPlugin *nm = (NetManPlugin *) user_data;
+    NMApplet *nm = (NMApplet *) user_data;
 
     /* Deallocate memory. */
     g_free (nm);
@@ -90,8 +102,8 @@ static void nm_destructor (gpointer user_data)
 static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
 {
     /* Allocate plugin context and set into Plugin private data pointer. */
-    NetManPlugin *nm = g_new0 (NetManPlugin, 1);
-    int val;
+    NMApplet *nm = g_new0 (NMApplet, 1);
+
     nm->panel = panel;
     nm->settings = settings;
 
@@ -102,16 +114,18 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
     textdomain (GETTEXT_PACKAGE);
 #endif
 
+    applet_startup (nm, NULL);
     /* Allocate top level widget and set into Plugin widget pointer. */
     nm->plugin = gtk_toggle_button_new ();
     gtk_button_set_relief (GTK_BUTTON (nm->plugin), GTK_RELIEF_NONE);
 
     /* Allocate icon as a child of top level */
     nm->tray_icon = gtk_image_new ();
-    lxpanel_plugin_set_taskbar_icon (panel, nm->tray_icon, "system-search");
-    gtk_widget_set_tooltip_text (nm->tray_icon, _("Show virtual magnifier"));
+    gtk_widget_set_tooltip_text (nm->tray_icon, _("Network manager"));
     gtk_widget_set_visible (nm->tray_icon, TRUE);
     gtk_container_add (GTK_CONTAINER (nm->plugin), nm->tray_icon);
+
+    g_signal_connect (nm->plugin, "button-press-event", G_CALLBACK (nm_button_press_event), nm);
 
     lxpanel_plugin_set_data (nm->plugin, nm, nm_destructor);
     return nm->plugin;
@@ -125,6 +139,5 @@ LXPanelPluginInit fm_module_init_lxpanel_gtk = {
     .description = N_("Controller for Network Manager"),
     .new_instance = nm_constructor,
     .reconfigure = nm_configuration_changed,
-    .button_press_event = nm_button_press_event,
     .gettext_package = GETTEXT_PACKAGE
 };
