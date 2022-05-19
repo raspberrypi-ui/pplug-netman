@@ -1,3 +1,5 @@
+SUBDIRS = icons
+
 uidir = $(datadir)/lxpanel/ui
 
 ui_in_files = 	8021x.ui \
