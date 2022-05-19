@@ -42,9 +42,6 @@ netman_la_CFLAGS = \
 	-DHAVE_LIBNOTIFY_07 \
 	-D_GNU_SOURCE=1 \
 	-I/usr/include/lxpanel \
-	-I/usr/include/libnm \
-	-I/usr/include/libnma \
-	-I/usr/include/libsecret-1 \
 	-I../shared \
 	-Iutils \
 	-Iwireless-security \
