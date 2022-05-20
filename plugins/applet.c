@@ -42,6 +42,9 @@ extern gboolean shell_debug;
 extern gboolean with_agent;
 extern gboolean with_appindicator;
 
+extern void update_icon (NMApplet *applet, const char *icon_name);
+extern void update_tooltip (NMApplet *applet, char *text);
+
 G_DEFINE_TYPE (NMApplet, nma, G_TYPE_APPLICATION)
 
 /********************************************************************/
@@ -1656,7 +1659,7 @@ static void nma_menu_show_cb (GtkWidget *menu, NMApplet *applet)
 	g_return_if_fail (applet != NULL);
 
 	if (applet->status_icon)
-		gtk_status_icon_set_tooltip_text (applet->status_icon, NULL);
+		update_tooltip (applet, NULL);
 
 	if (!nm_client_get_nm_running (applet->nm_client)) {
 		nma_menu_add_text_item (menu, _("NetworkManager is not running…"));
@@ -1703,7 +1706,7 @@ nma_menu_deactivate_cb (GtkWidget *widget, NMApplet *applet)
 	applet_stop_wifi_scan (applet, NULL);
 
 	/* Re-set the tooltip */
-	gtk_status_icon_set_tooltip_text (applet->status_icon, applet->tip);
+	update_tooltip (applet, applet->tip);
 }
 
 static gboolean
@@ -2749,7 +2752,7 @@ applet_update_icon (gpointer user_data)
 		break;
 	}
 
-    lxpanel_plugin_set_taskbar_icon (applet->panel, applet->tray_icon, icon_name);
+	update_icon (applet, icon_name);
 
 	icon_name = NULL;
 	g_clear_pointer (&icon_name_free, g_free);
@@ -2787,7 +2790,7 @@ applet_update_icon (gpointer user_data)
 			vpn_tip = tmp;
 		}
 	}
-    lxpanel_plugin_set_taskbar_icon (applet->panel, applet->tray_icon, icon_name);
+	update_icon (applet, icon_name);
 
 	/* update tooltip */
 	g_free (applet->tip);
@@ -2800,7 +2803,7 @@ applet_update_icon (gpointer user_data)
 		applet->tip = g_strdup (dev_tip);
 
 	if (applet->status_icon)
-		gtk_status_icon_set_tooltip_text (applet->status_icon, applet->tip);
+		update_tooltip (applet, applet->tip);
 
 	return FALSE;
 }
@@ -3191,7 +3194,7 @@ status_icon_size_changed_cb (GtkStatusIcon *icon,
 	return TRUE;
 }
 
-void
+static void
 status_icon_activate_cb (GtkStatusIcon *icon, NMApplet *applet)
 {
 	/* Have clicking on the applet act also as acknowledgement
@@ -3220,7 +3223,7 @@ status_icon_activate_cb (GtkStatusIcon *icon, NMApplet *applet)
 	                1, gtk_get_current_event_time ());
 }
 
-void
+static void
 status_icon_popup_menu_cb (GtkStatusIcon *icon,
                            guint button,
                            guint32 activate_time,
@@ -3344,15 +3347,22 @@ applet_activate (GApplication *app, gpointer user_data)
 	/* Nothing to do, but glib requires this handler */
 }
 
-void
-applet_startup (NMApplet *applet, gpointer user_data)
+static void
+applet_startup (GApplication *app, gpointer user_data)
 {
+	NMApplet *applet = NM_APPLET (app);
 	gs_free_error GError *error = NULL;
 
 	g_set_application_name (_("NetworkManager Applet"));
 	gtk_window_set_default_icon_name ("network-workgroup");
 
-	applet->info_dialog_ui = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/info.ui");
+	applet->info_dialog_ui = gtk_builder_new ();
+
+	if (!gtk_builder_add_from_resource (applet->info_dialog_ui, "/org/freedesktop/network-manager-applet/info.ui", &error)) {
+		g_warning ("Could not load info dialog UI file: %s", error->message);
+		g_application_quit (app);
+		return;
+	}
 
 	applet->gsettings = g_settings_new (APPLET_PREFS_SCHEMA);
 	applet->visible = g_settings_get_boolean (applet->gsettings, PREF_SHOW_APPLET);
@@ -3364,6 +3374,7 @@ applet_startup (NMApplet *applet, gpointer user_data)
 	/* Load pixmaps and create applet widgets */
 	if (!setup_widgets (applet)) {
 		g_warning ("Could not initialize applet widgets.");
+		g_application_quit (app);
 		return;
 	}
 	g_assert (INDICATOR_ENABLED (applet) || applet->status_icon);
@@ -3407,6 +3418,8 @@ applet_startup (NMApplet *applet, gpointer user_data)
 
 	if (with_agent)
 		register_agent (applet);
+
+	g_application_hold (G_APPLICATION (applet));
 }
 
 static void finalize (GObject *object)
@@ -3470,3 +3483,75 @@ static void nma_class_init (NMAppletClass *klass)
 
 	oclass->finalize = finalize;
 }
+
+
+void plugin_startup (NMApplet *applet)
+{
+	gs_free_error GError *error = NULL;
+
+	g_set_application_name (_("NetworkManager Applet"));
+	gtk_window_set_default_icon_name ("network-workgroup");
+
+	applet->info_dialog_ui = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/info.ui");
+
+	applet->gsettings = g_settings_new (APPLET_PREFS_SCHEMA);
+	applet->visible = g_settings_get_boolean (applet->gsettings, PREF_SHOW_APPLET);
+	g_signal_connect (applet->gsettings, "changed::show-applet",
+	                  G_CALLBACK (applet_gsettings_show_changed), applet);
+
+	foo_client_setup (applet);
+
+	/* Load pixmaps and create applet widgets */
+	if (!setup_widgets (applet)) {
+		g_warning ("Could not initialize applet widgets.");
+		return;
+	}
+	g_assert (INDICATOR_ENABLED (applet) || applet->status_icon);
+
+	applet->icon_cache = g_hash_table_new_full (g_str_hash,
+	                                            g_str_equal,
+	                                            g_free,
+	                                            nm_g_object_unref);
+	nma_icons_init (applet);
+
+	if (!notify_is_initted ())
+		notify_init ("NetworkManager");
+
+	/* Initialize device classes */
+	applet->ethernet_class = applet_device_ethernet_get_class (applet);
+	g_assert (applet->ethernet_class);
+
+	applet->wifi_class = applet_device_wifi_get_class (applet);
+	g_assert (applet->wifi_class);
+
+#if WITH_WWAN
+	applet->broadband_class = applet_device_broadband_get_class (applet);
+	g_assert (applet->broadband_class);
+#endif
+
+	applet->bt_class = applet_device_bt_get_class (applet);
+	g_assert (applet->bt_class);
+
+#if WITH_WWAN
+	mm1_client_setup (applet);
+#endif
+
+	if (applet->status_icon) {
+		/* Track embedding to help debug issues where user has removed the
+		 * notification area applet from the panel, and thus nm-applet too.
+		 */
+		g_signal_connect (applet->status_icon, "notify::embedded",
+			              G_CALLBACK (applet_embedded_cb), NULL);
+		applet_embedded_cb (G_OBJECT (applet->status_icon), NULL, NULL);
+	}
+
+	if (with_agent)
+		register_agent (applet);
+}
+
+void plugin_handle_button (NMApplet *applet, GtkWidget *button, int lorr)
+{
+	if (lorr == 1) status_icon_activate_cb (button, applet);
+	if (lorr == 2) status_icon_popup_menu_cb (button, 2, gtk_get_current_event_time (), applet);
+}
+

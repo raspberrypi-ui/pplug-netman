@@ -47,17 +47,18 @@ gboolean with_appindicator = FALSE;
 
 /* Private context for plugin */
 
-typedef struct
-{
-    GtkWidget *plugin;              /* Back pointer to the widget */
-    LXPanel *panel;                 /* Back pointer to panel */
-    GtkWidget *tray_icon;           /* Displayed image */
-    config_setting_t *settings;     /* Plugin settings */
-} NetManPlugin;
+extern void plugin_startup (NMApplet *applet);
+extern void plugin_handle_button (NMApplet *applet, GtkWidget *button, int lorr);
 
-extern void status_icon_activate_cb (GtkStatusIcon *icon, NMApplet *applet);
-extern void status_icon_popup_menu_cb (GtkStatusIcon *icon, guint button, guint32 activate_time, NMApplet *applet);
-extern void applet_startup (NMApplet *applet, gpointer user_data);
+void update_icon (NMApplet *applet, const char *icon_name)
+{
+	lxpanel_plugin_set_taskbar_icon (applet->panel, applet->tray_icon, icon_name);
+}
+
+void update_tooltip (NMApplet *applet, char *text)
+{
+    gtk_widget_set_tooltip_text (applet->tray_icon, text);
+}
 
 /* Handler for configure_event on drawing area. */
 static void nm_configuration_changed (LXPanel *panel, GtkWidget *p)
@@ -78,12 +79,12 @@ static gboolean nm_button_press_event (GtkWidget *widget, GdkEventButton *event,
 
     if (event->button == 1)
     {
-        status_icon_activate_cb (widget, nm);
+        plugin_handle_button (nm, widget, 1);
         return TRUE;
     }
     else if (event->button == 3)
     {
-        status_icon_popup_menu_cb (widget, 2, gtk_get_current_event_time (), nm);
+        plugin_handle_button (nm, widget, 2);
         return TRUE;
     }
     else return FALSE;
@@ -114,14 +115,13 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
     textdomain (GETTEXT_PACKAGE);
 #endif
 
-    applet_startup (nm, NULL);
+    plugin_startup (nm);
     /* Allocate top level widget and set into Plugin widget pointer. */
     nm->plugin = gtk_toggle_button_new ();
     gtk_button_set_relief (GTK_BUTTON (nm->plugin), GTK_RELIEF_NONE);
 
     /* Allocate icon as a child of top level */
     nm->tray_icon = gtk_image_new ();
-    gtk_widget_set_tooltip_text (nm->tray_icon, _("Network manager"));
     gtk_widget_set_visible (nm->tray_icon, TRUE);
     gtk_container_add (GTK_CONTAINER (nm->plugin), nm->tray_icon);
 
