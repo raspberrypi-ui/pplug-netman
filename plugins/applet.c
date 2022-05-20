@@ -3555,3 +3555,7 @@ void plugin_handle_button (NMApplet *applet, GtkWidget *button, int lorr)
 	if (lorr == 2) status_icon_popup_menu_cb (button, 2, gtk_get_current_event_time (), applet);
 }
 
+void plugin_reload_icon (NMApplet *applet)
+{
+	nma_icons_reload (applet);
+}

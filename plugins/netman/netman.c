@@ -49,6 +49,7 @@ gboolean with_appindicator = FALSE;
 
 extern void plugin_startup (NMApplet *applet);
 extern void plugin_handle_button (NMApplet *applet, GtkWidget *button, int lorr);
+extern void plugin_reload_icon (NMApplet *applet);
 
 void update_icon (NMApplet *applet, const char *icon_name)
 {
@@ -64,8 +65,7 @@ void update_tooltip (NMApplet *applet, char *text)
 static void nm_configuration_changed (LXPanel *panel, GtkWidget *p)
 {
     NMApplet *nm = lxpanel_plugin_get_data (p);
-    if (nm->tray_icon)
-        lxpanel_plugin_set_taskbar_icon (panel, nm->tray_icon, "system-search");
+    if (nm->tray_icon) plugin_reload_icon (nm);
 }
 
 /* Handler for menu button click */
