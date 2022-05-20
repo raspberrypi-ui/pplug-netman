@@ -52,7 +52,7 @@ extern void plugin_handle_button (NMApplet *applet, GtkWidget *button, int lorr)
 
 void update_icon (NMApplet *applet, const char *icon_name)
 {
-	lxpanel_plugin_set_taskbar_icon (applet->panel, applet->tray_icon, icon_name);
+	if (icon_name) lxpanel_plugin_set_taskbar_icon (applet->panel, applet->tray_icon, icon_name);
 }
 
 void update_tooltip (NMApplet *applet, char *text)
