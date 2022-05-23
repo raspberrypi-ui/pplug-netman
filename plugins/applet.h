@@ -72,8 +72,6 @@ typedef struct NMADeviceClass NMADeviceClass;
 typedef struct {
     GtkWidget *plugin;              /* Back pointer to the widget */
     LXPanel *panel;                 /* Back pointer to panel */
-    GtkWidget *tray_icon;           /* Displayed image */
-    config_setting_t *settings;     /* Plugin settings */
 
 	GApplication parent;
 

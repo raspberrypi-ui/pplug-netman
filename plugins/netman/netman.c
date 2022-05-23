@@ -53,19 +53,19 @@ extern void plugin_reload_icon (NMApplet *applet);
 
 void update_icon (NMApplet *applet, const char *icon_name)
 {
-	if (icon_name) lxpanel_plugin_set_taskbar_icon (applet->panel, applet->tray_icon, icon_name);
+	if (icon_name) lxpanel_plugin_set_taskbar_icon (applet->panel, applet->status_icon, icon_name);
 }
 
 void update_tooltip (NMApplet *applet, char *text)
 {
-    gtk_widget_set_tooltip_text (applet->tray_icon, text);
+    gtk_widget_set_tooltip_text (applet->status_icon, text);
 }
 
 /* Handler for configure_event on drawing area. */
 static void nm_configuration_changed (LXPanel *panel, GtkWidget *p)
 {
     NMApplet *nm = lxpanel_plugin_get_data (p);
-    if (nm->tray_icon) plugin_reload_icon (nm);
+    if (nm->status_icon) plugin_reload_icon (nm);
 }
 
 /* Handler for menu button click */
@@ -106,7 +106,6 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
     NMApplet *nm = g_new0 (NMApplet, 1);
 
     nm->panel = panel;
-    nm->settings = settings;
 
 #ifdef ENABLE_NLS
     setlocale (LC_ALL, "");
@@ -121,9 +120,9 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
     gtk_button_set_relief (GTK_BUTTON (nm->plugin), GTK_RELIEF_NONE);
 
     /* Allocate icon as a child of top level */
-    nm->tray_icon = gtk_image_new ();
-    gtk_widget_set_visible (nm->tray_icon, TRUE);
-    gtk_container_add (GTK_CONTAINER (nm->plugin), nm->tray_icon);
+    nm->status_icon = gtk_image_new ();
+    gtk_widget_set_visible (nm->status_icon, TRUE);
+    gtk_container_add (GTK_CONTAINER (nm->plugin), nm->status_icon);
 
     g_signal_connect (nm->plugin, "button-press-event", G_CALLBACK (nm_button_press_event), nm);
 
