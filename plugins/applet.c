@@ -3492,7 +3492,12 @@ void plugin_startup (NMApplet *applet)
 	g_set_application_name (_("NetworkManager Applet"));
 	gtk_window_set_default_icon_name ("network-workgroup");
 
-	applet->info_dialog_ui = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/info.ui");
+	applet->info_dialog_ui = gtk_builder_new ();
+
+	if (!gtk_builder_add_from_resource (applet->info_dialog_ui, "/org/freedesktop/network-manager-applet/info.ui", &error)) {
+		g_warning ("Could not load info dialog UI file: %s", error->message);
+		return;
+	}
 
 	applet->gsettings = g_settings_new (APPLET_PREFS_SCHEMA);
 	applet->visible = g_settings_get_boolean (applet->gsettings, PREF_SHOW_APPLET);

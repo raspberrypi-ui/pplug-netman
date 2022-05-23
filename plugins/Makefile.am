@@ -32,7 +32,8 @@ netman_la_SOURCES = \
 	utils/utils.c \
 	wireless-security/eap-method.c \
 	../shared/nm-utils/nm-compat.c \
-	../shared/nm-utils/nm-shared-utils.c
+	../shared/nm-utils/nm-shared-utils.c \
+	netman-resources.c
 
 netman_la_CFLAGS = \
 	-I$(top_srcdir) \
@@ -53,6 +54,11 @@ netman_la_CFLAGS = \
 netman_la_LDFLAGS = \
 	$(PACKAGE_LIBS) \
 	-module @LXPANEL_MODULE@
+
+GLIB_COMPILE_RESOURCES=glib-compile-resources
+
+netman-resources.c : applet.gresource.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies applet.gresource.xml)
+	$(GLIB_COMPILE_RESOURCES) --target=$@ --generate-source $<
 
 install-exec-hook:
 	rm -f $(DESTDIR)$(libdir)/lxpanel/plugins/*.la
