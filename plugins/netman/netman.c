@@ -112,6 +112,7 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
 
     /* Allocate icon as a child of top level */
     nm->status_icon = gtk_image_new ();
+    nm->icon_size = panel_get_safe_icon_size (panel);
     gtk_widget_set_visible (nm->status_icon, TRUE);
     gtk_container_add (GTK_CONTAINER (nm->plugin), nm->status_icon);
 

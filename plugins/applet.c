@@ -3220,7 +3220,9 @@ status_icon_size_changed_cb (GtkStatusIcon *icon,
 
 	applet_schedule_update_icon (applet);
 
+#ifndef LXPANEL_PLUGIN
 	return TRUE;
+#endif
 }
 
 #ifdef LXPANEL_PLUGIN
@@ -3417,8 +3419,10 @@ applet_startup (GApplication *app, gpointer user_data)
 #endif
 	gs_free_error GError *error = NULL;
 
+#ifndef LXPANEL_PLUGIN
 	g_set_application_name (_("NetworkManager Applet"));
 	gtk_window_set_default_icon_name ("network-workgroup");
+#endif
 
 	applet->info_dialog_ui = gtk_builder_new ();
 
@@ -3543,11 +3547,9 @@ static void finalize (GObject *object)
 
 static void nma_init (NMApplet *applet)
 {
-#ifdef LXPANEL_PLUGIN
-	applet->icon_size = panel_get_safe_icon_size (applet->panel);
-#else
 	applet->icon_size = 16;
 
+#ifndef LXPANEL_PLUGIN
 	g_signal_connect (applet, "startup", G_CALLBACK (applet_startup), NULL);
 	g_signal_connect (applet, "activate", G_CALLBACK (applet_activate), NULL);
 #endif
