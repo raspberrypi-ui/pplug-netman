@@ -699,15 +699,14 @@ applet_clear_notify (NMApplet *applet)
 {
 #ifdef LXPANEL_PLUGIN
 	lxpanel_notify_clear (applet->notification);
-	return;
-#endif
-
+#else
 	if (applet->notification == NULL)
 		return;
 
 	notify_notification_close (applet->notification, NULL);
 	g_object_unref (applet->notification);
 	applet->notification = NULL;
+#endif
 }
 
 static gboolean
@@ -758,9 +757,7 @@ applet_do_notify (NMApplet *applet,
 	applet->notification = lxpanel_notify (applet->panel, msg);
 	g_free (msg);
 	g_free (escaped);
-	return;
-#endif
-
+#else
 	if (INDICATOR_ENABLED (applet)) {
 #ifdef WITH_APPINDICATOR
 		if (app_indicator_get_status (applet->app_indicator) == APP_INDICATOR_STATUS_PASSIVE)
@@ -809,6 +806,7 @@ applet_do_notify (NMApplet *applet,
 		           error && error->message ? error->message : "(unknown)");
 		g_clear_error (&error);
 	}
+#endif
 }
 
 static void
