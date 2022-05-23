@@ -28,10 +28,14 @@
 #include <NetworkManager.h>
 
 #include "applet-agent.h"
-#include "plugin.h"
 
 #if WITH_WWAN
 #include <libmm-glib.h>
+#endif
+
+#define LXPANEL_PLUGIN
+#ifdef LXPANEL_PLUGIN
+#include "plugin.h"
 #endif
 
 #define NM_TYPE_APPLET              (nma_get_type())
@@ -70,9 +74,10 @@ typedef struct NMADeviceClass NMADeviceClass;
  *
  */
 typedef struct {
-    GtkWidget *plugin;              /* Back pointer to the widget */
+#ifdef LXPANEL_PLUGIN
+    GtkWidget *plugin;              /* Back pointer to widget */
     LXPanel *panel;                 /* Back pointer to panel */
-
+#endif
 	GApplication parent;
 
 	NMClient *nm_client;
@@ -123,7 +128,11 @@ typedef struct {
 #endif
 	guint           update_menu_id;
 
+#ifdef LXPANEL_PLUGIN
+	GtkWidget * status_icon;
+#else
 	GtkStatusIcon * status_icon;
+#endif
 
 	GtkWidget *     menu;
 	GtkWidget *     context_menu;

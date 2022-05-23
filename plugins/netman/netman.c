@@ -47,25 +47,16 @@ gboolean with_appindicator = FALSE;
 
 /* Private context for plugin */
 
-extern void plugin_startup (NMApplet *applet);
-extern void plugin_handle_button (NMApplet *applet, GtkWidget *button, int lorr);
-extern void plugin_reload_icon (NMApplet *applet);
-
-void update_icon (NMApplet *applet, const char *icon_name)
-{
-	if (icon_name) lxpanel_plugin_set_taskbar_icon (applet->panel, applet->status_icon, icon_name);
-}
-
-void update_tooltip (NMApplet *applet, char *text)
-{
-    gtk_widget_set_tooltip_text (applet->status_icon, text);
-}
+extern void applet_startup (NMApplet *applet);
+extern void status_icon_size_changed_cb (NMApplet *applet);
+extern void status_icon_activate_cb (NMApplet *applet);
+extern void status_icon_popup_menu_cb (NMApplet *applet);
 
 /* Handler for configure_event on drawing area. */
 static void nm_configuration_changed (LXPanel *panel, GtkWidget *p)
 {
     NMApplet *nm = lxpanel_plugin_get_data (p);
-    if (nm->status_icon) plugin_reload_icon (nm);
+    if (nm->status_icon) status_icon_size_changed_cb (nm);
 }
 
 /* Handler for menu button click */
@@ -79,12 +70,12 @@ static gboolean nm_button_press_event (GtkWidget *widget, GdkEventButton *event,
 
     if (event->button == 1)
     {
-        plugin_handle_button (nm, widget, 1);
+        status_icon_activate_cb (nm);
         return TRUE;
     }
     else if (event->button == 3)
     {
-        plugin_handle_button (nm, widget, 2);
+        status_icon_popup_menu_cb (nm);
         return TRUE;
     }
     else return FALSE;
@@ -114,7 +105,7 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
     textdomain (GETTEXT_PACKAGE);
 #endif
 
-    plugin_startup (nm);
+    applet_startup (nm);
     /* Allocate top level widget and set into Plugin widget pointer. */
     nm->plugin = gtk_toggle_button_new ();
     gtk_button_set_relief (GTK_BUTTON (nm->plugin), GTK_RELIEF_NONE);
