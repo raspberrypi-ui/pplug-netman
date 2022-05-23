@@ -339,6 +339,7 @@ fi
 AC_CONFIG_FILES([
     Makefile
     plugins/Makefile
+    plugins/connection-editor/Makefile
     data/Makefile
     data/icons/Makefile
     data/icons/hicolor/Makefile

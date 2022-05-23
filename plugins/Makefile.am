@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+SUBDIRS = connection-editor
+
 ## loadable plugins
 if BUILD_PLUGIN_LOADER
 DYNAMIC_PLUGINS = \
