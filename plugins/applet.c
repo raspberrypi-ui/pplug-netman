@@ -697,6 +697,11 @@ applet_menu_item_create_device_item_helper (NMDevice *device,
 static void
 applet_clear_notify (NMApplet *applet)
 {
+#ifdef LXPANEL_PLUGIN
+	lxpanel_notify_clear (applet->notification);
+	return;
+#endif
+
 	if (applet->notification == NULL)
 		return;
 
@@ -747,7 +752,15 @@ applet_do_notify (NMApplet *applet,
 	g_return_if_fail (summary != NULL);
 	g_return_if_fail (message != NULL);
 
-#ifndef LXPANEL_PLUGIN
+#ifdef LXPANEL_PLUGIN
+	escaped = utils_escape_notify_message (message);
+	char *msg = g_strdup_printf ("%s\n%s", summary, escaped);
+	applet->notification = lxpanel_notify (applet->panel, msg);
+	g_free (msg);
+	g_free (escaped);
+	return;
+#endif
+
 	if (INDICATOR_ENABLED (applet)) {
 #ifdef WITH_APPINDICATOR
 		if (app_indicator_get_status (applet->app_indicator) == APP_INDICATOR_STATUS_PASSIVE)
@@ -757,7 +770,6 @@ applet_do_notify (NMApplet *applet,
 		if (!gtk_status_icon_is_embedded (applet->status_icon))
 			return;
 	}
-#endif
 
 	/* if we're not acting as a secret agent, don't notify either */
 	if (!applet->agent)
@@ -2171,7 +2183,7 @@ foo_set_icon (NMApplet *applet, guint32 layer, GdkPixbuf *pixbuf, const char *ic
 		pixbuf = nma_icon_check_and_load ("nm-no-connection", applet);
 
 #ifdef LXPANEL_PLUGIN
-	gtk_image_set_from_pixbuf (applet->status_icon, pixbuf);
+	gtk_image_set_from_pixbuf (GTK_IMAGE (applet->status_icon), pixbuf);
 #else
 	gtk_status_icon_set_from_pixbuf (applet->status_icon, pixbuf);
 #endif
@@ -3498,7 +3510,11 @@ applet_startup (GApplication *app, gpointer user_data)
 #endif
 }
 
+#ifdef LXPANEL_PLUGIN
+void finalize (GObject *object)
+#else
 static void finalize (GObject *object)
+#endif
 {
 	NMApplet *applet = NM_APPLET (object);
 
@@ -3512,9 +3528,11 @@ static void finalize (GObject *object)
 	nm_clear_g_source (&applet->update_icon_id);
 	nm_clear_g_source (&applet->wifi_scan_id);
 
+#ifndef LXPANEL_PLUGIN
 #ifdef WITH_APPINDICATOR
 	g_clear_object (&applet->app_indicator);
 #endif /* WITH_APPINDICATOR */
+#endif
 	nm_clear_g_source (&applet->update_menu_id);
 
 	g_clear_object (&applet->status_icon);
@@ -3527,10 +3545,12 @@ static void finalize (GObject *object)
 	while (g_slist_length (applet->secrets_reqs))
 		applet_secrets_request_free ((SecretsRequest *) applet->secrets_reqs->data);
 
+#ifndef LXPANEL_PLUGIN
 	if (applet->notification) {
 		notify_notification_close (applet->notification, NULL);
 		g_object_unref (applet->notification);
 	}
+#endif
 
 	g_clear_object (&applet->info_dialog_ui);
 	g_clear_object (&applet->gsettings);
