@@ -3506,6 +3506,8 @@ applet_startup (GApplication *app, gpointer user_data)
 #ifndef LXPANEL_PLUGIN
 	g_application_hold (G_APPLICATION (applet));
 #endif
+
+	applet->ap_list = NULL;
 }
 
 #ifdef LXPANEL_PLUGIN
