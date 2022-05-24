@@ -1118,7 +1118,7 @@ idle_check_avail_access_point_notification (gpointer datap)
 	                  NOTIFY_URGENCY_LOW,
 	                  _("Wi-Fi Networks Available"),
 	                  _("Use the network menu to connect to a Wi-Fi network"),
-	                  "nm-device-wireless",
+	                  "network-wireless-connected-100",
 	                  "dont-show",
 	                  _("Don’t show this message again"),
 	                  wifi_available_dont_show_cb,
@@ -1297,7 +1297,7 @@ wifi_notify_connected (NMDevice *device,
 	esc_ssid = get_ssid_utf8 (ap);
 
 	if (!ap)
-		signal_strength_icon = "nm-device-wireless";
+		signal_strength_icon = "network-wireless-connected-100";
 	else
 		signal_strength_icon = mobile_helper_get_quality_icon_name (nm_access_point_get_strength (ap));
 

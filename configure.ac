@@ -347,8 +347,6 @@ AC_CONFIG_FILES([
     data/icons/hicolor/16x16/apps/Makefile
     data/icons/hicolor/22x22/Makefile
     data/icons/hicolor/22x22/apps/Makefile
-    data/icons/hicolor/48x48/Makefile
-    data/icons/hicolor/48x48/apps/Makefile
     data/icons/hicolor/scalable/Makefile
     data/icons/hicolor/scalable/apps/Makefile
     po/Makefile.in
