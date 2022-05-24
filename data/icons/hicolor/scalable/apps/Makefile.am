@@ -16,8 +16,7 @@ appicon_DATA = 	nm-device-wwan-symbolic.svg \
 				nm-vpn-connecting11-symbolic.svg \
 				nm-vpn-connecting12-symbolic.svg \
 				nm-vpn-connecting13-symbolic.svg \
-				nm-vpn-connecting14-symbolic.svg \
-				nm-vpn-standalone-lock-symbolic.svg
+				nm-vpn-connecting14-symbolic.svg
 				
 
 
