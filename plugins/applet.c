@@ -3548,7 +3548,9 @@ static void finalize (GObject *object)
 #endif
 	nm_clear_g_source (&applet->update_menu_id);
 
+#ifndef LXPANEL_PLUGIN
 	g_clear_object (&applet->status_icon);
+#endif
 	g_clear_object (&applet->menu);
 	g_clear_pointer (&applet->icon_cache, g_hash_table_destroy);
 	g_clear_object (&applet->fallback_icon);
