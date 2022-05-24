@@ -3509,12 +3509,14 @@ applet_startup (GApplication *app, gpointer user_data)
 }
 
 #ifdef LXPANEL_PLUGIN
-void finalize (GObject *object)
+void finalize (NMApplet *applet)
+{
+	clear_aps (applet);
 #else
 static void finalize (GObject *object)
-#endif
 {
 	NMApplet *applet = NM_APPLET (object);
+#endif
 
 	g_slice_free (NMADeviceClass, applet->ethernet_class);
 	g_slice_free (NMADeviceClass, applet->wifi_class);
@@ -3552,7 +3554,7 @@ static void finalize (GObject *object)
 
 	g_clear_object (&applet->info_dialog_ui);
 	g_clear_object (&applet->gsettings);
-	g_clear_object (&applet->nm_client);
+	//g_clear_object (&applet->nm_client);
 
 #if WITH_WWAN
 	g_clear_object (&applet->mm1);
@@ -3560,7 +3562,9 @@ static void finalize (GObject *object)
 
 	g_clear_object (&applet->agent);
 
+#ifndef LXPANEL_PLUGIN
 	G_OBJECT_CLASS (nma_parent_class)->finalize (object);
+#endif
 }
 
 static void nma_init (NMApplet *applet)
@@ -3577,5 +3581,7 @@ static void nma_class_init (NMAppletClass *klass)
 {
 	GObjectClass *oclass = G_OBJECT_CLASS (klass);
 
+#ifndef LXPANEL_PLUGIN
 	oclass->finalize = finalize;
+#endif
 }

@@ -51,7 +51,7 @@ extern void applet_startup (NMApplet *applet);
 extern void status_icon_size_changed_cb (NMApplet *applet);
 extern void status_icon_activate_cb (NMApplet *applet);
 extern void status_icon_popup_menu_cb (NMApplet *applet);
-extern void finalize (GObject *object);
+extern void finalize (NMApplet *applet);
 
 /* Handler for configure_event on drawing area. */
 static void nm_configuration_changed (LXPanel *panel, GtkWidget *p)
@@ -88,8 +88,7 @@ static void nm_destructor (gpointer user_data)
     NMApplet *nm = (NMApplet *) user_data;
 
     /* Deallocate memory. */
-    finalize ((GObject *) nm);
-    g_free (nm);
+    finalize (nm);
 }
 
 /* Plugin constructor. */
