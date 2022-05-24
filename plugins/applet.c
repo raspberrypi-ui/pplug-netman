@@ -3512,11 +3512,22 @@ applet_startup (GApplication *app, gpointer user_data)
 
 #ifdef LXPANEL_PLUGIN
 void finalize (NMApplet *applet)
-{
-	clear_aps (applet);
 #else
 static void finalize (GObject *object)
+#endif
 {
+#ifdef LXPANEL_PLUGIN
+	// clear the current access point list and related handlers
+	clear_aps (applet);
+
+	// disconnect all device handlers
+	const GPtrArray *devices = nm_client_get_devices (applet->nm_client);
+	for (int i = 0; devices && (i < devices->len); i++)
+		g_signal_handlers_disconnect_by_data (NM_DEVICE (g_ptr_array_index (devices, i)), applet);
+
+	// disconnect all client handlers
+	g_signal_handlers_disconnect_by_data (applet->nm_client, applet);
+#else
 	NMApplet *applet = NM_APPLET (object);
 #endif
 
@@ -3556,7 +3567,7 @@ static void finalize (GObject *object)
 
 	g_clear_object (&applet->info_dialog_ui);
 	g_clear_object (&applet->gsettings);
-	//g_clear_object (&applet->nm_client);
+	g_clear_object (&applet->nm_client);
 
 #if WITH_WWAN
 	g_clear_object (&applet->mm1);
