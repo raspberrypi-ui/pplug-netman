@@ -73,7 +73,11 @@ _active_ap_get (NMApplet *applet, NMDevice *device)
 	g_return_val_if_fail (NM_IS_APPLET (applet), NULL);
 	g_return_val_if_fail (NM_IS_DEVICE (device), NULL);
 
+#ifdef LXPANEL_PLUGIN
+	list = applet->ap_list;
+#else
 	list = g_object_get_data ((GObject *) applet, ACTIVE_AP_TAG);
+#endif
 	for (iter = list; iter; iter = iter->next) {
 		ActiveAPData *d = iter->data;
 
@@ -116,7 +120,11 @@ _active_ap_set (NMApplet *applet, NMDevice *device, NMAccessPoint *ap)
 	g_return_if_fail (!device || NM_IS_DEVICE (device));
 	g_return_if_fail (!ap || NM_IS_ACCESS_POINT (ap));
 
+#ifdef LXPANEL_PLUGIN
+	list0 = applet->ap_list;
+#else
 	list0 = g_object_get_data ((GObject *) applet, ACTIVE_AP_TAG);
+#endif
 	list = list0;
 
 remove_empty:
@@ -167,9 +175,14 @@ remove_empty:
 
 out:
 	if (list0 != list) {
+#ifdef LXPANEL_PLUGIN
+		_active_ap_set_destroy (list0);
+		applet->ap_list = list;
+#else
 		g_object_replace_data ((GObject *) applet, ACTIVE_AP_TAG,
 		                       list0, list,
 		                       _active_ap_set_destroy, NULL);
+#endif
 	}
 }
 
@@ -1668,3 +1681,9 @@ applet_device_wifi_get_class (NMApplet *applet)
 	return dclass;
 }
 
+#ifdef LXPANEL_PLUGIN
+void clear_aps (NMApplet *applet)
+{
+	_active_ap_set_destroy (applet->ap_list);
+}
+#endif
