@@ -39,7 +39,11 @@
 #define NOTIFY_CAPS_ACTIONS_KEY "actions"
 
 extern gboolean shell_debug;
+#ifdef LXPANEL_PLUGIN
+gboolean with_agent = TRUE;
+#else
 extern gboolean with_agent;
+#endif
 extern gboolean with_appindicator;
 
 G_DEFINE_TYPE (NMApplet, nma, G_TYPE_APPLICATION)

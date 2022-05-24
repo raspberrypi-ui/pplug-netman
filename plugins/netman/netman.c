@@ -41,10 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "nm-default.h"
 #include "applet.h"
 
-gboolean shell_debug = FALSE;
-gboolean with_agent = TRUE;
-gboolean with_appindicator = FALSE;
-
 /* Private context for plugin */
 
 extern void applet_startup (NMApplet *applet);
