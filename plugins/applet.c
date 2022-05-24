@@ -2153,7 +2153,7 @@ foo_set_icon (NMApplet *applet, guint32 layer, GdkPixbuf *pixbuf, const char *ic
 		 * icon and the VPN icon.
 		 */
 		if (icon_name == NULL && layer == ICON_LAYER_LINK)
-			icon_name = "nm-no-connection";
+			icon_name = "network-offline";
 		if (icon_name != NULL && g_strcmp0 (app_indicator_get_icon (applet->app_indicator), icon_name) != 0)
 			app_indicator_set_icon_full (applet->app_indicator, icon_name, applet->tip);
 		return;
@@ -2194,7 +2194,7 @@ foo_set_icon (NMApplet *applet, guint32 layer, GdkPixbuf *pixbuf, const char *ic
 			                      GDK_INTERP_NEAREST, 255);
 		}
 	} else
-		pixbuf = nma_icon_check_and_load ("nm-no-connection", applet);
+		pixbuf = nma_icon_check_and_load ("network-offline", applet);
 
 #ifdef LXPANEL_PLUGIN
 	gtk_image_set_from_pixbuf (GTK_IMAGE (applet->status_icon), pixbuf);
@@ -2336,7 +2336,7 @@ foo_client_state_changed_cb (NMClient *client, GParamSpec *pspec, gpointer user_
 	case NM_STATE_DISCONNECTED:
 		applet_do_notify_with_pref (applet, _("Disconnected"),
 		                            _("The network connection has been disconnected."),
-		                            "nm-no-connection",
+		                            "network-offline",
 		                            PREF_DISABLE_DISCONNECTED_NOTIFICATIONS);
 		break;
 	default:
@@ -2775,11 +2775,11 @@ applet_update_icon (gpointer user_data)
 	switch (state) {
 	case NM_STATE_UNKNOWN:
 	case NM_STATE_ASLEEP:
-		icon_name = "nm-no-connection";
+		icon_name = "network-offline";
 		dev_tip = _("Networking disabled");
 		break;
 	case NM_STATE_DISCONNECTED:
-		icon_name = "nm-no-connection";
+		icon_name = "network-offline";
 		dev_tip = _("No network connection");
 		break;
 	default:
@@ -2787,7 +2787,7 @@ applet_update_icon (gpointer user_data)
 		icon_name = icon_name_free;
 		dev_tip = dev_tip_free;
 		if (!pixbuf && state == NM_STATE_CONNECTED_GLOBAL) {
-			icon_name = g_strdup ("nm-device-wired");
+			icon_name = g_strdup ("network-transmit-receive");
 			pixbuf = g_object_ref (nma_icon_check_and_load (icon_name, applet));
 		}
 		break;
@@ -3324,7 +3324,7 @@ setup_widgets (NMApplet *applet)
 #ifdef WITH_APPINDICATOR
 	if (with_appindicator) {
 		applet->app_indicator = app_indicator_new ("nm-applet",
-		                                           "nm-no-connection",
+		                                           "network-offline",
 		                                           APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
 		if (!applet->app_indicator)
 			return FALSE;

@@ -123,7 +123,7 @@ ethernet_notify_connected (NMDevice *device,
 	applet_do_notify_with_pref (applet,
 	                            _("Connection Established"),
 	                            msg ? msg : _("You are now connected to the ethernet network."),
-	                            "nm-device-wired",
+	                            "network-transmit-receive",
 	                            PREF_DISABLE_CONNECTED_NOTIFICATIONS);
 }
 
@@ -162,7 +162,7 @@ ethernet_get_icon (NMDevice *device,
 		*tip = g_strdup_printf (_("Requesting an ethernet network address for “%s”…"), id);
 		break;
 	case NM_DEVICE_STATE_ACTIVATED:
-		*out_icon_name = "nm-device-wired";
+		*out_icon_name = "network-transmit-receive";
 		*tip = g_strdup_printf (_("Ethernet network connection “%s” active"), id);
 		break;
 	default:

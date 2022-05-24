@@ -2,22 +2,9 @@
 
 appicondir = $(datadir)/icons/hicolor/22x22/apps
 appicon_DATA = 	nm-adhoc.png \
-				nm-device-wired.png \
-				nm-device-wired-secure.png \
 				nm-device-wwan.png \
 				nm-mb-roam.png \
-				nm-no-connection.png \
 				nm-secure-lock.png \
-				nm-signal-00.png \
-				nm-signal-00-secure.png \
-				nm-signal-100.png \
-				nm-signal-100-secure.png \
-				nm-signal-25.png \
-				nm-signal-25-secure.png \
-				nm-signal-50.png \
-				nm-signal-50-secure.png \
-				nm-signal-75.png \
-				nm-signal-75-secure.png \
 				nm-stage01-connecting01.png \
 				nm-stage01-connecting02.png \
 				nm-stage01-connecting03.png \

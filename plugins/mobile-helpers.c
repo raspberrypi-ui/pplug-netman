@@ -93,15 +93,15 @@ const char *
 mobile_helper_get_quality_icon_name (guint32 quality)
 {
 	if (quality > 80)
-		return "nm-signal-100";
+		return "network-wireless-connected-100";
 	else if (quality > 55)
-		return "nm-signal-75";
+		return "network-wireless-connected-75";
 	else if (quality > 30)
-		return "nm-signal-50";
+		return "network-wireless-connected-50";
 	else if (quality > 5)
-		return "nm-signal-25";
+		return "network-wireless-connected-25";
 	else
-		return "nm-signal-00";
+		return "network-wireless-connected-00";
 }
 
 const char *
