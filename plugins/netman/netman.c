@@ -89,6 +89,7 @@ static void nm_destructor (gpointer user_data)
 
     /* Deallocate memory. */
     finalize (nm);
+    g_free (nm);
 }
 
 /* Plugin constructor. */
