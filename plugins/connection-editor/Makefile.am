@@ -1,6 +1,6 @@
-bin_PROGRAMS = coned
+bin_PROGRAMS = lp-connection-editor
 
-coned_CFLAGS = \
+lp_connection_editor_CFLAGS = \
 	-I$(top_srcdir) \
 	-DPACKAGE_DATA_DIR=\""$(datadir)/coned"\" \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
@@ -17,7 +17,7 @@ coned_CFLAGS = \
 	$(PACKAGE_CFLAGS) \
 	$(G_CAST_CHECKS)
 
-coned_SOURCES = \
+lp_connection_editor_SOURCES = \
 	ce-page.c \
 	ce-polkit-button.c \
 	ce-polkit.c \
@@ -61,7 +61,7 @@ coned_SOURCES = \
 	../../shared/nm-utils/nm-shared-utils.c \
 	ce-resources.c
 
-coned_LDFLAGS = \
+lp_connection_editor_LDFLAGS = \
 	$(PACKAGE_LIBS) \
 	-lm
 	

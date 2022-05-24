@@ -1119,7 +1119,11 @@ nma_menu_vpn_item_clicked (GtkMenuItem *item, gpointer user_data)
 static void
 nma_menu_configure_vpn_item_activate (GtkMenuItem *item, gpointer user_data)
 {
+#ifdef LXPANEL_PLUGIN
+	const char *argv[] = { BINDIR "/lp-connection-editor", "--show", "--type", NM_SETTING_VPN_SETTING_NAME, NULL};
+#else
 	const char *argv[] = { BINDIR "/nm-connection-editor", "--show", "--type", NM_SETTING_VPN_SETTING_NAME, NULL};
+#endif
 
 	g_spawn_async (NULL, (gchar **) argv, NULL, 0, NULL, NULL, NULL, NULL);
 }
@@ -1133,7 +1137,11 @@ nma_menu_configure_vpn_item_activate (GtkMenuItem *item, gpointer user_data)
 static void
 nma_menu_add_vpn_item_activate (GtkMenuItem *item, gpointer user_data)
 {
+#ifdef LXPANEL_PLUGIN
+	const char *argv[] = { BINDIR "/lp-connection-editor", "--create", "--type", NM_SETTING_VPN_SETTING_NAME, NULL};
+#else
 	const char *argv[] = { BINDIR "/nm-connection-editor", "--create", "--type", NM_SETTING_VPN_SETTING_NAME, NULL};
+#endif
 
 	g_spawn_async (NULL, (gchar **) argv, NULL, 0, NULL, NULL, NULL, NULL);
 }
@@ -1856,7 +1864,11 @@ nma_edit_connections_cb (void)
 	GError *error = NULL;
 	gboolean success;
 
+#ifdef LXPANEL_PLUGIN
+	argv[0] = BINDIR "/lp-connection-editor";
+#else
 	argv[0] = BINDIR "/nm-connection-editor";
+#endif
 	argv[1] = NULL;
 
 	success = g_spawn_async ("/", argv, NULL, 0, &ce_child_setup, NULL, NULL, &error);
