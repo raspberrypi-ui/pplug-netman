@@ -5,39 +5,6 @@ appicon_DATA = 	nm-adhoc.png \
 				nm-device-wwan.png \
 				nm-mb-roam.png \
 				nm-secure-lock.png \
-				nm-stage01-connecting01.png \
-				nm-stage01-connecting02.png \
-				nm-stage01-connecting03.png \
-				nm-stage01-connecting04.png \
-				nm-stage01-connecting05.png \
-				nm-stage01-connecting06.png \
-				nm-stage01-connecting07.png \
-				nm-stage01-connecting08.png \
-				nm-stage01-connecting09.png \
-				nm-stage01-connecting10.png \
-				nm-stage01-connecting11.png \
-				nm-stage02-connecting01.png \
-				nm-stage02-connecting02.png \
-				nm-stage02-connecting03.png \
-				nm-stage02-connecting04.png \
-				nm-stage02-connecting05.png \
-				nm-stage02-connecting06.png \
-				nm-stage02-connecting07.png \
-				nm-stage02-connecting08.png \
-				nm-stage02-connecting09.png \
-				nm-stage02-connecting10.png \
-				nm-stage02-connecting11.png \
-				nm-stage03-connecting01.png \
-				nm-stage03-connecting02.png \
-				nm-stage03-connecting03.png \
-				nm-stage03-connecting04.png \
-				nm-stage03-connecting05.png \
-				nm-stage03-connecting06.png \
-				nm-stage03-connecting07.png \
-				nm-stage03-connecting08.png \
-				nm-stage03-connecting09.png \
-				nm-stage03-connecting10.png \
-				nm-stage03-connecting11.png \
 				nm-tech-3g.png \
 				nm-tech-cdma-1x.png \
 				nm-tech-edge.png \

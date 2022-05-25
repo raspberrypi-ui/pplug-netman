@@ -858,7 +858,11 @@ start_animation_timeout (NMApplet *applet)
 {
 	if (applet->animation_id == 0) {
 		applet->animation_step = 0;
+#ifdef LXPANEL_PLUGIN
+		applet->animation_id = g_timeout_add (500, animation_timeout, applet);
+#else
 		applet->animation_id = g_timeout_add (100, animation_timeout, applet);
+#endif
 	}
 }
 
@@ -2622,6 +2626,106 @@ applet_common_get_device_icon (NMDeviceState state,
 	}
 }
 
+static void
+applet_common_get_device_icon_lxp (gboolean wifi, NMDeviceState state,
+                               GdkPixbuf **out_pixbuf,
+                               char **out_icon_name,
+                               NMApplet *applet)
+{
+	char *name;
+	int stage = -1;
+	int lim;
+
+	switch (state) {
+	case NM_DEVICE_STATE_PREPARE:
+	case NM_DEVICE_STATE_CONFIG:
+	case NM_DEVICE_STATE_NEED_AUTH:
+		stage = 0;
+		break;
+	case NM_DEVICE_STATE_IP_CONFIG:
+		stage = 1;
+		break;
+	default:
+		break;
+	}
+
+	if (stage >= 0)
+	{
+		if (stage == 0)
+		{
+			if (wifi)
+			{
+				lim = 4;
+				if (applet->animation_step > lim) applet->animation_step = 0;
+				switch (applet->animation_step)
+				{
+					case 0 : 	name = g_strdup_printf ("network-wireless-connected-00");
+								break;
+					case 1 : 	name = g_strdup_printf ("network-wireless-connected-25");
+								break;
+					case 2 : 	name = g_strdup_printf ("network-wireless-connected-50");
+								break;
+					case 3 : 	name = g_strdup_printf ("network-wireless-connected-75");
+								break;
+					case 4 : 	name = g_strdup_printf ("network-wireless-connected-100");
+								break;
+				}
+			}
+			else
+			{
+				lim = 2;
+				if (applet->animation_step > lim) applet->animation_step = 0;
+				switch (applet->animation_step)
+				{
+					case 0 : 	name = g_strdup_printf ("network-transmit");
+								break;
+					case 1 : 	name = g_strdup_printf ("network-receive");
+								break;
+					case 2 : 	name = g_strdup_printf ("network-idle");
+								break;
+				}
+			}
+		}
+		else
+		{
+			lim = 1;
+			if (applet->animation_step > lim) applet->animation_step = 0;
+			if (wifi)
+			{
+				switch (applet->animation_step)
+				{
+					case 0 : 	name = g_strdup_printf ("network-wireless-connected-00");
+								break;
+					case 1 : 	name = g_strdup_printf ("network-wireless-connected-100");
+								break;
+				}
+			}
+			else
+			{
+				switch (applet->animation_step)
+				{
+					case 0 : 	name = g_strdup_printf ("network-transmit-receive");
+								break;
+					case 1 : 	name = g_strdup_printf ("network-idle");
+								break;
+				}
+			}
+		}
+
+		if (out_pixbuf)
+			*out_pixbuf = nm_g_object_ref (nma_icon_check_and_load (name, applet));
+		if (out_icon_name)
+			*out_icon_name = name;
+		else
+			g_free (name);
+
+		applet->animation_step++;
+		if (applet->animation_step > lim)
+			applet->animation_step = 0;
+	}
+}
+
+
 static char *
 get_tip_for_device_state (NMDevice *device,
                           NMDeviceState state,
@@ -2703,7 +2807,11 @@ applet_get_device_icon_for_state (NMApplet *applet,
 	}
 
 out:
+#ifdef LXPANEL_PLUGIN
+	applet_common_get_device_icon_lxp (NM_IS_DEVICE_WIFI (device), state, out_pixbuf, out_icon_name, applet);
+#else
 	applet_common_get_device_icon (state, out_pixbuf, out_icon_name, applet);
+#endif
 }
 
 static char *
