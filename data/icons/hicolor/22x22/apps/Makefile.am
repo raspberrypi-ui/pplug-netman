@@ -4,7 +4,6 @@ appicondir = $(datadir)/icons/hicolor/22x22/apps
 appicon_DATA = 	nm-adhoc.png \
 				nm-device-wwan.png \
 				nm-mb-roam.png \
-				nm-secure-lock.png \
 				nm-tech-3g.png \
 				nm-tech-cdma-1x.png \
 				nm-tech-edge.png \

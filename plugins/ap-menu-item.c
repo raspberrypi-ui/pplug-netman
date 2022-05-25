@@ -25,6 +25,9 @@ G_DEFINE_TYPE (NMNetworkMenuItem, nm_network_menu_item, GTK_TYPE_MENU_ITEM);
 typedef struct {
 	GtkWidget * ssid;
 	GtkWidget * strength;
+#ifdef LXPANEL_PLUGIN
+	GtkWidget * encrypted;
+#endif
 	GtkWidget * hbox;
 
 	char *      ssid_string;
@@ -91,6 +94,10 @@ update_icon (NMNetworkMenuItem *item, NMApplet *applet)
 	else
 		icon_name = mobile_helper_get_quality_icon_name (priv->int_strength);
 
+#ifdef LXPANEL_PLUGIN
+    lxpanel_plugin_set_menu_icon (applet->panel, priv->strength, icon_name);
+	lxpanel_plugin_set_menu_icon (applet->panel, priv->encrypted, priv->is_encrypted ? "network-wireless-encrypted" : NULL);
+#else
 	scale = gtk_widget_get_scale_factor (GTK_WIDGET (item));
 	icon_size = 24;
 	if (INDICATOR_ENABLED (applet)) {
@@ -129,6 +136,7 @@ update_icon (NMNetworkMenuItem *item, NMApplet *applet)
 		gtk_image_set_from_surface (GTK_IMAGE (priv->strength), surface);
 		cairo_surface_destroy (surface);
 	}
+#endif
 }
 
 void
@@ -317,6 +325,11 @@ nm_network_menu_item_init (NMNetworkMenuItem *item)
 	priv->strength = gtk_image_new ();
 	gtk_box_pack_end (GTK_BOX (priv->hbox), priv->strength, FALSE, TRUE, 0);
 	gtk_widget_show (priv->strength);
+#ifdef LXPANEL_PLUGIN
+	priv->encrypted = gtk_image_new ();
+	gtk_box_pack_end (GTK_BOX (priv->hbox), priv->encrypted, FALSE, TRUE, 0);
+	gtk_widget_show (priv->encrypted);
+#endif
 
 	gtk_widget_show (priv->ssid);
 	gtk_widget_show (priv->hbox);
