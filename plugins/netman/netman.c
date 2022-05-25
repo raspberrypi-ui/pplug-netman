@@ -105,7 +105,7 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
 
     applet_startup (nm);
     /* Allocate top level widget and set into Plugin widget pointer. */
-    nm->plugin = gtk_toggle_button_new ();
+    nm->plugin = gtk_button_new ();
     gtk_button_set_relief (GTK_BUTTON (nm->plugin), GTK_RELIEF_NONE);
 
     /* Allocate icon as a child of top level */
