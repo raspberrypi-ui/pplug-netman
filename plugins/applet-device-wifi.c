@@ -850,7 +850,11 @@ wifi_add_menu_item (NMDevice *device,
 		if (active_ap) {
 			active_item = item = get_menu_item_for_ap (wdev, active_ap, connections, NULL, applet);
 			if (item) {
+#ifdef LXPANEL_PLUGIN
+				nm_network_menu_item_set_active (item, TRUE, applet);
+#else
 				nm_network_menu_item_set_active (item, TRUE);
+#endif
 				menu_items = g_slist_append (menu_items, item);
 
 				gtk_menu_shell_append (GTK_MENU_SHELL (menu), GTK_WIDGET (item));

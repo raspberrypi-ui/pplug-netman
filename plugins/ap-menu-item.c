@@ -26,6 +26,7 @@ typedef struct {
 	GtkWidget * ssid;
 	GtkWidget * strength;
 #ifdef LXPANEL_PLUGIN
+	GtkWidget * sel;
 	GtkWidget * encrypted;
 #endif
 	GtkWidget * hbox;
@@ -191,6 +192,10 @@ update_label (NMNetworkMenuItem *item, gboolean use_bold)
 {
 	NMNetworkMenuItemPrivate *priv = NM_NETWORK_MENU_ITEM_GET_PRIVATE (item);
 
+#ifdef LXPANEL_PLUGIN
+	gtk_label_set_use_markup (GTK_LABEL (priv->ssid), FALSE);
+	gtk_label_set_text (GTK_LABEL (priv->ssid), priv->ssid_string);
+#else
 	if (use_bold) {
 		char *markup = g_markup_printf_escaped ("<b>%s</b>", priv->ssid_string);
 
@@ -200,13 +205,23 @@ update_label (NMNetworkMenuItem *item, gboolean use_bold)
 		gtk_label_set_use_markup (GTK_LABEL (priv->ssid), FALSE);
 		gtk_label_set_text (GTK_LABEL (priv->ssid), priv->ssid_string);
 	}
+#endif
 }
 
 void
+#ifdef LXPANEL_PLUGIN
+nm_network_menu_item_set_active (NMNetworkMenuItem *item, gboolean active, NMApplet *applet)
+#else
 nm_network_menu_item_set_active (NMNetworkMenuItem *item, gboolean active)
+#endif
 {
 	g_return_if_fail (NM_IS_NETWORK_MENU_ITEM (item));
 
+#ifdef LXPANEL_PLUGIN
+	GtkWidget *sel = gtk_image_new ();
+	lxpanel_plugin_set_menu_icon (applet->panel, sel, active ? "dialog-ok-apply" : NULL);
+	lxpanel_plugin_update_menu_icon (item, sel);
+#endif
 	update_label (item, active);
 }
 
@@ -320,6 +335,10 @@ nm_network_menu_item_init (NMNetworkMenuItem *item)
 	gtk_misc_set_alignment (GTK_MISC (priv->ssid), 0.0, 0.5);
 
 	gtk_container_add (GTK_CONTAINER (item), priv->hbox);
+#ifdef LXPANEL_PLUGIN
+    priv->sel = gtk_image_new ();
+    gtk_box_pack_start (GTK_BOX (priv->hbox), priv->sel, FALSE, FALSE, 0);
+#endif
 	gtk_box_pack_start (GTK_BOX (priv->hbox), priv->ssid, TRUE, TRUE, 0);
 
 	priv->strength = gtk_image_new ();
