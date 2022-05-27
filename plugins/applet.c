@@ -757,9 +757,7 @@ applet_do_notify (NMApplet *applet,
 
 #ifdef LXPANEL_PLUGIN
 	escaped = utils_escape_notify_message (message);
-	char *msg = g_strdup_printf ("%s\n%s", summary, escaped);
-	applet->notification = lxpanel_notify (applet->panel, msg);
-	g_free (msg);
+	applet->notification = lxpanel_notify (applet->panel, escaped);
 	g_free (escaped);
 #else
 	if (INDICATOR_ENABLED (applet)) {
