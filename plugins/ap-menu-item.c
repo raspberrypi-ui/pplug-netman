@@ -18,7 +18,11 @@
 #include "nm-access-point.h"
 #include "mobile-helpers.h"
 
+#ifdef LXPANEL_PLUGIN
+G_DEFINE_TYPE (NMNetworkMenuItem, nm_network_menu_item, GTK_TYPE_CHECK_MENU_ITEM);
+#else
 G_DEFINE_TYPE (NMNetworkMenuItem, nm_network_menu_item, GTK_TYPE_MENU_ITEM);
+#endif
 
 #define NM_NETWORK_MENU_ITEM_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), NM_TYPE_NETWORK_MENU_ITEM, NMNetworkMenuItemPrivate))
 
@@ -218,9 +222,11 @@ nm_network_menu_item_set_active (NMNetworkMenuItem *item, gboolean active)
 	g_return_if_fail (NM_IS_NETWORK_MENU_ITEM (item));
 
 #ifdef LXPANEL_PLUGIN
-	GtkWidget *sel = gtk_image_new ();
-	lxpanel_plugin_set_menu_icon (applet->panel, sel, active ? "dialog-ok-apply" : NULL);
-	lxpanel_plugin_update_menu_icon (item, sel);
+	gulong hid = g_signal_handler_find (item, G_SIGNAL_MATCH_ID, g_signal_lookup ("activate", NM_TYPE_NETWORK_MENU_ITEM), 0, NULL, NULL, NULL);
+	g_signal_handler_block (item, hid);
+	if (gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (item)) != active)
+		gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item), active);
+	g_signal_handler_unblock (item, hid);
 #endif
 	update_label (item, active);
 }

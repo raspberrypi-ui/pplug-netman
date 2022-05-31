@@ -26,11 +26,19 @@ typedef struct _NMNetworkMenuItem	    NMNetworkMenuItem;
 typedef struct _NMNetworkMenuItemClass  NMNetworkMenuItemClass;
 
 struct _NMNetworkMenuItem {
+#ifdef LXPANEL_PLUGIN
+	GtkCheckMenuItem parent;
+#else
 	GtkMenuItem parent;
+#endif
 };
 
 struct _NMNetworkMenuItemClass {
+#ifdef LXPANEL_PLUGIN
+	GtkCheckMenuItemClass parent_class;
+#else
 	GtkMenuItemClass parent_class;
+#endif
 };
 
 
