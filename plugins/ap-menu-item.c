@@ -30,7 +30,6 @@ typedef struct {
 	GtkWidget * ssid;
 	GtkWidget * strength;
 #ifdef LXPANEL_PLUGIN
-	GtkWidget * sel;
 	GtkWidget * encrypted;
 #endif
 	GtkWidget * hbox;
@@ -341,10 +340,6 @@ nm_network_menu_item_init (NMNetworkMenuItem *item)
 	gtk_misc_set_alignment (GTK_MISC (priv->ssid), 0.0, 0.5);
 
 	gtk_container_add (GTK_CONTAINER (item), priv->hbox);
-#ifdef LXPANEL_PLUGIN
-    priv->sel = gtk_image_new ();
-    gtk_box_pack_start (GTK_BOX (priv->hbox), priv->sel, FALSE, FALSE, 0);
-#endif
 	gtk_box_pack_start (GTK_BOX (priv->hbox), priv->ssid, TRUE, TRUE, 0);
 
 	priv->strength = gtk_image_new ();
