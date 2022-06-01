@@ -563,6 +563,12 @@ wifi_menu_item_activate (GtkMenuItem *item, gpointer user_data)
 
 	if (info->ap)
 		specific_object = nm_object_get_path (NM_OBJECT (info->ap));
+
+#ifdef LXPANEL_PLUGIN
+	if (info->ap == _active_ap_get (info->applet, info->device))
+		applet_menu_item_disconnect_helper (NM_DEVICE (info->device), info->applet);
+	else
+#endif
 	applet_menu_item_activate_helper (NM_DEVICE (info->device),
 	                                  info->connection,
 	                                  specific_object ? specific_object : "/",
@@ -826,6 +832,7 @@ wifi_add_menu_item (NMDevice *device,
 	wdev = NM_DEVICE_WIFI (device);
 	aps = nm_device_wifi_get_access_points (wdev);
 
+#ifndef LXPANEL_PLUGIN
 	if (multiple_devices) {
 		const char *desc;
 
@@ -843,6 +850,7 @@ wifi_add_menu_item (NMDevice *device,
 	gtk_widget_set_sensitive (widget, FALSE);
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), widget);
 	gtk_widget_show (widget);
+#endif
 
 	/* Add the active AP if we're connected to something and the device is available */
 	if (!nma_menu_device_check_unusable (device)) {
@@ -863,6 +871,7 @@ wifi_add_menu_item (NMDevice *device,
 		}
 	}
 
+#ifndef LXPANEL_PLUGIN
 	/* Notify user of unmanaged or unavailable device */
 	wifi_enabled = nm_client_wireless_get_enabled (applet->nm_client);
 	wifi_hw_enabled = nm_client_wireless_hardware_get_enabled (applet->nm_client);
@@ -874,6 +883,7 @@ wifi_add_menu_item (NMDevice *device,
 		gtk_menu_shell_append (GTK_MENU_SHELL (menu), widget);
 		gtk_widget_show (widget);
 	}
+#endif
 
 	/* If disabled or rfkilled or whatever, nothing left to do */
 	if (nma_menu_device_check_unusable (device))
@@ -903,7 +913,9 @@ wifi_add_menu_item (NMDevice *device,
 		GSList *topmenu_items = NULL;
 		guint32 num_for_toplevel = 5;
 
+#ifndef LXPANEL_PLUGIN
 		applet_menu_item_add_complex_separator_helper (menu, applet, _("Available"));
+#endif
 
 		if (g_slist_length (menu_items) == (num_for_toplevel + 1))
 			num_for_toplevel++;
