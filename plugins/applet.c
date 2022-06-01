@@ -1474,14 +1474,18 @@ nma_menu_add_devices (GtkWidget *menu, NMApplet *applet)
 	all_devices = nm_client_get_devices (applet->nm_client);
 
 	n_items = 0;
+#ifndef LXPANEL_PLUGIN
 	n_items += add_device_items  (NM_DEVICE_TYPE_ETHERNET,
 	                              all_devices, all_connections, menu, applet);
+#endif
 	n_items += add_device_items  (NM_DEVICE_TYPE_WIFI,
 	                              all_devices, all_connections, menu, applet);
+#ifndef LXPANEL_PLUGIN
 	n_items += add_device_items  (NM_DEVICE_TYPE_MODEM,
 	                              all_devices, all_connections, menu, applet);
 	n_items += add_device_items  (NM_DEVICE_TYPE_BT,
 	                              all_devices, all_connections, menu, applet);
+#endif
 
 	g_ptr_array_unref (all_connections);
 
@@ -1595,8 +1599,11 @@ nma_set_wifi_enabled_cb (GtkWidget *widget, NMApplet *applet)
 	gboolean state;
 
 	g_return_if_fail (applet != NULL);
-
+#ifdef LXPANEL_PLUGIN
+	state = ! nm_client_wireless_get_enabled (applet->nm_client);
+#else
 	state = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget));
+#endif
 	nm_client_wireless_set_enabled (applet->nm_client, state);
 }
 
@@ -1670,6 +1677,21 @@ has_usable_wifi (NMApplet *applet)
 	return FALSE;
 }
 
+void
+nma_menu_add_wifi_switch_item (GtkWidget *menu, NMApplet *applet)
+{
+	GtkWidget *menu_item;
+	GtkWidget *label;
+
+	menu_item = gtk_menu_item_new ();
+	label = gtk_label_new_with_mnemonic (nm_client_wireless_get_enabled (applet->nm_client) ? _("_Turn Off Wireless LAN") : _("_Turn On Wireless LAN"));
+	gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
+	gtk_container_add (GTK_CONTAINER (menu_item), label);
+	gtk_widget_show_all (menu_item);
+	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+	g_signal_connect (menu_item, "activate", G_CALLBACK (nma_set_wifi_enabled_cb), applet);
+}
+
 /*
  * nma_menu_show_cb
  *
@@ -1697,6 +1719,11 @@ static void nma_menu_show_cb (GtkWidget *menu, NMApplet *applet)
 		nma_menu_add_text_item (menu, _("Networking disabled"));
 		return;
 	}
+
+#ifdef LXPANEL_PLUGIN
+	nma_menu_add_wifi_switch_item (menu, applet);
+	nma_menu_add_separator_item (menu);
+#endif
 
 	nma_menu_add_devices (menu, applet);
 
