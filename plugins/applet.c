@@ -3422,16 +3422,11 @@ status_icon_activate_cb (GtkStatusIcon *icon, NMApplet *applet)
 #endif
 }
 
-#ifdef LXPANEL_PLUGIN
-void
-status_icon_popup_menu_cb (NMApplet *applet)
-#else
 static void
 status_icon_popup_menu_cb (GtkStatusIcon *icon,
                            guint button,
                            guint32 activate_time,
                            NMApplet *applet)
-#endif
 {
 	/* Have clicking on the applet act also as acknowledgement
 	 * of the notification.
@@ -3439,13 +3434,9 @@ status_icon_popup_menu_cb (GtkStatusIcon *icon,
 	applet_clear_notify (applet);
 
 	nma_context_menu_update (applet);
-#ifdef LXPANEL_PLUGIN
-	gtk_menu_popup_at_widget (GTK_MENU (applet->context_menu), applet->plugin, GDK_GRAVITY_NORTH_WEST, GDK_GRAVITY_NORTH_WEST, NULL);
-#else
 	gtk_menu_popup (GTK_MENU (applet->context_menu), NULL, NULL,
 			gtk_status_icon_position_menu, icon,
 			button, activate_time);
-#endif
 }
 
 static gboolean

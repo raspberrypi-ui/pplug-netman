@@ -46,7 +46,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern void applet_startup (NMApplet *applet);
 extern void status_icon_size_changed_cb (NMApplet *applet);
 extern void status_icon_activate_cb (NMApplet *applet);
-extern void status_icon_popup_menu_cb (NMApplet *applet);
 extern void finalize (NMApplet *applet);
 
 /* Handler for configure_event on drawing area. */
@@ -68,11 +67,6 @@ static gboolean nm_button_press_event (GtkWidget *widget, GdkEventButton *event,
     if (event->button == 1)
     {
         status_icon_activate_cb (nm);
-        return TRUE;
-    }
-    else if (event->button == 3)
-    {
-        status_icon_popup_menu_cb (nm);
         return TRUE;
     }
     else return FALSE;
@@ -114,8 +108,6 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
     gtk_widget_set_visible (nm->status_icon, TRUE);
     gtk_container_add (GTK_CONTAINER (nm->plugin), nm->status_icon);
 
-    g_signal_connect (nm->plugin, "button-press-event", G_CALLBACK (nm_button_press_event), nm);
-
     lxpanel_plugin_set_data (nm->plugin, nm, nm_destructor);
     return nm->plugin;
 }
@@ -128,5 +120,6 @@ LXPanelPluginInit fm_module_init_lxpanel_gtk = {
     .description = N_("Controller for Network Manager"),
     .new_instance = nm_constructor,
     .reconfigure = nm_configuration_changed,
+    .button_press_event = nm_button_press_event,
     .gettext_package = GETTEXT_PACKAGE
 };
