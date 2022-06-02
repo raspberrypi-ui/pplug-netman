@@ -31,11 +31,15 @@ typedef struct {
 	GtkWidget * strength;
 #ifdef LXPANEL_PLUGIN
 	GtkWidget * encrypted;
+	GtkWidget * fiveg;
 #endif
 	GtkWidget * hbox;
 
 	char *      ssid_string;
 	guint32     int_strength;
+#ifdef LXPANEL_PLUGIN
+	guint32     int_freq;
+#endif
 	gchar *     hash;
 	GSList *    dupes;
 	gboolean    has_connections;
@@ -101,6 +105,7 @@ update_icon (NMNetworkMenuItem *item, NMApplet *applet)
 #ifdef LXPANEL_PLUGIN
     lxpanel_plugin_set_menu_icon (applet->panel, priv->strength, icon_name);
 	lxpanel_plugin_set_menu_icon (applet->panel, priv->encrypted, priv->is_encrypted ? "network-wireless-encrypted" : NULL);
+	lxpanel_plugin_set_menu_icon (applet->panel, priv->fiveg, priv->int_freq > 2500 ? "5g" : NULL);
 #else
 	scale = gtk_widget_get_scale_factor (GTK_WIDGET (item));
 	icon_size = 24;
@@ -300,6 +305,9 @@ nm_network_menu_item_new (NMAccessPoint *ap,
 	priv->has_connections = has_connections;
 	priv->hash = g_strdup (hash);
 	priv->int_strength = nm_access_point_get_strength (ap);
+#ifdef LXPANEL_PLUGIN
+	priv->int_freq = nm_access_point_get_frequency (ap);
+#endif
 
 	if (nm_access_point_get_mode (ap) == NM_802_11_MODE_ADHOC)
 		priv->is_adhoc = TRUE;
@@ -349,6 +357,10 @@ nm_network_menu_item_init (NMNetworkMenuItem *item)
 	priv->encrypted = gtk_image_new ();
 	gtk_box_pack_end (GTK_BOX (priv->hbox), priv->encrypted, FALSE, TRUE, 0);
 	gtk_widget_show (priv->encrypted);
+
+	priv->fiveg = gtk_image_new ();
+	gtk_box_pack_end (GTK_BOX (priv->hbox), priv->fiveg, FALSE, TRUE, 0);
+	gtk_widget_show (priv->fiveg);
 #endif
 
 	gtk_widget_show (priv->ssid);
