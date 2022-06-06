@@ -1893,11 +1893,7 @@ nma_edit_connections_cb (void)
 	GError *error = NULL;
 	gboolean success;
 
-#ifdef LXPANEL_PLUGIN
-	argv[0] = BINDIR "/lp-connection-editor";
-#else
 	argv[0] = BINDIR "/nm-connection-editor";
-#endif
 	argv[1] = NULL;
 
 	success = g_spawn_async ("/", argv, NULL, 0, &ce_child_setup, NULL, NULL, &error);
