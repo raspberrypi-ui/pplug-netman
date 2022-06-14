@@ -1730,7 +1730,9 @@ static void nma_menu_show_cb (GtkWidget *menu, NMApplet *applet)
 	if (has_usable_wifi (applet)) {
 		/* Add the "Hidden Wi-Fi network..." entry */
 		nma_menu_add_hidden_network_item (menu, applet);
+#ifndef LXPANEL_PLUGIN
 		nma_menu_add_create_network_item (menu, applet);
+#endif
 		nma_menu_add_separator_item (menu);
 	}
 	nma_menu_add_vpn_submenu (menu, applet);
