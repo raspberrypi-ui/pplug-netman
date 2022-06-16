@@ -36,6 +36,7 @@ mobile_helper_get_status_pixbuf (guint32 quality,
 	                         qual_pixbuf ? gdk_pixbuf_get_height (qual_pixbuf) : 22);
 	gdk_pixbuf_fill (pixbuf, 0xFFFFFF00);
 
+#ifndef LXPANEL_PLUGIN
 	/* Composite the tower icon into the final icon at the bottom layer */
 	tmp = nma_icon_check_and_load ("nm-wwan-tower", applet);
 	if (tmp) {
@@ -46,6 +47,7 @@ mobile_helper_get_status_pixbuf (guint32 quality,
 		                      0, 0, 1.0, 1.0,
 		                      GDK_INTERP_BILINEAR, 255);
 	}
+#endif
 
 	/* Composite the signal quality onto the icon on top of the WWAN tower */
 	if (qual_pixbuf) {
@@ -57,6 +59,7 @@ mobile_helper_get_status_pixbuf (guint32 quality,
 		                      GDK_INTERP_BILINEAR, 255);
 	}
 
+#ifndef LXPANEL_PLUGIN
 	/* And finally the roaming or technology icon */
 	if (state == MB_STATE_ROAMING) {
 		tmp = nma_icon_check_and_load ("nm-mb-roam", applet);
@@ -84,6 +87,7 @@ mobile_helper_get_status_pixbuf (guint32 quality,
 			}
 		}
 	}
+#endif
 
 	/* 'pixbuf' will be freed by the caller */
 	return pixbuf;
