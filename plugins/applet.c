@@ -1677,20 +1677,27 @@ has_usable_wifi (NMApplet *applet)
 	return FALSE;
 }
 
+#ifdef LXPANEL_PLUGIN
 void
 nma_menu_add_wifi_switch_item (GtkWidget *menu, NMApplet *applet)
 {
-	GtkWidget *menu_item;
-	GtkWidget *label;
-
-	menu_item = gtk_menu_item_new ();
-	label = gtk_label_new_with_mnemonic (nm_client_wireless_get_enabled (applet->nm_client) ? _("_Turn Off Wireless LAN") : _("_Turn On Wireless LAN"));
-	gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
-	gtk_container_add (GTK_CONTAINER (menu_item), label);
+	GtkWidget *menu_item = gtk_menu_item_new_with_mnemonic (nm_client_wireless_get_enabled (applet->nm_client) ? _("_Turn Off Wireless LAN") : _("_Turn On Wireless LAN"));
 	gtk_widget_show_all (menu_item);
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 	g_signal_connect (menu_item, "activate", G_CALLBACK (nma_set_wifi_enabled_cb), applet);
 }
+
+static void applet_connection_info_cb (NMApplet *applet);
+
+void
+nma_menu_add_connection_info_item (GtkWidget *menu, NMApplet *applet)
+{
+	GtkWidget *menu_item = gtk_menu_item_new_with_mnemonic (_("Connection _Information..."));
+	gtk_widget_show_all (menu_item);
+	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+	g_signal_connect_swapped (menu_item, "activate", G_CALLBACK (applet_connection_info_cb), applet);
+}
+#endif
 
 /*
  * nma_menu_show_cb
@@ -1736,6 +1743,10 @@ static void nma_menu_show_cb (GtkWidget *menu, NMApplet *applet)
 		nma_menu_add_separator_item (menu);
 	}
 	nma_menu_add_vpn_submenu (menu, applet);
+#ifdef LXPANEL_PLUGIN
+	nma_menu_add_separator_item (menu);
+	nma_menu_add_connection_info_item (menu, applet);
+#endif
 
 	if (!INDICATOR_ENABLED (applet))
 		gtk_widget_show_all (menu);
