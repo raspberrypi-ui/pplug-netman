@@ -2848,6 +2848,92 @@ out:
 #endif
 }
 
+static char *get_tooltip (NMApplet *applet)
+{
+	char *out, *tmp, *ret = NULL;
+	const char *icon_name;
+	int i;
+
+	g_return_val_if_fail (NM_IS_APPLET (applet), NULL);
+
+	// loop through all current connnections
+	const GPtrArray *connections = nm_client_get_active_connections (applet->nm_client);
+	if (!connections || !connections->len) return NULL;
+
+	for (i = 0; i < connections->len; i++)
+	{
+		NMActiveConnection *aconn = g_ptr_array_index (connections, i);
+
+		// find the connection
+		NMConnection *connection = (NMConnection *) nm_active_connection_get_connection (aconn);
+		if (!connection) continue;
+
+		// find the device
+		const GPtrArray *devices = nm_active_connection_get_devices (aconn);
+		if (!devices || !devices->len) continue;
+		NMDevice *device = g_ptr_array_index (devices, 0);
+
+		// find device state and class
+		NMDeviceState state = nm_device_get_state (device);
+		NMADeviceClass *dclass = get_device_class (device, applet);
+
+		// get the standard tooltip for the device, state and connection
+		out = NULL;
+		if (dclass) dclass->get_icon (device, state, connection, NULL, &icon_name, &out, applet);
+
+		// get the fallback tooltip if get_icon didn't supply one
+		if (!out) out = get_tip_for_device_state (device, state, connection);
+
+		if (out)
+		{
+			// append the new tooltip to any we already have
+			if (!ret) ret = g_strdup_printf ("%s", out);
+			else
+			{
+				tmp = g_strdup_printf ("%s\n%s", ret, out);
+				g_free (ret);
+				ret = tmp;
+			}
+			g_free (out);
+
+			// get the IP4 address
+			NMIPConfig *ip4_config = nm_device_get_ip4_config (device);
+			if (ip4_config)
+			{
+				const GPtrArray *addresses = nm_ip_config_get_addresses (ip4_config);
+				if (addresses && addresses->len)
+				{
+					NMIPAddress *addr = (NMIPAddress *) g_ptr_array_index (addresses, 0);
+					if (addr)
+					{
+						tmp = g_strdup_printf ("%s\nIP4 : %s", ret, nm_ip_address_get_address (addr));
+						g_free (ret);
+						ret = tmp;
+					}
+				}
+			}
+
+			// get the IP6 address
+			NMIPConfig *ip6_config = nm_device_get_ip6_config (device);
+			if (ip6_config)
+			{
+				const GPtrArray *addresses = nm_ip_config_get_addresses (ip6_config);
+				if (addresses && addresses->len)
+				{
+					NMIPAddress *addr = (NMIPAddress *) g_ptr_array_index (addresses, 0);
+					if (addr)
+					{
+						tmp = g_strdup_printf ("%s\nIP6 : %s", ret, nm_ip_address_get_address (addr));
+						g_free (ret);
+						ret = tmp;
+					}
+				}
+			}
+		}
+	}
+	return ret;
+}
+
 static char *
 get_tip_for_vpn (NMActiveConnection *active, NMVpnConnectionState state, NMApplet *applet)
 {
@@ -2979,11 +3065,15 @@ applet_update_icon (gpointer user_data)
 	g_free (applet->tip);
 	if (vpn_tip)
 		applet->tip = vpn_tip;
+#ifdef LXPANEL_PLUGIN
+	else applet->tip = get_tooltip (applet);
+#else
 	else if (dev_tip == dev_tip_free) {
 		applet->tip = dev_tip_free;
 		dev_tip_free = NULL;
 	} else
 		applet->tip = g_strdup (dev_tip);
+#endif
 
 	if (applet->status_icon)
 #ifdef LXPANEL_PLUGIN
