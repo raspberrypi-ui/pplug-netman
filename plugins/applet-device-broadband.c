@@ -808,7 +808,7 @@ notify_connected (NMDevice *device,
 	applet_do_notify_with_pref (applet,
 	                            _("Connection Established"),
 	                            msg ? msg : _("You are now connected to the Mobile Broadband network."),
-	                            "nm-device-wwan",
+	                            "network-cellular-connected",
 	                            PREF_DISABLE_CONNECTED_NOTIFICATIONS);
 }
 

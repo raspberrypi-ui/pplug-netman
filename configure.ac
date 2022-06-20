@@ -340,13 +340,6 @@ AC_CONFIG_FILES([
     Makefile
     plugins/Makefile
     plugins/connection-editor/Makefile
-    data/Makefile
-    data/icons/Makefile
-    data/icons/hicolor/Makefile
-    data/icons/hicolor/22x22/Makefile
-    data/icons/hicolor/22x22/apps/Makefile
-    data/icons/hicolor/scalable/Makefile
-    data/icons/hicolor/scalable/apps/Makefile
     po/Makefile.in
 ])
 AC_OUTPUT
