@@ -1480,9 +1480,9 @@ nma_menu_add_devices (GtkWidget *menu, NMApplet *applet)
 #endif
 	n_items += add_device_items  (NM_DEVICE_TYPE_WIFI,
 	                              all_devices, all_connections, menu, applet);
-#ifndef LXPANEL_PLUGIN
 	n_items += add_device_items  (NM_DEVICE_TYPE_MODEM,
 	                              all_devices, all_connections, menu, applet);
+#ifndef LXPANEL_PLUGIN
 	n_items += add_device_items  (NM_DEVICE_TYPE_BT,
 	                              all_devices, all_connections, menu, applet);
 #endif
