@@ -98,7 +98,7 @@ update_icon (NMNetworkMenuItem *item, NMApplet *applet)
 	const char *icon_name = NULL;
 
 	if (priv->is_adhoc)
-		icon_name = "nm-adhoc";
+		icon_name = "network-wireless-connected-100";
 	else
 		icon_name = mobile_helper_get_quality_icon_name (priv->int_strength);
 

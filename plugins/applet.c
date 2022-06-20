@@ -3031,7 +3031,7 @@ applet_update_icon (gpointer user_data)
 	if (active_vpn) {
 		switch (vpn_state) {
 		case NM_VPN_CONNECTION_STATE_ACTIVATED:
-			icon_name = "network-wireless-encrypted";
+			icon_name = "network-vpn-lock";
 #ifdef WITH_APPINDICATOR
 			if (INDICATOR_ENABLED (applet))
 				icon_name = icon_name_free = g_strdup_printf ("%s-secure", app_indicator_get_icon (applet->app_indicator));
@@ -3044,7 +3044,7 @@ applet_update_icon (gpointer user_data)
 #ifdef LXPANEL_PLUGIN
 			if (applet->animation_step == 0)
 			{
-				icon_name = "network-wireless-encrypted";
+				icon_name = "network-vpn-lock";
 				applet->animation_step = 1;
 			}
 			else
