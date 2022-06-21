@@ -2877,6 +2877,12 @@ static char *get_tooltip (NMApplet *applet)
 		NMDeviceState state = nm_device_get_state (device);
 		NMADeviceClass *dclass = get_device_class (device, applet);
 
+		// filter out virtual devices
+		if (!nm_device_get_hw_address (device)) continue;
+
+		// filter out VPNs
+		if (NM_IS_VPN_CONNECTION (aconn)) continue;
+
 		// get the standard tooltip for the device, state and connection
 		out = NULL;
 		if (dclass) dclass->get_icon (device, state, connection, NULL, &icon_name, &out, applet);
@@ -3012,6 +3018,10 @@ applet_update_icon (gpointer user_data)
 		break;
 	default:
 		applet_get_device_icon_for_state (applet, &pixbuf, &icon_name_free, &dev_tip_free);
+#ifdef LXPANEL_PLUGIN
+		g_free (dev_tip_free);
+		dev_tip_free = get_tooltip (applet);
+#endif
 		icon_name = icon_name_free;
 		dev_tip = dev_tip_free;
 		if (!pixbuf && state == NM_STATE_CONNECTED_GLOBAL) {
@@ -3078,15 +3088,11 @@ applet_update_icon (gpointer user_data)
 	g_free (applet->tip);
 	if (vpn_tip)
 		applet->tip = vpn_tip;
-#ifdef LXPANEL_PLUGIN
-	else applet->tip = get_tooltip (applet);
-#else
 	else if (dev_tip == dev_tip_free) {
 		applet->tip = dev_tip_free;
 		dev_tip_free = NULL;
 	} else
 		applet->tip = g_strdup (dev_tip);
-#endif
 
 	if (applet->status_icon)
 #ifdef LXPANEL_PLUGIN
