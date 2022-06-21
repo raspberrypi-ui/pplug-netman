@@ -137,6 +137,9 @@ typedef struct {
 
 	GtkWidget *     menu;
 	GtkWidget *     context_menu;
+#ifdef LXPANEL_PLUGIN
+	GtkWidget *		vpn_menu;
+#endif
 
 	GtkWidget *     notifications_enabled_item;
 	guint           notifications_enabled_toggled_id;

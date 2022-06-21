@@ -1549,6 +1549,9 @@ nma_menu_add_vpn_submenu (GtkWidget *menu, NMApplet *applet)
 	int i;
 
 	vpn_menu = GTK_MENU (gtk_menu_new ());
+#ifdef LXPANEL_PLUGIN
+	applet->vpn_menu = vpn_menu;
+#endif
 
 #ifdef LXPANEL_PLUGIN
 	item = GTK_MENU_ITEM (gtk_menu_item_new_with_mnemonic (_("_Advanced Options")));
@@ -2203,6 +2206,9 @@ out:
 void
 applet_schedule_update_menu (NMApplet *applet)
 {
+#ifdef LXPANEL_PLUGIN
+	if (GTK_IS_WIDGET (applet->vpn_menu) && gtk_widget_get_visible (applet->vpn_menu)) return;
+#endif
 	if (!applet->update_menu_id)
 		applet->update_menu_id = g_idle_add (applet_update_menu, applet);
 }
