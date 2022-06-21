@@ -97,7 +97,7 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
     textdomain (GETTEXT_PACKAGE);
 #endif
 
-    if (!system ("systemctl status NetworkManager | grep -qw active"))
+    if (system ("systemctl status NetworkManager | grep -qw inactive"))
     {
         applet_startup (nm);
 
