@@ -1534,6 +1534,12 @@ get_vpn_connections (NMApplet *applet)
 	return vpn_connections;
 }
 
+#ifdef LXPANEL_PLUGIN
+static gboolean has_usable_wifi (NMApplet *applet);
+static void applet_connection_info_cb (NMApplet *applet);
+static void nma_edit_connections_cb (void);
+#endif
+
 static void
 nma_menu_add_vpn_submenu (GtkWidget *menu, NMApplet *applet)
 {
@@ -1544,10 +1550,23 @@ nma_menu_add_vpn_submenu (GtkWidget *menu, NMApplet *applet)
 
 	vpn_menu = GTK_MENU (gtk_menu_new ());
 
+#ifdef LXPANEL_PLUGIN
+	item = GTK_MENU_ITEM (gtk_menu_item_new_with_mnemonic (_("_Advanced Options")));
+#else
 	item = GTK_MENU_ITEM (gtk_menu_item_new_with_mnemonic (_("_VPN Connections")));
+#endif
 	gtk_menu_item_set_submenu (item, GTK_WIDGET (vpn_menu));
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), GTK_WIDGET (item));
 	gtk_widget_show (GTK_WIDGET (item));
+
+#ifdef LXPANEL_PLUGIN
+	if (has_usable_wifi (applet)) {
+		/* Add the "Hidden Wi-Fi network..." entry */
+		nma_menu_add_hidden_network_item (vpn_menu, applet);
+		nma_menu_add_create_network_item (vpn_menu, applet);
+		nma_menu_add_separator_item (vpn_menu);
+	}
+#endif
 
 	list = get_vpn_connections (applet);
 	for (i = 0; i < list->len; i++) {
@@ -1588,15 +1607,36 @@ nma_menu_add_vpn_submenu (GtkWidget *menu, NMApplet *applet)
 	/* Draw a separator, but only if we have VPN connections above it */
 	if (list->len) {
 		nma_menu_add_separator_item (GTK_WIDGET (vpn_menu));
+#ifndef LXPANEL_PLUGIN
 		item = GTK_MENU_ITEM (gtk_menu_item_new_with_mnemonic (_("_Configure VPN…")));
 		g_signal_connect (item, "activate", G_CALLBACK (nma_menu_configure_vpn_item_activate), applet);
 	} else {
-		item = GTK_MENU_ITEM (gtk_menu_item_new_with_mnemonic (_("_Add a VPN connection…")));
+#endif
+		item = GTK_MENU_ITEM (gtk_menu_item_new_with_mnemonic (_("_Add VPN Connection…")));
 		g_signal_connect (item, "activate", G_CALLBACK (nma_menu_add_vpn_item_activate), applet);
 	}
 	gtk_menu_shell_append (GTK_MENU_SHELL (vpn_menu), GTK_WIDGET (item));
 	gtk_widget_show (GTK_WIDGET (item));
 
+#ifdef LXPANEL_PLUGIN
+	nma_menu_add_separator_item (vpn_menu);
+
+	/* 'Connection Information' item */
+	applet->info_menu_item = gtk_menu_item_new_with_mnemonic (_("Connection _Information…"));
+	g_signal_connect_swapped (applet->info_menu_item,
+	                          "activate",
+	                          G_CALLBACK (applet_connection_info_cb),
+	                          applet);
+	gtk_menu_shell_append (GTK_MENU_SHELL (vpn_menu), applet->info_menu_item);
+
+	/* 'Edit Connections...' item */
+	applet->connections_menu_item = gtk_menu_item_new_with_mnemonic (_("Edit Connections…"));
+	g_signal_connect (applet->connections_menu_item,
+				   "activate",
+				   G_CALLBACK (nma_edit_connections_cb),
+				   applet);
+	gtk_menu_shell_append (GTK_MENU_SHELL (vpn_menu), applet->connections_menu_item);
+#endif
 	g_ptr_array_unref (list);
 }
 
@@ -1694,17 +1734,6 @@ nma_menu_add_wifi_switch_item (GtkWidget *menu, NMApplet *applet)
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 	g_signal_connect (menu_item, "activate", G_CALLBACK (nma_set_wifi_enabled_cb), applet);
 }
-
-static void applet_connection_info_cb (NMApplet *applet);
-
-void
-nma_menu_add_connection_info_item (GtkWidget *menu, NMApplet *applet)
-{
-	GtkWidget *menu_item = gtk_menu_item_new_with_mnemonic (_("Connection _Information..."));
-	gtk_widget_show_all (menu_item);
-	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
-	g_signal_connect_swapped (menu_item, "activate", G_CALLBACK (applet_connection_info_cb), applet);
-}
 #endif
 
 /*
@@ -1742,17 +1771,15 @@ static void nma_menu_show_cb (GtkWidget *menu, NMApplet *applet)
 
 	nma_menu_add_devices (menu, applet);
 
+#ifndef LXPANEL_PLUGIN
 	if (has_usable_wifi (applet)) {
 		/* Add the "Hidden Wi-Fi network..." entry */
 		nma_menu_add_hidden_network_item (menu, applet);
 		nma_menu_add_create_network_item (menu, applet);
 		nma_menu_add_separator_item (menu);
 	}
-	nma_menu_add_vpn_submenu (menu, applet);
-#ifdef LXPANEL_PLUGIN
-	nma_menu_add_separator_item (menu);
-	nma_menu_add_connection_info_item (menu, applet);
 #endif
+	nma_menu_add_vpn_submenu (menu, applet);
 
 	if (!INDICATOR_ENABLED (applet))
 		gtk_widget_show_all (menu);

@@ -130,22 +130,6 @@ ce_child_setup (gpointer user_data G_GNUC_UNUSED)
 	setpgid (pid, pid);
 }
 
-static GtkWidget *nm_configure (LXPanel *panel, GtkWidget *p)
-{
-	char *argv[2];
-	GError *error = NULL;
-	gboolean success;
-
-	argv[0] = BINDIR "/lp-connection-editor";
-	argv[1] = NULL;
-
-	success = g_spawn_async ("/", argv, NULL, 0, &ce_child_setup, NULL, NULL, &error);
-	if (!success) {
-		g_warning ("Error launching connection editor: %s", error->message);
-		g_error_free (error);
-    }
-    return NULL;
-}
 FM_DEFINE_MODULE(lxpanel_gtk, netman)
 
 /* Plugin descriptor. */
@@ -153,7 +137,6 @@ LXPanelPluginInit fm_module_init_lxpanel_gtk = {
     .name = N_("Network Manager"),
     .description = N_("Controller for Network Manager"),
     .new_instance = nm_constructor,
-    .config = nm_configure,
     .reconfigure = nm_configuration_changed,
     .button_press_event = nm_button_press_event,
     .gettext_package = GETTEXT_PACKAGE
