@@ -1223,6 +1223,11 @@ applet_get_active_vpn_connection (NMApplet *applet,
 static void
 nma_menu_add_separator_item (GtkWidget *menu)
 {
+#ifdef LXPANEL_PLUGIN
+	GList *ch = gtk_container_get_children (GTK_CONTAINER (menu));
+	GList *last = g_list_last (ch);
+	if (GTK_IS_SEPARATOR_MENU_ITEM (last->data)) return;
+#endif
 	GtkWidget *menu_item;
 
 	menu_item = gtk_separator_menu_item_new ();
@@ -1491,6 +1496,9 @@ nma_menu_add_devices (GtkWidget *menu, NMApplet *applet)
 
 	if (!n_items)
 		nma_menu_add_text_item (menu, _("No network devices available"));
+#ifdef LXPANEL_PLUGIN
+	nma_menu_add_separator_item (menu);
+#endif
 }
 
 static int
@@ -1737,9 +1745,7 @@ static void nma_menu_show_cb (GtkWidget *menu, NMApplet *applet)
 	if (has_usable_wifi (applet)) {
 		/* Add the "Hidden Wi-Fi network..." entry */
 		nma_menu_add_hidden_network_item (menu, applet);
-#ifndef LXPANEL_PLUGIN
 		nma_menu_add_create_network_item (menu, applet);
-#endif
 		nma_menu_add_separator_item (menu);
 	}
 	nma_menu_add_vpn_submenu (menu, applet);
