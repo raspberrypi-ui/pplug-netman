@@ -1550,7 +1550,7 @@ nma_menu_add_vpn_submenu (GtkWidget *menu, NMApplet *applet)
 
 	vpn_menu = GTK_MENU (gtk_menu_new ());
 #ifdef LXPANEL_PLUGIN
-	applet->vpn_menu = vpn_menu;
+	applet->vpn_menu = GTK_WIDGET (vpn_menu);
 #endif
 
 #ifdef LXPANEL_PLUGIN
@@ -1565,9 +1565,9 @@ nma_menu_add_vpn_submenu (GtkWidget *menu, NMApplet *applet)
 #ifdef LXPANEL_PLUGIN
 	if (has_usable_wifi (applet)) {
 		/* Add the "Hidden Wi-Fi network..." entry */
-		nma_menu_add_hidden_network_item (vpn_menu, applet);
-		nma_menu_add_create_network_item (vpn_menu, applet);
-		nma_menu_add_separator_item (vpn_menu);
+		nma_menu_add_hidden_network_item (GTK_WIDGET (vpn_menu), applet);
+		nma_menu_add_create_network_item (GTK_WIDGET (vpn_menu), applet);
+		nma_menu_add_separator_item (GTK_WIDGET (vpn_menu));
 	}
 #endif
 
@@ -1622,7 +1622,7 @@ nma_menu_add_vpn_submenu (GtkWidget *menu, NMApplet *applet)
 	gtk_widget_show (GTK_WIDGET (item));
 
 #ifdef LXPANEL_PLUGIN
-	nma_menu_add_separator_item (vpn_menu);
+	nma_menu_add_separator_item (GTK_WIDGET (vpn_menu));
 
 	/* 'Connection Information' item */
 	applet->info_menu_item = gtk_menu_item_new_with_mnemonic (_("Connection _Information…"));
@@ -3591,9 +3591,11 @@ status_icon_popup_menu_cb (GtkStatusIcon *icon,
 	applet_clear_notify (applet);
 
 	nma_context_menu_update (applet);
+#ifndef LXPANEL_PLUGIN
 	gtk_menu_popup (GTK_MENU (applet->context_menu), NULL, NULL,
 			gtk_status_icon_position_menu, icon,
 			button, activate_time);
+#endif
 }
 
 static gboolean

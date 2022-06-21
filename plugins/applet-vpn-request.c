@@ -212,7 +212,7 @@ external_ui_from_child_response (VpnSecretsInfo *info, GError **error)
 	 * create a dialog and display it. */
 	if (num_ask > 0) {
 		dialog = (NMAVpnPasswordDialog *) nma_vpn_password_dialog_new (title, message, NULL);
-		req_data->dialog = g_object_ref_sink (dialog);
+		req_data->dialog = GTK_DIALOG (g_object_ref_sink (dialog));
 
 		nma_vpn_password_dialog_set_show_password (dialog, FALSE);
 		nma_vpn_password_dialog_set_show_password_secondary (dialog, FALSE);

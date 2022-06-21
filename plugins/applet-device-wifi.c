@@ -218,7 +218,12 @@ nma_menu_add_hidden_network_item (GtkWidget *menu, NMApplet *applet)
 
 	menu_item = gtk_menu_item_new ();
 	label = gtk_label_new_with_mnemonic (_("_Connect to Hidden Wi-Fi Network…"));
+#ifdef LXPANEL_PLUGIN
+	gtk_label_set_xalign (GTK_LABEL (label), 0.0);
+	gtk_label_set_yalign (GTK_LABEL (label), 0.5);
+#else
 	gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
+#endif
 	gtk_container_add (GTK_CONTAINER (menu_item), label);
 	gtk_widget_show_all (menu_item);
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
@@ -269,7 +274,12 @@ nma_menu_add_create_network_item (GtkWidget *menu, NMApplet *applet)
 
 	menu_item = gtk_menu_item_new ();
 	label = gtk_label_new_with_mnemonic (_("Create _New Wi-Fi Network…"));
+#ifdef LXPANEL_PLUGIN
+	gtk_label_set_xalign (GTK_LABEL (label), 0.0);
+	gtk_label_set_yalign (GTK_LABEL (label), 0.5);
+#else
 	gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
+#endif
 	gtk_container_add (GTK_CONTAINER (menu_item), label);
 	gtk_widget_show_all (menu_item);
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
@@ -565,7 +575,7 @@ wifi_menu_item_activate (GtkMenuItem *item, gpointer user_data)
 		specific_object = nm_object_get_path (NM_OBJECT (info->ap));
 
 #ifdef LXPANEL_PLUGIN
-	if (info->ap == _active_ap_get (info->applet, info->device))
+	if (info->ap == _active_ap_get (info->applet, NM_DEVICE (info->device)))
 		applet_menu_item_disconnect_helper (NM_DEVICE (info->device), info->applet);
 	else
 #endif
@@ -945,7 +955,7 @@ wifi_add_menu_item (NMDevice *device,
 			GtkWidget *subitem, *submenu;
 			GSList *sorted_subitems;
 
-			subitem = gtk_menu_item_new_with_mnemonic (_("More networks"));
+			subitem = gtk_menu_item_new_with_mnemonic (_("More Networks"));
 			submenu = gtk_menu_new ();
 			gtk_menu_item_set_submenu (GTK_MENU_ITEM (subitem), submenu);
 
@@ -1075,7 +1085,11 @@ idle_check_avail_access_point_notification (gpointer datap)
 	const GPtrArray *aps;
 	GPtrArray *all_connections;
 	GPtrArray *connections;
+#ifdef LXPANEL_PLUGIN
+	gint64 t_usec;
+#else
 	GTimeVal timeval;
+#endif
 	gboolean have_unused_access_point = FALSE;
 	gboolean have_no_autoconnect_points = TRUE;
 
@@ -1087,9 +1101,16 @@ idle_check_avail_access_point_notification (gpointer datap)
 	if (nm_device_get_state (NM_DEVICE (device)) != NM_DEVICE_STATE_DISCONNECTED)
 		return FALSE;
 
+#ifdef LXPANEL_PLUGIN
+	t_usec = g_get_real_time ();
+	t_usec /= G_USEC_PER_SEC;
+	if ((t_usec - data->last_notification_time) < 60*60) /* Notify at most once an hour */
+		return FALSE;
+#else
 	g_get_current_time (&timeval);
 	if ((timeval.tv_sec - data->last_notification_time) < 60*60) /* Notify at most once an hour */
 		return FALSE;	
+#endif
 
 	all_connections = applet_get_all_connections (applet);
 	connections = nm_device_filter_connections (NM_DEVICE (device), all_connections);
@@ -1130,8 +1151,14 @@ idle_check_avail_access_point_notification (gpointer datap)
 		return FALSE;
 
 	/* Avoid notifying too often */
+#ifdef LXPANEL_PLUGIN
+	t_usec = g_get_real_time ();
+	t_usec /= G_USEC_PER_SEC;
+	data->last_notification_time = t_usec;
+#else
 	g_get_current_time (&timeval);
 	data->last_notification_time = timeval.tv_sec;
+#endif
 
 	applet_do_notify (applet,
 	                  NOTIFY_URGENCY_LOW,

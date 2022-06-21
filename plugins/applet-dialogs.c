@@ -121,7 +121,12 @@ create_info_label (const char *text)
 	GtkWidget *label;
 
 	label = gtk_label_new (text ? text : "");
+#ifdef LXPANEL_PLUGIN
+	gtk_label_set_xalign (GTK_LABEL (label), 1.0);
+	gtk_label_set_yalign (GTK_LABEL (label), 0.0);
+#else
 	gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.0);
+#endif
 	gtk_style_context_add_class (gtk_widget_get_style_context (label),
 	                             "dim-label");
 	return label;
@@ -133,7 +138,12 @@ create_info_value (const char *text)
 	GtkWidget *label;
 
 	label = gtk_label_new (text ? text : "");
+#ifdef LXPANEL_PLUGIN
+	gtk_label_set_xalign (GTK_LABEL (label), 1.0);
+	gtk_label_set_yalign (GTK_LABEL (label), 0.0);
+#else
 	gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
+#endif
 	gtk_label_set_selectable (GTK_LABEL (label), TRUE);
 	return label;
 }
@@ -1191,12 +1201,20 @@ applet_mobile_password_dialog_new (NMConnection *connection,
 
 	gtk_box_pack_start (vbox, w, TRUE, TRUE, 0);
 
+#ifndef LXPANEL_PLUGIN
 	w = gtk_alignment_new (0.5, 0.5, 0, 1.0);
 	gtk_box_pack_start (vbox, w, TRUE, TRUE, 0);
+#endif
 
 	box = GTK_BOX (gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6));
 	gtk_container_set_border_width (GTK_CONTAINER (box), 6);
+#ifdef LXPANEL_PLUGIN
+	gtk_widget_set_halign (GTK_WIDGET (box), GTK_ALIGN_CENTER);
+	gtk_widget_set_valign (GTK_WIDGET (box), GTK_ALIGN_FILL);
+	gtk_box_pack_start (vbox, GTK_WIDGET (box), TRUE, TRUE, 0);
+#else
 	gtk_container_add (GTK_CONTAINER (w), GTK_WIDGET (box));
+#endif
 
 	gtk_box_pack_start (box, gtk_label_new (_("Password:")), FALSE, FALSE, 0);
 

@@ -193,7 +193,12 @@ nm_mb_menu_item_init (NMMbMenuItem *self)
 
 	priv->hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
 	priv->desc = gtk_label_new (NULL);
+#ifdef LXPANEL_PLUGIN
+	gtk_label_set_xalign (GTK_LABEL (priv->desc), 0.0);
+	gtk_label_set_yalign (GTK_LABEL (priv->desc), 0.5);
+#else
 	gtk_misc_set_alignment (GTK_MISC (priv->desc), 0.0, 0.5);
+#endif
 
 	gtk_container_add (GTK_CONTAINER (self), priv->hbox);
 	gtk_box_pack_start (GTK_BOX (priv->hbox), priv->desc, TRUE, TRUE, 0);
