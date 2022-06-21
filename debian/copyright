@@ -1,0 +1,36 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+
+Files: *
+Copyright: Hong Jen Yee (PCMan)  <pcman.tw@gmail.com>
+           Jim Huang  <jserv.tw@gmail.com>
+           Fred Chien <cfsghost@gmail.com>
+           Daniel Kesler <kesler.daniel@gmail.com>
+           Juergen Hoetzel <juergen@archlinux.org>
+           Marty Jack <martyj19@comcast.net>
+           Alexander Iliev <sasoiliev@mamul.org>
+           Andriy Grytsenko <andrej@rep.kiev.ua>
+           Giuseppe Penone <giuspen@gmail.com>
+           Piotr Sipika <piotr.sipika@gmail.com>
+           Simon Long <simon@raspberrypi.com>
+           2004 - 2015 Red Hat, Inc.
+           2005 - 2009 Novell, Inc.
+           2001, 2002 Free Software Foundation
+           2012 Lanedo GmbH
+           1999, 2000 Eazel, Inc.
+License: GPL-3+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License
+ as published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ .
+ The complete text of the GNU General Public License
+ can be found in /usr/share/common-licenses/GPL-2 file.
