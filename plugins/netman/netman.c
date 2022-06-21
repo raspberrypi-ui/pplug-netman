@@ -97,16 +97,26 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
     textdomain (GETTEXT_PACKAGE);
 #endif
 
-    applet_startup (nm);
-    /* Allocate top level widget and set into Plugin widget pointer. */
-    nm->plugin = gtk_button_new ();
-    gtk_button_set_relief (GTK_BUTTON (nm->plugin), GTK_RELIEF_NONE);
+    if (!system ("systemctl status NetworkManager | grep -qw active"))
+    {
+        applet_startup (nm);
 
-    /* Allocate icon as a child of top level */
-    nm->status_icon = gtk_image_new ();
-    nm->icon_size = panel_get_safe_icon_size (panel);
-    gtk_widget_set_visible (nm->status_icon, TRUE);
-    gtk_container_add (GTK_CONTAINER (nm->plugin), nm->status_icon);
+        /* Allocate top level widget and set into Plugin widget pointer. */
+        nm->plugin = gtk_button_new ();
+        gtk_button_set_relief (GTK_BUTTON (nm->plugin), GTK_RELIEF_NONE);
+
+        /* Allocate icon as a child of top level */
+        nm->status_icon = gtk_image_new ();
+        nm->icon_size = panel_get_safe_icon_size (panel);
+        gtk_widget_set_visible (nm->status_icon, TRUE);
+        gtk_container_add (GTK_CONTAINER (nm->plugin), nm->status_icon);
+    }
+    else
+    {
+        g_message ("netman: network manager service not running; plugin hidden");
+        nm->plugin = gtk_label_new (NULL);
+        nm->status_icon = NULL;
+    }
 
     lxpanel_plugin_set_data (nm->plugin, nm, nm_destructor);
     return nm->plugin;
