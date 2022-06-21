@@ -832,7 +832,6 @@ wifi_add_menu_item (NMDevice *device,
 	wdev = NM_DEVICE_WIFI (device);
 	aps = nm_device_wifi_get_access_points (wdev);
 
-#ifndef LXPANEL_PLUGIN
 	if (multiple_devices) {
 		const char *desc;
 
@@ -841,8 +840,10 @@ wifi_add_menu_item (NMDevice *device,
 			text = g_strdup_printf (_("Wi-Fi Networks (%s)"), desc);
 		else
 			text = g_strdup_printf (_("Wi-Fi Network (%s)"), desc);
+#ifndef LXPANEL_PLUGIN
 	} else
 		text = g_strdup (ngettext ("Wi-Fi Network", "Wi-Fi Networks", aps ? aps->len : 0));
+#endif
 
 	widget = applet_menu_item_create_device_item_helper (device, applet, text);
 	g_free (text);
@@ -850,6 +851,8 @@ wifi_add_menu_item (NMDevice *device,
 	gtk_widget_set_sensitive (widget, FALSE);
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), widget);
 	gtk_widget_show (widget);
+#ifdef LXPANEL_PLUGIN
+	}
 #endif
 
 	/* Add the active AP if we're connected to something and the device is available */
