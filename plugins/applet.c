@@ -1609,8 +1609,8 @@ nma_menu_add_vpn_submenu (GtkWidget *menu, NMApplet *applet)
 
 	/* Draw a separator, but only if we have VPN connections above it */
 	if (list->len) {
-		nma_menu_add_separator_item (GTK_WIDGET (vpn_menu));
 #ifndef LXPANEL_PLUGIN
+		nma_menu_add_separator_item (GTK_WIDGET (vpn_menu));
 		item = GTK_MENU_ITEM (gtk_menu_item_new_with_mnemonic (_("_Configure VPN…")));
 		g_signal_connect (item, "activate", G_CALLBACK (nma_menu_configure_vpn_item_activate), applet);
 	} else {
@@ -2951,7 +2951,7 @@ static char *get_tooltip (NMApplet *applet)
 					NMIPAddress *addr = (NMIPAddress *) g_ptr_array_index (addresses, 0);
 					if (addr)
 					{
-						tmp = g_strdup_printf ("%s\nIP4 : %s", ret, nm_ip_address_get_address (addr));
+						tmp = g_strdup_printf ("%s\nIPv4 : %s", ret, nm_ip_address_get_address (addr));
 						g_free (ret);
 						ret = tmp;
 					}
@@ -2968,7 +2968,7 @@ static char *get_tooltip (NMApplet *applet)
 					NMIPAddress *addr = (NMIPAddress *) g_ptr_array_index (addresses, 0);
 					if (addr)
 					{
-						tmp = g_strdup_printf ("%s\nIP6 : %s", ret, nm_ip_address_get_address (addr));
+						tmp = g_strdup_printf ("%s\nIPv6 : %s", ret, nm_ip_address_get_address (addr));
 						g_free (ret);
 						ret = tmp;
 					}
