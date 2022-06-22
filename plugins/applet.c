@@ -1608,8 +1608,8 @@ nma_menu_add_vpn_submenu (GtkWidget *menu, NMApplet *applet)
 	}
 
 	/* Draw a separator, but only if we have VPN connections above it */
-	if (list->len) {
 #ifndef LXPANEL_PLUGIN
+	if (list->len) {
 		nma_menu_add_separator_item (GTK_WIDGET (vpn_menu));
 		item = GTK_MENU_ITEM (gtk_menu_item_new_with_mnemonic (_("_Configure VPN…")));
 		g_signal_connect (item, "activate", G_CALLBACK (nma_menu_configure_vpn_item_activate), applet);
@@ -1617,7 +1617,9 @@ nma_menu_add_vpn_submenu (GtkWidget *menu, NMApplet *applet)
 #endif
 		item = GTK_MENU_ITEM (gtk_menu_item_new_with_mnemonic (_("_Add VPN Connection…")));
 		g_signal_connect (item, "activate", G_CALLBACK (nma_menu_add_vpn_item_activate), applet);
+#ifndef LXPANEL_PLUGIN
 	}
+#endif
 	gtk_menu_shell_append (GTK_MENU_SHELL (vpn_menu), GTK_WIDGET (item));
 	gtk_widget_show (GTK_WIDGET (item));
 
