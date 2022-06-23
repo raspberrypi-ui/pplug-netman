@@ -48,6 +48,24 @@ extern void status_icon_size_changed_cb (NMApplet *applet);
 extern void status_icon_activate_cb (NMApplet *applet);
 extern void finalize (NMApplet *applet);
 
+static int check_service (char *name)
+{
+    int res;
+    char *buf;
+
+    buf = g_strdup_printf ("systemctl status %s 2> /dev/null | grep -qw Active:", name);
+    res = system (buf);
+    g_free (buf);
+
+    if (res) return 0;
+
+    buf = g_strdup_printf ("systemctl status %s 2> /dev/null | grep -w Active: | grep -qw inactive", name);
+    res = system (buf);
+    g_free (buf);
+
+    return res;
+}
+
 /* Handler for configure_event on drawing area. */
 static void nm_configuration_changed (LXPanel *panel, GtkWidget *p)
 {
@@ -97,7 +115,13 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
     textdomain (GETTEXT_PACKAGE);
 #endif
 
-    if (system ("systemctl status NetworkManager | grep Active: | grep -qw inactive"))
+    if (!check_service ("NetworkManager"))
+    {
+        g_message ("netman: network manager service not running; plugin hidden");
+        nm->plugin = gtk_label_new (NULL);
+        nm->status_icon = NULL;
+    }
+    else
     {
         applet_startup (nm);
 
@@ -110,12 +134,6 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
         nm->icon_size = panel_get_safe_icon_size (panel);
         gtk_widget_set_visible (nm->status_icon, TRUE);
         gtk_container_add (GTK_CONTAINER (nm->plugin), nm->status_icon);
-    }
-    else
-    {
-        g_message ("netman: network manager service not running; plugin hidden");
-        nm->plugin = gtk_label_new (NULL);
-        nm->status_icon = NULL;
     }
 
     lxpanel_plugin_set_data (nm->plugin, nm, nm_destructor);
