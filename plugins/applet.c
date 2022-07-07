@@ -1468,6 +1468,111 @@ add_device_items (NMDeviceType type, const GPtrArray *all_devices,
 	return n_devices;
 }
 
+#ifdef LXPANEL_PLUGIN
+static void activate_hotspot_cb (GObject *client, GAsyncResult *result, gpointer user_data)
+{
+	GError *error = NULL;
+	NMActiveConnection *active;
+
+	active = nm_client_activate_connection_finish (NM_CLIENT (client), result, &error);
+	g_clear_object (&active);
+	if (error)
+	{
+		const char *text = _("Failed to activate connection");
+		char *err_text = g_strdup_printf ("(%d) %s", error->code, error->message ? error->message : _("Unknown error"));
+
+		g_warning ("%s: %s", text, err_text);
+		utils_show_error_dialog (_("Connection failure"), text, err_text, FALSE, NULL);
+		g_free (err_text);
+		g_error_free (error);
+	}
+	applet_schedule_update_icon (NM_APPLET (user_data));
+}
+
+static void activate_hotspot (GtkMenuItem *item, gpointer user_data)
+{
+	NMApplet *applet = (NMApplet *) user_data;
+	NMConnection *con;
+	NMDevice *dev;
+	const GPtrArray *all_devices;
+	int i;
+
+	// the connection path is stored as the name of the menu item widget - get the relevant connection
+	con = nm_client_get_connection_by_path (applet->nm_client, gtk_widget_get_name (GTK_WIDGET (item)));
+	if (!con) return;
+
+	// now find a device which can use that connection
+	all_devices = nm_client_get_devices (applet->nm_client);
+	for (i = 0; all_devices && (i < all_devices->len); i++)
+	{
+		dev = all_devices->pdata[i];
+		if (nm_device_connection_valid (dev, con)) break;
+		dev = NULL;
+	}
+	if (!dev) return;
+
+	// activate the connection with the found device - ap is NULL, as already in the connection
+	nm_client_activate_connection_async (applet->nm_client, con, dev, NULL, NULL, activate_hotspot_cb, applet);
+}
+
+static int add_hotspots (const GPtrArray *all_connections, GtkWidget *menu, NMApplet *applet)
+{
+	const GPtrArray *act_conns;
+	int i, n_devices = 0;
+	GtkWidget *item, *hbox, *lbl, *icon;
+	char *ssid_utf8;
+	NMConnection *con;
+	NMSettingWireless *s_wire;
+	GBytes *ssid;
+
+	// don't show hotspots if one is active
+	act_conns = nm_client_get_active_connections (applet->nm_client);
+	for (i = 0; act_conns && (i < act_conns->len); i++)
+	{
+		NMActiveConnection *ac = act_conns->pdata[i];
+		con = nm_active_connection_get_connection (ac);
+		s_wire = nm_connection_get_setting_wireless (con);
+		if (!s_wire || !NM_IS_SETTING_WIRELESS (s_wire)) continue;
+		if (!g_strcmp0 (nm_setting_wireless_get_mode (s_wire), "ap")) return 0;
+	}
+
+	// find any ap connections and add to menu
+	for (i = 0; all_connections && (i < all_connections->len); i++)
+	{
+		con = NM_CONNECTION (all_connections->pdata[i]);
+		s_wire = nm_connection_get_setting_wireless (con);
+		if (!s_wire || !NM_IS_SETTING_WIRELESS (s_wire)) continue;
+		if (g_strcmp0 (nm_setting_wireless_get_mode (s_wire), "ap")) continue;
+
+		if (!n_devices) nma_menu_add_separator_item (menu);
+
+		item = gtk_check_menu_item_new ();
+		hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
+		gtk_container_add (GTK_CONTAINER (item), hbox);
+
+		ssid = nm_setting_wireless_get_ssid (s_wire);
+		ssid_utf8 = nm_utils_ssid_to_utf8 (g_bytes_get_data (ssid, NULL), g_bytes_get_size (ssid));
+		lbl = gtk_label_new (ssid_utf8);
+		g_free (ssid_utf8);
+		gtk_label_set_xalign (GTK_LABEL (lbl), 0.0);
+		gtk_label_set_yalign (GTK_LABEL (lbl), 0.5);
+		gtk_box_pack_start (GTK_BOX (hbox), lbl, TRUE, TRUE, 0);
+
+		icon = gtk_image_new ();
+		lxpanel_plugin_set_menu_icon (applet->panel, icon, "bluetooth-online");		// update icon when ready !!!!!
+		gtk_box_pack_end (GTK_BOX (hbox), icon, FALSE, TRUE, 0);
+
+		g_signal_connect (item, "activate", G_CALLBACK (activate_hotspot), applet);
+		gtk_widget_set_name (item, nm_connection_get_path (con));
+		gtk_menu_shell_append (GTK_MENU_SHELL (menu), GTK_WIDGET (item));
+		gtk_widget_show_all (GTK_WIDGET (item));
+
+		n_devices++;
+	}
+	return n_devices;
+}
+#endif
+
 static void
 nma_menu_add_devices (GtkWidget *menu, NMApplet *applet)
 {
@@ -1485,6 +1590,9 @@ nma_menu_add_devices (GtkWidget *menu, NMApplet *applet)
 #endif
 	n_items += add_device_items  (NM_DEVICE_TYPE_WIFI,
 	                              all_devices, all_connections, menu, applet);
+#ifdef LXPANEL_PLUGIN
+	n_items += add_hotspots (all_connections, menu, applet);
+#endif
 	n_items += add_device_items  (NM_DEVICE_TYPE_MODEM,
 	                              all_devices, all_connections, menu, applet);
 #ifndef LXPANEL_PLUGIN
