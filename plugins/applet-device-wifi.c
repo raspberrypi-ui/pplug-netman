@@ -911,6 +911,17 @@ wifi_add_menu_item (NMDevice *device,
 			if (item) {
 #ifdef LXPANEL_PLUGIN
 				nm_network_menu_item_set_active (item, TRUE, applet);
+
+				const GPtrArray *act_conns = nm_client_get_active_connections (applet->nm_client);
+				for (i = 0; act_conns && (i < act_conns->len); i++)
+				{
+					NMActiveConnection *ac = act_conns->pdata[i];
+					NMRemoteConnection *con = nm_active_connection_get_connection (ac);
+					NMSettingWireless *s_wire = nm_connection_get_setting_wireless (NM_CONNECTION (con));
+					if (!s_wire || !NM_IS_SETTING_WIRELESS (s_wire)) continue;
+					if (!g_strcmp0 (nm_setting_wireless_get_mode (s_wire), "ap"))
+						nm_network_menu_item_set_hotspot (item, TRUE, applet);
+				}
 #else
 				nm_network_menu_item_set_active (item, TRUE);
 #endif

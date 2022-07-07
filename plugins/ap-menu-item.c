@@ -45,6 +45,9 @@ typedef struct {
 	gboolean    has_connections;
 	gboolean    is_adhoc;
 	gboolean    is_encrypted;
+#ifdef LXPANEL_PLUGIN
+	gboolean    is_hotspot;
+#endif
 } NMNetworkMenuItemPrivate;
 
 /******************************************************************/
@@ -99,6 +102,10 @@ update_icon (NMNetworkMenuItem *item, NMApplet *applet)
 
 	if (priv->is_adhoc)
 		icon_name = "network-wireless-connected-100";
+#ifdef LXPANEL_PLUGIN
+	else if (priv->is_hotspot)
+		icon_name = "bluetooth-online";		// update icon when ready !!!!!!
+#endif
 	else
 		icon_name = mobile_helper_get_quality_icon_name (priv->int_strength);
 
@@ -337,6 +344,15 @@ nm_network_menu_item_new (NMAccessPoint *ap,
 
 	return GTK_WIDGET (item);
 }
+
+#ifdef LXPANEL_PLUGIN
+void nm_network_menu_item_set_hotspot (NMNetworkMenuItem *item, gboolean hotspot, NMApplet *applet)
+{
+	NMNetworkMenuItemPrivate *priv = NM_NETWORK_MENU_ITEM_GET_PRIVATE (item);
+	priv->is_hotspot = hotspot;
+	update_icon (item, applet);
+}
+#endif
 
 static void
 nm_network_menu_item_init (NMNetworkMenuItem *item)
