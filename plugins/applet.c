@@ -1519,7 +1519,7 @@ static int add_hotspots (const GPtrArray *all_connections, GtkWidget *menu, NMAp
 {
 	const GPtrArray *act_conns;
 	int i, n_devices = 0;
-	GtkWidget *item, *hbox, *lbl, *icon;
+	GtkWidget *item, *hbox, *lbl, *icon, *sec;
 	char *ssid_utf8;
 	NMConnection *con;
 	NMSettingWireless *s_wire;
@@ -1561,6 +1561,11 @@ static int add_hotspots (const GPtrArray *all_connections, GtkWidget *menu, NMAp
 		icon = gtk_image_new ();
 		lxpanel_plugin_set_menu_icon (applet->panel, icon, "bluetooth-online");		// update icon when ready !!!!!
 		gtk_box_pack_end (GTK_BOX (hbox), icon, FALSE, TRUE, 0);
+
+		sec = gtk_image_new ();
+		NMSettingWirelessSecurity *s_sec = nm_connection_get_setting_wireless_security (con);
+		if (s_sec) lxpanel_plugin_set_menu_icon (applet->panel, sec, "network-wireless-encrypted");
+		gtk_box_pack_end (GTK_BOX (hbox), sec, FALSE, TRUE, 0);
 
 		g_signal_connect (item, "activate", G_CALLBACK (activate_hotspot), applet);
 		gtk_widget_set_name (item, nm_connection_get_path (con));
