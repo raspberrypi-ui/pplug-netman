@@ -603,6 +603,42 @@ wifi_new_auto_connection (NMDevice *device,
 	return TRUE;
 }
 
+static void handle_ok (GtkButton *button, gpointer user_data)
+{
+	NMApplet *applet = (NMApplet *) user_data;
+	GtkWidget *wid = GTK_WIDGET (button);
+	while (!GTK_IS_WINDOW (wid)) wid = gtk_widget_get_parent (wid);
+	applet_menu_item_disconnect_helper (nm_client_get_device_by_path (applet->nm_client, gtk_widget_get_name (wid)), applet);
+	gtk_widget_destroy (wid);
+}
+
+static void handle_cancel (GtkButton *button, gpointer user_data)
+{
+	GtkWidget *wid = GTK_WIDGET (button);
+	while (!GTK_IS_WINDOW (wid)) wid = gtk_widget_get_parent (wid);
+	gtk_widget_destroy (wid);
+}
+
+static void disconnect_prompt (WifiMenuItemInfo *info, const char *name)
+{
+	GtkBuilder *builder;
+	char *buffer;
+
+	builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/lxpanel-modal.ui");
+
+	GtkWidget *disc_dlg = (GtkWidget *) gtk_builder_get_object (builder, "modal");
+	buffer = g_strdup_printf (_("Do you want to disconnect from the wireless network '%s'?"), name);
+	gtk_label_set_text (GTK_LABEL (gtk_builder_get_object (builder, "modal_msg")), buffer);
+	g_signal_connect (gtk_builder_get_object (builder, "modal_ok"), "clicked", G_CALLBACK (handle_ok), info->applet);
+	g_signal_connect (gtk_builder_get_object (builder, "modal_cancel"), "clicked", G_CALLBACK (handle_cancel), info->applet);
+	gtk_widget_hide (GTK_WIDGET (gtk_builder_get_object (builder, "modal_pb")));
+	g_object_unref (builder);
+
+	gtk_widget_set_name (disc_dlg, nm_object_get_path (NM_OBJECT (info->device)));
+	gtk_widget_show (disc_dlg);
+	g_free (buffer);
+}
+
 static void
 wifi_menu_item_activate (GtkMenuItem *item, gpointer user_data)
 {
@@ -614,7 +650,13 @@ wifi_menu_item_activate (GtkMenuItem *item, gpointer user_data)
 
 #ifdef LXPANEL_PLUGIN
 	if (info->ap == _active_ap_get (info->applet, NM_DEVICE (info->device)))
-		applet_menu_item_disconnect_helper (NM_DEVICE (info->device), info->applet);
+	{
+		GList *ch1 = gtk_container_get_children (GTK_CONTAINER (item));
+		GList *ch2 = gtk_container_get_children (ch1->data);
+		disconnect_prompt (info, gtk_label_get_text (GTK_LABEL (ch2->data)));
+		g_list_free (ch2);
+		g_list_free (ch1);
+	}
 	else
 #endif
 	applet_menu_item_activate_helper (NM_DEVICE (info->device),
