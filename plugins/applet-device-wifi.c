@@ -1450,7 +1450,12 @@ wifi_get_icon (NMDevice *device,
 
 		if (ap) {
 			char *ssid = get_ssid_utf8 (ap);
-
+#ifdef LXPANEL_PLUGIN
+			NMSettingWireless *s_wire = nm_connection_get_setting_wireless (connection);
+			if (!g_strcmp0 (nm_setting_wireless_get_mode (s_wire), "ap"))
+				*tip = g_strdup_printf (_("Wi-Fi network connection “%s” active: %s (hotspot)"), id, ssid);
+			else
+#endif
 			*tip = g_strdup_printf (_("Wi-Fi network connection “%s” active: %s (%d%%)"),
 			                        id, ssid, strength);
 			g_free (ssid);

@@ -104,7 +104,7 @@ update_icon (NMNetworkMenuItem *item, NMApplet *applet)
 		icon_name = "network-wireless-connected-100";
 #ifdef LXPANEL_PLUGIN
 	else if (priv->is_hotspot)
-		icon_name = "bluetooth-online";		// update icon when ready !!!!!!
+		icon_name = "network-wireless-hotspot";
 #endif
 	else
 		icon_name = mobile_helper_get_quality_icon_name (priv->int_strength);

@@ -1559,7 +1559,7 @@ static int add_hotspots (const GPtrArray *all_connections, GtkWidget *menu, NMAp
 		gtk_box_pack_start (GTK_BOX (hbox), lbl, TRUE, TRUE, 0);
 
 		icon = gtk_image_new ();
-		lxpanel_plugin_set_menu_icon (applet->panel, icon, "bluetooth-online");		// update icon when ready !!!!!
+		lxpanel_plugin_set_menu_icon (applet->panel, icon, "network-wireless-hotspot");
 		gtk_box_pack_end (GTK_BOX (hbox), icon, FALSE, TRUE, 0);
 
 		sec = gtk_image_new ();
