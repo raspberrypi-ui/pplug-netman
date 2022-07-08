@@ -603,6 +603,7 @@ wifi_new_auto_connection (NMDevice *device,
 	return TRUE;
 }
 
+#ifdef LXPANEL_PLUGIN
 static void handle_ok (GtkButton *button, gpointer user_data)
 {
 	NMApplet *applet = (NMApplet *) user_data;
@@ -638,6 +639,7 @@ static void disconnect_prompt (WifiMenuItemInfo *info, const char *name)
 	gtk_widget_show (disc_dlg);
 	g_free (buffer);
 }
+#endif
 
 static void
 wifi_menu_item_activate (GtkMenuItem *item, gpointer user_data)

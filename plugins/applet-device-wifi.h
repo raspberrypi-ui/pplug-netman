@@ -17,10 +17,9 @@ NMADeviceClass *applet_device_wifi_get_class (NMApplet *applet);
 
 void nma_menu_add_hidden_network_item (GtkWidget *menu, NMApplet *applet);
 void nma_menu_add_create_network_item (GtkWidget *menu, NMApplet *applet);
-void nma_menu_add_create_hotspot_item (GtkWidget *menu, NMApplet *applet);
 
 #ifdef LXPANEL_PLUGIN
-extern void clear_aps (NMApplet *applet);
+void nma_menu_add_create_hotspot_item (GtkWidget *menu, NMApplet *applet);
+void clear_aps (NMApplet *applet);
 #endif
-
 #endif /* __APPLET_DEVICE_WIFI_H__ */

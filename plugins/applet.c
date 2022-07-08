@@ -1498,7 +1498,7 @@ static void activate_hotspot (GtkMenuItem *item, gpointer user_data)
 	int i;
 
 	// the connection path is stored as the name of the menu item widget - get the relevant connection
-	con = nm_client_get_connection_by_path (applet->nm_client, gtk_widget_get_name (GTK_WIDGET (item)));
+	con = NM_CONNECTION (nm_client_get_connection_by_path (applet->nm_client, gtk_widget_get_name (GTK_WIDGET (item))));
 	if (!con) return;
 
 	// now find a device which can use that connection
@@ -1530,7 +1530,7 @@ static int add_hotspots (const GPtrArray *all_connections, GtkWidget *menu, NMAp
 	for (i = 0; act_conns && (i < act_conns->len); i++)
 	{
 		NMActiveConnection *ac = act_conns->pdata[i];
-		con = nm_active_connection_get_connection (ac);
+		con = NM_CONNECTION (nm_active_connection_get_connection (ac));
 		s_wire = nm_connection_get_setting_wireless (con);
 		if (!s_wire || !NM_IS_SETTING_WIRELESS (s_wire)) continue;
 		if (!g_strcmp0 (nm_setting_wireless_get_mode (s_wire), "ap")) return 0;
@@ -2819,6 +2819,7 @@ applet_common_get_device_icon (NMDeviceState state,
 	}
 }
 
+#ifdef LXPANEL_PLUGIN
 static void
 applet_common_get_device_icon_lxp (gboolean wifi, NMDeviceState state,
                                GdkPixbuf **out_pixbuf,
@@ -2917,7 +2918,7 @@ applet_common_get_device_icon_lxp (gboolean wifi, NMDeviceState state,
 			applet->animation_step = 0;
 	}
 }
-
+#endif
 
 static char *
 get_tip_for_device_state (NMDevice *device,
@@ -3007,6 +3008,7 @@ out:
 #endif
 }
 
+#ifdef LXPANEL_PLUGIN
 static char *get_tooltip (NMApplet *applet)
 {
 	char *out, *tmp, *ret = NULL;
@@ -3098,6 +3100,7 @@ static char *get_tooltip (NMApplet *applet)
 	}
 	return ret;
 }
+#endif
 
 static char *
 get_tip_for_vpn (NMActiveConnection *active, NMVpnConnectionState state, NMApplet *applet)
