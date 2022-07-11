@@ -1679,7 +1679,6 @@ nma_menu_add_vpn_submenu (GtkWidget *menu, NMApplet *applet)
 	if (has_usable_wifi (applet)) {
 		/* Add the "Hidden Wi-Fi network..." entry */
 		nma_menu_add_hidden_network_item (GTK_WIDGET (vpn_menu), applet);
-		nma_menu_add_create_network_item (GTK_WIDGET (vpn_menu), applet);
 		nma_menu_add_create_hotspot_item (GTK_WIDGET (vpn_menu), applet);
 		nma_menu_add_separator_item (GTK_WIDGET (vpn_menu));
 	}
