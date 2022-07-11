@@ -920,6 +920,9 @@ wifi_add_menu_item (NMDevice *device,
 	GSList *menu_items = NULL;  /* All menu items we'll be adding */
 	NMNetworkMenuItem *item, *active_item = NULL;
 	GtkWidget *widget;
+#ifdef LXPANEL_PLUGIN
+	gboolean active_hotspot = FALSE;
+#endif
 
 	wdev = NM_DEVICE_WIFI (device);
 	aps = nm_device_wifi_get_access_points (wdev);
@@ -964,7 +967,10 @@ wifi_add_menu_item (NMDevice *device,
 					NMSettingWireless *s_wire = nm_connection_get_setting_wireless (NM_CONNECTION (con));
 					if (!s_wire || !NM_IS_SETTING_WIRELESS (s_wire)) continue;
 					if (!g_strcmp0 (nm_setting_wireless_get_mode (s_wire), "ap"))
+					{
 						nm_network_menu_item_set_hotspot (item, TRUE, applet);
+						active_hotspot = TRUE;
+					}
 				}
 #else
 				nm_network_menu_item_set_active (item, TRUE);
@@ -989,6 +995,8 @@ wifi_add_menu_item (NMDevice *device,
 		gtk_menu_shell_append (GTK_MENU_SHELL (menu), widget);
 		gtk_widget_show (widget);
 	}
+#else
+	if (active_hotspot) goto out;
 #endif
 
 	/* If disabled or rfkilled or whatever, nothing left to do */
