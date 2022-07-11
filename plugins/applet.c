@@ -1515,7 +1515,7 @@ static void activate_hotspot (GtkMenuItem *item, gpointer user_data)
 	nm_client_activate_connection_async (applet->nm_client, con, dev, NULL, NULL, activate_hotspot_cb, applet);
 }
 
-static int add_hotspots (const GPtrArray *all_connections, GtkWidget *menu, NMApplet *applet)
+static int add_hotspots (const GPtrArray *all_devices, const GPtrArray *all_connections, GtkWidget *menu, NMApplet *applet)
 {
 	const GPtrArray *act_conns;
 	int i, n_devices = 0;
@@ -1524,6 +1524,17 @@ static int add_hotspots (const GPtrArray *all_connections, GtkWidget *menu, NMAp
 	NMConnection *con;
 	NMSettingWireless *s_wire;
 	GBytes *ssid;
+	gboolean dev_ok = FALSE;
+
+	// is there a usable wifi device?
+	for (i = 0; all_devices && (i < all_devices->len); i++)
+	{
+		NMDevice *device = all_devices->pdata[i];
+
+		if (nm_device_get_device_type (device) == NM_DEVICE_TYPE_WIFI && !nma_menu_device_check_unusable (device))
+			dev_ok = TRUE;
+	}
+	if (!dev_ok) return 0;
 
 	// don't show hotspots if one is active
 	act_conns = nm_client_get_active_connections (applet->nm_client);
@@ -1596,7 +1607,7 @@ nma_menu_add_devices (GtkWidget *menu, NMApplet *applet)
 	n_items += add_device_items  (NM_DEVICE_TYPE_WIFI,
 	                              all_devices, all_connections, menu, applet);
 #ifdef LXPANEL_PLUGIN
-	n_items += add_hotspots (all_connections, menu, applet);
+	n_items += add_hotspots (all_devices, all_connections, menu, applet);
 #endif
 	n_items += add_device_items  (NM_DEVICE_TYPE_MODEM,
 	                              all_devices, all_connections, menu, applet);
