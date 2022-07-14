@@ -3083,7 +3083,7 @@ static char *get_tooltip (NMApplet *applet)
 					NMIPAddress *addr = (NMIPAddress *) g_ptr_array_index (addresses, 0);
 					if (addr)
 					{
-						tmp = g_strdup_printf ("%s\nIPv4 : %s", ret, nm_ip_address_get_address (addr));
+						tmp = g_strdup_printf (_("%s\nIPv4 : %s"), ret, nm_ip_address_get_address (addr));
 						g_free (ret);
 						ret = tmp;
 					}
@@ -3100,7 +3100,7 @@ static char *get_tooltip (NMApplet *applet)
 					NMIPAddress *addr = (NMIPAddress *) g_ptr_array_index (addresses, 0);
 					if (addr)
 					{
-						tmp = g_strdup_printf ("%s\nIPv6 : %s", ret, nm_ip_address_get_address (addr));
+						tmp = g_strdup_printf (_("%s\nIPv6 : %s"), ret, nm_ip_address_get_address (addr));
 						g_free (ret);
 						ret = tmp;
 					}
