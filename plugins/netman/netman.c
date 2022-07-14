@@ -78,10 +78,6 @@ static gboolean nm_button_press_event (GtkWidget *widget, GdkEventButton *event,
 {
     NMApplet *nm = lxpanel_plugin_get_data (widget);
 
-#ifdef ENABLE_NLS
-    textdomain (GETTEXT_PACKAGE);
-#endif
-
     if (event->button == 1)
     {
         status_icon_activate_cb (nm);
@@ -112,7 +108,6 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
     setlocale (LC_ALL, "");
     bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
-    textdomain (GETTEXT_PACKAGE);
 #endif
 
     if (!check_service ("NetworkManager"))
