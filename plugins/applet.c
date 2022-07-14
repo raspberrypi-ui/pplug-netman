@@ -1751,7 +1751,7 @@ nma_menu_add_vpn_submenu (GtkWidget *menu, NMApplet *applet)
 	nma_menu_add_separator_item (GTK_WIDGET (vpn_menu));
 
 	/* 'Connection Information' item */
-	applet->info_menu_item = gtk_menu_item_new_with_mnemonic (_("Connection _Information…"));
+	applet->info_menu_item = gtk_menu_item_new_with_mnemonic (_("Connection _Information"));
 	g_signal_connect_swapped (applet->info_menu_item,
 	                          "activate",
 	                          G_CALLBACK (applet_connection_info_cb),
