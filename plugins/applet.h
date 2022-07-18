@@ -77,7 +77,9 @@ typedef struct {
 #ifdef LXPANEL_PLUGIN
     GtkWidget *plugin;              /* Back pointer to widget */
     LXPanel *panel;                 /* Back pointer to panel */
+    config_setting_t *settings;     /* Plugin settings */
     GSList *ap_list;
+    gboolean active;
 #endif
 	GApplication parent;
 
