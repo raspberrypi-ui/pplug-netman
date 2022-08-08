@@ -89,6 +89,19 @@ static gboolean nm_button_press_event (GtkWidget *widget, GdkEventButton *event,
     else return FALSE;
 }
 
+/* Handler for control message */
+static gboolean nm_control_msg (GtkWidget *plugin, const char *cmd)
+{
+    NMApplet *nm = lxpanel_plugin_get_data (plugin);
+
+    if (!g_strcmp0 (cmd, "menu"))
+    {
+        status_icon_activate_cb (nm);
+    }
+
+    return TRUE;
+}
+
 /* Plugin destructor. */
 static void nm_destructor (gpointer user_data)
 {
@@ -152,5 +165,6 @@ LXPanelPluginInit fm_module_init_lxpanel_gtk = {
     .new_instance = nm_constructor,
     .reconfigure = nm_configuration_changed,
     .button_press_event = nm_button_press_event,
+    .control = nm_control_msg,
     .gettext_package = GETTEXT_PACKAGE
 };
