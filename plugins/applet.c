@@ -64,7 +64,7 @@ applet_request_wifi_scan (NMApplet *applet)
 	for (i = 0; devices && i < devices->len; i++) {
 		device = g_ptr_array_index (devices, i);
 		if (NM_IS_DEVICE_WIFI (device))
-			nm_device_wifi_request_scan ((NMDeviceWifi *) device, NULL, NULL);
+			nm_device_wifi_request_scan_async ((NMDeviceWifi *) device, NULL, NULL, NULL);
 	}
 
 	return G_SOURCE_CONTINUE;
@@ -713,6 +713,7 @@ applet_clear_notify (NMApplet *applet)
 #endif
 }
 
+#ifndef LXPANEL_PLUGIN
 static gboolean
 applet_notify_server_has_actions (void)
 {
@@ -735,6 +736,7 @@ applet_notify_server_has_actions (void)
 
 	return has_actions;
 }
+#endif
 
 void
 applet_do_notify (NMApplet *applet,
@@ -747,8 +749,10 @@ applet_do_notify (NMApplet *applet,
                   NotifyActionCallback action1_cb,
                   gpointer action1_user_data)
 {
+#ifndef LXPANEL_PLUGIN
 	NotifyNotification *notify;
 	GError *error = NULL;
+#endif
 	char *escaped;
 
 	g_return_if_fail (applet != NULL);
@@ -1083,7 +1087,7 @@ nma_menu_vpn_item_clicked (GtkMenuItem *item, gpointer user_data)
 	active = applet_get_active_for_connection (applet, connection);
 	if (active) {
 		/* Connection already active; disconnect it */
-		nm_client_deactivate_connection (applet->nm_client, active, NULL, NULL);
+		nm_client_deactivate_connection_async (applet->nm_client, active, NULL, NULL, NULL);
 		return;
 	}
 
@@ -1118,17 +1122,15 @@ nma_menu_vpn_item_clicked (GtkMenuItem *item, gpointer user_data)
  * Signal function called when user clicks "Configure VPN..."
  *
  */
+#ifndef LXPANEL_PLUGIN
 static void
 nma_menu_configure_vpn_item_activate (GtkMenuItem *item, gpointer user_data)
 {
-#ifdef LXPANEL_PLUGIN
-	const char *argv[] = { BINDIR "/lp-connection-editor", "--show", "--type", NM_SETTING_VPN_SETTING_NAME, NULL};
-#else
 	const char *argv[] = { BINDIR "/nm-connection-editor", "--show", "--type", NM_SETTING_VPN_SETTING_NAME, NULL};
-#endif
 
 	g_spawn_async (NULL, (gchar **) argv, NULL, 0, NULL, NULL, NULL, NULL);
 }
+#endif
 
 /*
  * nma_menu_add_vpn_item_activate
@@ -1781,7 +1783,7 @@ nma_set_wifi_enabled_cb (GtkWidget *widget, NMApplet *applet)
 #else
 	state = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget));
 #endif
-	nm_client_wireless_set_enabled (applet->nm_client, state);
+	nm_client_dbus_set_property (applet->nm_client, NM_DBUS_PATH, NM_DBUS_INTERFACE, "WirelessEnabled", g_variant_new_boolean (state), -1, NULL, NULL, NULL);
 }
 
 static void
@@ -1792,7 +1794,7 @@ nma_set_wwan_enabled_cb (GtkWidget *widget, NMApplet *applet)
 	g_return_if_fail (applet != NULL);
 
 	state = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget));
-	nm_client_wwan_set_enabled (applet->nm_client, state);
+	nm_client_dbus_set_property (applet->nm_client, NM_DBUS_PATH, NM_DBUS_INTERFACE, "WwanEnabled", g_variant_new_boolean (state), -1, NULL, NULL, NULL);
 }
 
 static void
@@ -1803,7 +1805,7 @@ nma_set_networking_enabled_cb (GtkWidget *widget, NMApplet *applet)
 	g_return_if_fail (applet != NULL);
 
 	state = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget));
-	nm_client_networking_set_enabled (applet->nm_client, state, NULL);
+	nm_client_dbus_set_property (applet->nm_client, NM_DBUS_PATH, NM_DBUS_INTERFACE, "Enable", g_variant_new_boolean (state), -1, NULL, NULL, NULL);
 }
 
 
@@ -2790,6 +2792,7 @@ mm1_client_setup (NMApplet *applet)
 
 #endif /* WITH_WWAN */
 
+#ifndef LXPANEL_PLUGIN
 static void
 applet_common_get_device_icon (NMDeviceState state,
                                GdkPixbuf **out_pixbuf,
@@ -2829,7 +2832,7 @@ applet_common_get_device_icon (NMDeviceState state,
 	}
 }
 
-#ifdef LXPANEL_PLUGIN
+#else
 static void
 applet_common_get_device_icon_lxp (gboolean wifi, NMDeviceState state,
                                GdkPixbuf **out_pixbuf,
@@ -2873,6 +2876,8 @@ applet_common_get_device_icon_lxp (gboolean wifi, NMDeviceState state,
 								break;
 					case 4 : 	name = g_strdup_printf ("network-wireless-connected-100");
 								break;
+					default : 	name = g_strdup_printf ("network-wireless-connected-00");
+								break;
 				}
 			}
 			else
@@ -2886,6 +2891,8 @@ applet_common_get_device_icon_lxp (gboolean wifi, NMDeviceState state,
 					case 1 : 	name = g_strdup_printf ("network-receive");
 								break;
 					case 2 : 	name = g_strdup_printf ("network-idle");
+								break;
+					default : 	name = g_strdup_printf ("network-transmit");
 								break;
 				}
 			}
@@ -2902,6 +2909,8 @@ applet_common_get_device_icon_lxp (gboolean wifi, NMDeviceState state,
 								break;
 					case 1 : 	name = g_strdup_printf ("network-wireless-connected-100");
 								break;
+					default : 	name = g_strdup_printf ("network-wireless-connected-00");
+								break;
 				}
 			}
 			else
@@ -2911,6 +2920,8 @@ applet_common_get_device_icon_lxp (gboolean wifi, NMDeviceState state,
 					case 0 : 	name = g_strdup_printf ("network-transmit-receive");
 								break;
 					case 1 : 	name = g_strdup_printf ("network-idle");
+								break;
+					default : 	name = g_strdup_printf ("network-transmit-receive");
 								break;
 				}
 			}
@@ -3632,6 +3643,7 @@ static void nma_icons_init (NMApplet *applet)
 	nma_icons_reload (applet);
 }
 
+#ifndef LXPANEL_PLUGIN
 static void
 status_icon_screen_changed_cb (GtkStatusIcon *icon,
                                GParamSpec *pspec,
@@ -3639,6 +3651,7 @@ status_icon_screen_changed_cb (GtkStatusIcon *icon,
 {
 	nma_icons_init (applet);
 }
+#endif
 
 #ifdef LXPANEL_PLUGIN
 void
@@ -3712,6 +3725,7 @@ status_icon_activate_cb (GtkStatusIcon *icon, NMApplet *applet)
 #endif
 }
 
+#ifndef LXPANEL_PLUGIN
 static void
 status_icon_popup_menu_cb (GtkStatusIcon *icon,
                            guint button,
@@ -3724,12 +3738,11 @@ status_icon_popup_menu_cb (GtkStatusIcon *icon,
 	applet_clear_notify (applet);
 
 	nma_context_menu_update (applet);
-#ifndef LXPANEL_PLUGIN
 	gtk_menu_popup (GTK_MENU (applet->context_menu), NULL, NULL,
 			gtk_status_icon_position_menu, icon,
 			button, activate_time);
-#endif
 }
+#endif
 
 static gboolean
 setup_widgets (NMApplet *applet)
@@ -4026,9 +4039,9 @@ static void nma_init (NMApplet *applet)
 
 static void nma_class_init (NMAppletClass *klass)
 {
+#ifndef LXPANEL_PLUGIN
 	GObjectClass *oclass = G_OBJECT_CLASS (klass);
 
-#ifndef LXPANEL_PLUGIN
 	oclass->finalize = finalize;
 #endif
 }

@@ -29,16 +29,16 @@ static const SecretSchema network_manager_secret_schema = {
 	}
 };
 
-G_DEFINE_TYPE (AppletAgent, applet_agent, NM_TYPE_SECRET_AGENT_OLD);
-
-#define APPLET_AGENT_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), APPLET_TYPE_AGENT, AppletAgentPrivate))
-
 typedef struct {
 	GHashTable *requests;
 	gboolean vpn_only;
 
 	gboolean disposed;
 } AppletAgentPrivate;
+
+G_DEFINE_TYPE_WITH_CODE (AppletAgent, applet_agent, NM_TYPE_SECRET_AGENT_OLD, G_ADD_PRIVATE (AppletAgent));
+
+#define APPLET_AGENT_GET_PRIVATE(o) ((AppletAgentPrivate *) applet_agent_get_instance_private ((AppletAgent *) o))
 
 enum {
 	GET_SECRETS,
@@ -638,7 +638,6 @@ write_one_secret_to_keyring (NMSetting *setting,
                              gpointer user_data)
 {
 	Request *r = user_data;
-	GType type = G_VALUE_TYPE (value);
 	const char *secret;
 
 	/* Non-secrets obviously don't get saved in the keyring */
@@ -817,8 +816,6 @@ applet_agent_class_init (AppletAgentClass *agent_class)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (agent_class);
 	NMSecretAgentOldClass *parent_class = NM_SECRET_AGENT_OLD_CLASS (agent_class);
-
-	g_type_class_add_private (agent_class, sizeof (AppletAgentPrivate));
 
 	/* virtual methods */
 	object_class->dispose = dispose;

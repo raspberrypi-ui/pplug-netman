@@ -666,7 +666,9 @@ applet_vpn_request_get_secrets (SecretsRequest *req, GError **error)
 	RequestData *req_data;
 	NMSettingConnection *s_con;
 	NMSettingVpn *s_vpn;
+#ifndef G_DISABLE_CHECKS
 	const char *connection_type;
+#endif
 	const char *service_type;
 	const char *auth_dialog;
 	gs_unref_object NMVpnPluginInfo *plugin = NULL;
@@ -677,8 +679,10 @@ applet_vpn_request_get_secrets (SecretsRequest *req, GError **error)
 	s_con = nm_connection_get_setting_connection (req->connection);
 	s_vpn = nm_connection_get_setting_vpn (req->connection);
 
+#ifndef G_DISABLE_CHECKS
 	connection_type = nm_setting_connection_get_connection_type (s_con);
 	g_return_val_if_fail (nm_streq0 (connection_type, NM_SETTING_VPN_SETTING_NAME), FALSE);
+#endif
 
 	service_type = nm_setting_vpn_get_service_type (s_vpn);
 	g_return_val_if_fail (service_type, FALSE);

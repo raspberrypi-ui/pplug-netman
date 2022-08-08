@@ -18,14 +18,6 @@
 #include "nm-access-point.h"
 #include "mobile-helpers.h"
 
-#ifdef LXPANEL_PLUGIN
-G_DEFINE_TYPE (NMNetworkMenuItem, nm_network_menu_item, GTK_TYPE_CHECK_MENU_ITEM);
-#else
-G_DEFINE_TYPE (NMNetworkMenuItem, nm_network_menu_item, GTK_TYPE_MENU_ITEM);
-#endif
-
-#define NM_NETWORK_MENU_ITEM_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), NM_TYPE_NETWORK_MENU_ITEM, NMNetworkMenuItemPrivate))
-
 typedef struct {
 	GtkWidget * ssid;
 	GtkWidget * strength;
@@ -49,6 +41,14 @@ typedef struct {
 	gboolean    is_hotspot;
 #endif
 } NMNetworkMenuItemPrivate;
+
+#ifdef LXPANEL_PLUGIN
+G_DEFINE_TYPE_WITH_CODE (NMNetworkMenuItem, nm_network_menu_item, GTK_TYPE_CHECK_MENU_ITEM, G_ADD_PRIVATE (NMNetworkMenuItem));
+#else
+G_DEFINE_TYPE_WITH_CODE (NMNetworkMenuItem, nm_network_menu_item, GTK_TYPE_MENU_ITEM), G_ADD_PRIVATE (NMNetworkMenuItem);
+#endif
+
+#define NM_NETWORK_MENU_ITEM_GET_PRIVATE(o) ((NMNetworkMenuItemPrivate *) nm_network_menu_item_get_instance_private ((NMNetworkMenuItem *) o))
 
 /******************************************************************/
 
@@ -96,8 +96,10 @@ update_icon (NMNetworkMenuItem *item, NMApplet *applet)
 {
 	NMNetworkMenuItemPrivate *priv = NM_NETWORK_MENU_ITEM_GET_PRIVATE (item);
 	gs_unref_object GdkPixbuf *icon_free = NULL, *icon_free2 = NULL;
+#ifndef LXPANEL_PLUGIN
 	GdkPixbuf *icon;
 	int icon_size, scale;
+#endif
 	const char *icon_name = NULL;
 
 	if (priv->is_adhoc)
@@ -405,8 +407,6 @@ static void
 nm_network_menu_item_class_init (NMNetworkMenuItemClass * klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-	g_type_class_add_private (klass, sizeof (NMNetworkMenuItemPrivate));
 
 	/* virtual methods */
 	object_class->finalize = finalize;

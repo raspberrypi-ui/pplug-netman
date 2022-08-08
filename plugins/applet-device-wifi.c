@@ -113,7 +113,11 @@ _active_ap_set_weakref (gpointer data, GObject *where_the_object_was)
 static void
 _active_ap_set (NMApplet *applet, NMDevice *device, NMAccessPoint *ap)
 {
+#ifdef LXPANEL_PLUGIN
+	GSList *list, *iter, *pcurrent;
+#else
 	GSList *list, *iter, *list0, *pcurrent;
+#endif
 	ActiveAPData *d;
 
 	g_return_if_fail (NM_IS_APPLET (applet));
@@ -917,8 +921,10 @@ wifi_add_menu_item (NMDevice *device,
 	int i;
 	NMAccessPoint *active_ap = NULL;
 	GSList *iter;
+#ifndef LXPANEL_PLUGIN
 	gboolean wifi_enabled = TRUE;
 	gboolean wifi_hw_enabled = TRUE;
+#endif
 	GSList *menu_items = NULL;  /* All menu items we'll be adding */
 	NMNetworkMenuItem *item, *active_item = NULL;
 	GtkWidget *widget;

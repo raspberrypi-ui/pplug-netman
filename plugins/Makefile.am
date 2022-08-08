@@ -49,7 +49,8 @@ netman_la_CFLAGS = \
 	-Iutils \
 	-Iwireless-security \
 	$(PACKAGE_CFLAGS) \
-	$(G_CAST_CHECKS)
+	$(G_CAST_CHECKS) \
+	-Wall
 
 netman_la_LDFLAGS = \
 	$(PACKAGE_LIBS) \
