@@ -96,7 +96,8 @@ static gboolean nm_control_msg (GtkWidget *plugin, const char *cmd)
 
     if (!g_strcmp0 (cmd, "menu"))
     {
-        status_icon_activate_cb (nm);
+        if (nm_client_get_nm_running (nm->nm_client)) status_icon_activate_cb (nm);
+        else system ("lxpanelctl command dhcpcdui menu");
     }
 
     return TRUE;
