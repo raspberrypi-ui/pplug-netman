@@ -1,3 +1,9 @@
+lxplug-netman (0.2) bullseye; urgency=medium
+
+  * Text tweak
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 05 Sep 2022 14:52:04 +0100
+
 lxplug-netman (0.1) bullseye; urgency=medium
 
   * Initial release.

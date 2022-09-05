@@ -222,7 +222,7 @@ msgstr "_OK"
 
 #: ../plugins/applet-device-wifi.c:220
 msgid "_Connect to Hidden Wi-Fi Network…"
-msgstr "_Connect to Hidden Wireless Network"
+msgstr "_Connect to Hidden Wireless Network…"
 
 #: ../plugins/applet-device-wifi.c:276
 msgid "Create _New Wi-Fi Network…"
