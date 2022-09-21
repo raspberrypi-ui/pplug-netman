@@ -48,24 +48,6 @@ extern void status_icon_size_changed_cb (NMApplet *applet);
 extern void status_icon_activate_cb (NMApplet *applet);
 extern void finalize (NMApplet *applet);
 
-static int check_service (char *name)
-{
-    int res;
-    char *buf;
-
-    buf = g_strdup_printf ("systemctl status %s 2> /dev/null | grep -qw Active:", name);
-    res = system (buf);
-    g_free (buf);
-
-    if (res) return 0;
-
-    buf = g_strdup_printf ("systemctl status %s 2> /dev/null | grep -w Active: | grep -qw inactive", name);
-    res = system (buf);
-    g_free (buf);
-
-    return res;
-}
-
 /* Handler for system config changed message from panel */
 static void nm_configuration_changed (LXPanel *panel, GtkWidget *p)
 {
@@ -141,7 +123,7 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
     /* Set up variables */
     nm->icon_size = panel_get_safe_icon_size (panel);
 
-    if (!check_service ("NetworkManager"))
+    if (system ("ps ax | grep NetworkManager | grep -qv grep"))
     {
         nm->active = FALSE;
         g_message ("netman: network manager service not running; plugin hidden");
