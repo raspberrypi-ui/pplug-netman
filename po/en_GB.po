@@ -844,7 +844,7 @@ msgid "_Configure VPN…"
 msgstr "_Configure VPN…"
 
 #: ../plugins/applet.c:1746
-msgid "_Add VPN Connection…"
+msgid "_Add a VPN connection…"
 msgstr "_Add VPN Connection…"
 
 #. 'Connection Information' item
@@ -2355,10 +2355,6 @@ msgstr "DER, PEM, or PKCS#12 private keys (*.der, *.pem, *.p12)"
 #, fuzzy
 #~ msgid "_Network name"
 #~ msgstr "_Network name:"
-
-#, fuzzy
-#~ msgid "_Add a VPN connection…"
-#~ msgstr "Add a new VPN connection"
 
 #~ msgid "Ig_nore automatically obtained routes"
 #~ msgstr "Ig_nore automatically obtained routes"

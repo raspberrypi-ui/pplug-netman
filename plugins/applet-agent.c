@@ -638,6 +638,9 @@ write_one_secret_to_keyring (NMSetting *setting,
                              gpointer user_data)
 {
 	Request *r = user_data;
+#ifndef G_DISABLE_CHECKS
+	GType type = G_VALUE_TYPE (value);
+#endif
 	const char *secret;
 
 	/* Non-secrets obviously don't get saved in the keyring */

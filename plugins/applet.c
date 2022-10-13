@@ -1741,7 +1741,7 @@ nma_menu_add_vpn_submenu (GtkWidget *menu, NMApplet *applet)
 		g_signal_connect (item, "activate", G_CALLBACK (nma_menu_configure_vpn_item_activate), applet);
 	} else {
 #endif
-		item = GTK_MENU_ITEM (gtk_menu_item_new_with_mnemonic (_("_Add VPN Connection…")));
+		item = GTK_MENU_ITEM (gtk_menu_item_new_with_mnemonic (_("_Add a VPN connection…")));
 		g_signal_connect (item, "activate", G_CALLBACK (nma_menu_add_vpn_item_activate), applet);
 #ifndef LXPANEL_PLUGIN
 	}
