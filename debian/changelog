@@ -1,3 +1,9 @@
+lxplug-netman (0.4) bullseye; urgency=medium
+
+  * Reinstate translation string
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 20 Oct 2022 13:29:41 +0100
+
 lxplug-netman (0.3) bullseye; urgency=medium
 
   * Faster service check at start
