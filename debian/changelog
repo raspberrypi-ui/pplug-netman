@@ -1,3 +1,9 @@
+lxplug-netman (0.5) bookworm; urgency=medium
+
+  * Remove dependency on org.gnome.nm-applet schema
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 13 Feb 2023 10:32:00 +0000
+
 lxplug-netman (0.4) bullseye; urgency=medium
 
   * Reinstate translation string
