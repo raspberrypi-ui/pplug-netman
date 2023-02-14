@@ -1,3 +1,9 @@
+lxplug-netman (0.6) bookworm; urgency=medium
+
+  * Remove connection editor to separate package
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 14 Feb 2023 15:09:45 +0000
+
 lxplug-netman (0.5) bookworm; urgency=medium
 
   * Remove dependency on org.gnome.nm-applet schema

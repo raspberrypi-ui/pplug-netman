@@ -15,6 +15,7 @@ Package: lxplug-netman
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, lxmenu-data, libgtk-3-0 (>= 3.24),
  lxpanel (>= 0.10.1-1+rpt1), lxpanel-data (>= 0.10.1-1+rpt1), libfm-modules (>= 1.3.2-1+rpt1)
+Recommends: lp-connection-editor
 Description: Network Manager plugin for lxpanel
  Plugin for lxpanel to use Network Manager for wired and wireless networking.
  Based on GNOME's network-manager-applet.

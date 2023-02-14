@@ -339,7 +339,6 @@ fi
 AC_CONFIG_FILES([
     Makefile
     plugins/Makefile
-    plugins/connection-editor/Makefile
     po/Makefile.in
 ])
 AC_OUTPUT
