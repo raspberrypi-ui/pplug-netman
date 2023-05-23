@@ -1,3 +1,9 @@
+lxplug-netman (0.7) bookworm; urgency=medium
+
+  * Add IP address to tooltips
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 23 May 2023 13:34:31 +0100
+
 lxplug-netman (0.6) bookworm; urgency=medium
 
   * Remove connection editor to separate package
