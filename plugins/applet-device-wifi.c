@@ -1457,6 +1457,16 @@ wifi_notify_connected (NMDevice *device,
 		signal_strength_icon = mobile_helper_get_quality_icon_name (nm_access_point_get_strength (ap));
 
 	ssid_msg = g_strdup_printf (_("You are now connected to the Wi-Fi network “%s”."), esc_ssid);
+#ifdef LXPANEL_PLUGIN
+	char *ip = get_ip (device);
+	if (ip)
+	{
+		char *tmp = g_strdup_printf ("%s\n%s", ssid_msg, ip);
+		g_free (ssid_msg);
+		g_free (ip);
+		ssid_msg = tmp;
+	}
+#endif
 	applet_do_notify_with_pref (applet, _("Connection Established"),
 	                            ssid_msg, signal_strength_icon,
 	                            PREF_DISABLE_CONNECTED_NOTIFICATIONS);

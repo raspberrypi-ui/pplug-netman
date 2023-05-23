@@ -329,4 +329,7 @@ void applet_add_default_connection_item (NMDevice *device,
                                          GtkWidget *menu,
                                          NMApplet *applet);
 
+#ifdef LXPANEL_PLUGIN
+char *get_ip (NMDevice* device);
+#endif
 #endif
