@@ -1,3 +1,9 @@
+lxplug-netman (0.8) bookworm; urgency=medium
+
+  * Create wifi connections so all users can connect
+
+ -- Simon Long <simon@raspberrypi.com>  Fri, 06 Oct 2023 10:14:11 +0100
+
 lxplug-netman (0.7) bookworm; urgency=medium
 
   * Add IP address to tooltips
