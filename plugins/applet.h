@@ -80,6 +80,7 @@ typedef struct {
     config_setting_t *settings;     /* Plugin settings */
     GSList *ap_list;
     gboolean active;
+    gboolean killing;
 #endif
 	GApplication parent;
 

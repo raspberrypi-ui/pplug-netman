@@ -3220,6 +3220,9 @@ applet_update_icon (gpointer user_data)
 	NMVpnConnectionState vpn_state = NM_VPN_CONNECTION_STATE_UNKNOWN;
 	gboolean nm_running;
 	NMActiveConnection *active_vpn = NULL;
+#ifdef LXPANEL_PLUGIN
+	if (applet->killing) return FALSE;
+#endif
 
 	applet->update_icon_id = 0;
 
@@ -3924,6 +3927,8 @@ applet_startup (GApplication *app, gpointer user_data)
 {
 #ifndef LXPANEL_PLUGIN
 	NMApplet *applet = NM_APPLET (app);
+#else
+	applet->killing = FALSE;
 #endif
 	gs_free_error GError *error = NULL;
 
@@ -4019,6 +4024,7 @@ static void finalize (GObject *object)
 #endif
 {
 #ifdef LXPANEL_PLUGIN
+	applet->killing = TRUE;
 	// clear the current access point list and related handlers
 	clear_aps (applet);
 

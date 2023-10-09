@@ -1,3 +1,9 @@
+lxplug-netman (0.9) bookworm; urgency=medium
+
+  * Fix crash on termination
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 09 Oct 2023 08:26:41 +0100
+
 lxplug-netman (0.8) bookworm; urgency=medium
 
   * Create wifi connections so all users can connect
