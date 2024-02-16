@@ -81,6 +81,7 @@ typedef struct {
     GSList *ap_list;
     gboolean active;
     gboolean killing;
+	gboolean country_set;
 #endif
 	GApplication parent;
 

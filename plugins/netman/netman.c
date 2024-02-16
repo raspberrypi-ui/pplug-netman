@@ -48,6 +48,21 @@ extern void status_icon_size_changed_cb (NMApplet *applet);
 extern void status_icon_activate_cb (NMApplet *applet);
 extern void finalize (NMApplet *applet);
 
+static int wifi_country_set (void)
+{
+    FILE *fp;
+
+    // is this 5G-compatible hardware?
+    fp = popen ("iw phy0 info | grep -q '\\*[ \\t]*5[0-9][0-9][0-9][ \\t]*MHz'", "r");
+    if (pclose (fp)) return 1;
+
+    // is the country set?
+    fp = popen ("raspi-config nonint get_wifi_country 1", "r");
+    if (pclose (fp)) return 0;
+
+    return 1;
+}
+
 /* Handler for system config changed message from panel */
 static void nm_configuration_changed (LXPanel *panel, GtkWidget *p)
 {
@@ -82,6 +97,10 @@ static gboolean nm_control_msg (GtkWidget *plugin, const char *cmd)
         else system ("lxpanelctl command dhcpcdui menu");
     }
 
+    if (!g_strcmp0 (cmd, "cset"))
+    {
+        nm->country_set = wifi_country_set ();
+    }
     return TRUE;
 }
 
@@ -122,6 +141,7 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
 
     /* Set up variables */
     nm->icon_size = panel_get_safe_icon_size (panel);
+    nm->country_set = wifi_country_set ();
 
     if (system ("ps ax | grep NetworkManager | grep -qv grep"))
     {
