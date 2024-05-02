@@ -828,7 +828,7 @@ msgstr "device not managed"
 
 #: ../plugins/applet.c:1626
 msgid "No network devices available"
-msgstr "No network devices available"
+msgstr "No wireless interfaces available"
 
 #: ../plugins/applet.c:1685
 msgid "_Advanced Options"
