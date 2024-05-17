@@ -1,3 +1,9 @@
+lxplug-netman (0.11) bookworm; urgency=medium
+
+  * Update menu text
+
+ -- Simon Long <simon@raspberrypi.com>  Fri, 17 May 2024 15:12:14 +0100
+
 lxplug-netman (0.10) bookworm; urgency=medium
 
   * Speed up display of menu by moving wifi country check
