@@ -3758,7 +3758,7 @@ status_icon_activate_cb (GtkStatusIcon *icon, NMApplet *applet)
 
 	/* Display the new menu */
 #ifdef LXPANEL_PLUGIN
-	gtk_menu_popup_at_widget (GTK_MENU (applet->menu), applet->plugin, GDK_GRAVITY_NORTH_WEST, GDK_GRAVITY_NORTH_WEST, NULL);
+	gtk_menu_popup_at_widget (GTK_MENU (applet->menu), applet->plugin, GDK_GRAVITY_SOUTH_WEST, GDK_GRAVITY_NORTH_WEST, NULL);
 #else
 	gtk_menu_popup (GTK_MENU (applet->menu), NULL, NULL,
 	                gtk_status_icon_position_menu, icon,
