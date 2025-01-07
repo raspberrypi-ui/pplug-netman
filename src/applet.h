@@ -348,11 +348,4 @@ void applet_add_default_connection_item (NMDevice *device,
 char *get_ip (NMDevice* device);
 #endif
 
-#ifndef LXPLUG
-extern void netman_init (NMApplet *nm);
-extern void netman_update_display (NMApplet *nm);
-extern gboolean nm_control_msg (NMApplet *nm, const char *cmd);
-extern void netman_destructor (gpointer user_data);
-#endif
-
 #endif

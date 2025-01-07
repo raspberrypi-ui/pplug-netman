@@ -32,9 +32,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include <locale.h>
 #include <glib/gi18n.h>
 
 #ifdef LXPLUG
@@ -136,53 +134,23 @@ gboolean nm_control_msg (NMApplet *nm, const char *cmd)
     return TRUE;
 }
 
-
 /* Plugin destructor. */
-#ifdef LXPLUG
-static void nm_destructor (gpointer user_data)
-{
-    NMApplet *nm = (NMApplet *) user_data;
-
-    /* Deallocate memory. */
-    finalize (nm);
-    g_free (nm);
-}
-#else
 void netman_destructor (gpointer user_data)
 {
     NMApplet *nm = (NMApplet *) user_data;
 
     /* Deallocate memory. */
     finalize (nm);
+#ifndef LXPLUG
     if (nm->gesture) g_object_unref (nm->gesture);
     g_object_unref (nm);
-    //g_free (nm);
-}
-#endif
-
-/* Plugin constructor. */
-#ifdef LXPLUG
-static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
-{
-    /* Allocate and initialize plugin context */
-    NMApplet *nm = g_new0 (NMApplet, 1);
-
-#ifdef ENABLE_NLS
-    setlocale (LC_ALL, "");
-    bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
-    bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
-#endif
-
-    /* Allocate top level widget and set into plugin widget pointer. */
-    nm->panel = panel;
-    nm->settings = settings;
-    nm->plugin = gtk_button_new ();
-    lxpanel_plugin_set_data (nm->plugin, nm, nm_destructor);
 #else
+    g_free (nm);
+#endif
+}
+
 void netman_init (NMApplet *nm)
 {
-#endif
-
     /* Allocate icon as a child of top level */
     nm->status_icon = gtk_image_new ();
     gtk_container_add (GTK_CONTAINER (nm->plugin), nm->status_icon);
@@ -202,7 +170,7 @@ void netman_init (NMApplet *nm)
 
     /* Set up variables */
 #ifdef LXPLUG
-    nm->icon_size = panel_get_safe_icon_size (panel);
+    nm->icon_size = panel_get_safe_icon_size (nm->panel);
 #endif
     nm->country_set = wifi_country_set ();
 
@@ -219,11 +187,30 @@ void netman_init (NMApplet *nm)
 
     /* Show the widget and return */
     gtk_widget_show_all (nm->plugin);
-#ifdef LXPLUG
-    return nm->plugin;
-#endif
 }
+
 #ifdef LXPLUG
+/* Plugin constructor. */
+static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
+{
+    /* Allocate and initialize plugin context */
+    NMApplet *nm = g_new0 (NMApplet, 1);
+
+    setlocale (LC_ALL, "");
+    bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
+    bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+
+    /* Allocate top level widget and set into plugin widget pointer. */
+    nm->panel = panel;
+    nm->settings = settings;
+    nm->plugin = gtk_button_new ();
+    lxpanel_plugin_set_data (nm->plugin, nm, netman_destructor);
+
+    netman_init (nm);
+
+    return nm->plugin;
+}
+
 FM_DEFINE_MODULE (lxpanel_gtk, netman)
 
 /* Plugin descriptor. */

@@ -6,6 +6,10 @@
 
 extern "C" {
 #include "applet.h"
+extern void netman_init (NMApplet *nm);
+extern void netman_update_display (NMApplet *nm);
+extern gboolean nm_control_msg (NMApplet *nm, const char *cmd);
+extern void netman_destructor (gpointer user_data);
 }
 
 class WayfireNetman : public WayfireWidget
