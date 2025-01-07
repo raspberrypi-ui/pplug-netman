@@ -73,11 +73,7 @@ _active_ap_get (NMApplet *applet, NMDevice *device)
 	g_return_val_if_fail (NM_IS_APPLET (applet), NULL);
 	g_return_val_if_fail (NM_IS_DEVICE (device), NULL);
 
-#ifdef LXPANEL_PLUGIN
-	list = applet->ap_list;
-#else
 	list = g_object_get_data ((GObject *) applet, ACTIVE_AP_TAG);
-#endif
 	for (iter = list; iter; iter = iter->next) {
 		ActiveAPData *d = iter->data;
 
@@ -113,23 +109,15 @@ _active_ap_set_weakref (gpointer data, GObject *where_the_object_was)
 static void
 _active_ap_set (NMApplet *applet, NMDevice *device, NMAccessPoint *ap)
 {
-#ifdef LXPANEL_PLUGIN
-	GSList *list, *iter, *pcurrent;
-#else
 	GSList *list, *iter, *list0, *pcurrent;
-#endif
 	ActiveAPData *d;
 
 	g_return_if_fail (NM_IS_APPLET (applet));
 	g_return_if_fail (!device || NM_IS_DEVICE (device));
 	g_return_if_fail (!ap || NM_IS_ACCESS_POINT (ap));
 
-#ifdef LXPANEL_PLUGIN
-	list = applet->ap_list;
-#else
 	list0 = g_object_get_data ((GObject *) applet, ACTIVE_AP_TAG);
 	list = list0;
-#endif
 
 remove_empty:
 	pcurrent = NULL;
@@ -178,15 +166,11 @@ remove_empty:
 	                                 d);
 
 out:
-#ifdef LXPANEL_PLUGIN
-	applet->ap_list = list;
-#else
 	if (list0 != list) {
 		g_object_replace_data ((GObject *) applet, ACTIVE_AP_TAG,
 		                       list0, list,
 		                       _active_ap_set_destroy, NULL);
 	}
-#endif
 }
 
 /*****************************************************************************/
@@ -248,8 +232,10 @@ applet_wifi_can_create_wifi_network (NMApplet *applet)
 	 */
 	perm = nm_client_get_permission_result (applet->nm_client, NM_CLIENT_PERMISSION_WIFI_SHARE_OPEN);
 	if (perm == NM_CLIENT_PERMISSION_RESULT_YES || perm == NM_CLIENT_PERMISSION_RESULT_AUTH) {
+#ifndef LXPANEL_PLUGIN
 		disabled = g_settings_get_boolean (applet->gsettings, PREF_DISABLE_WIFI_CREATE);
 		if (!disabled)
+#endif
 			allowed = TRUE;
 	}
 	return allowed;
@@ -629,7 +615,9 @@ static void disconnect_prompt (WifiMenuItemInfo *info, const char *name)
 	GtkBuilder *builder;
 	char *buffer;
 
+#ifdef LXPLUG
 	textdomain (GETTEXT_PACKAGE);
+#endif
 
 	builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/lxpanel-modal.ui");
 
@@ -921,10 +909,8 @@ wifi_add_menu_item (NMDevice *device,
 	int i;
 	NMAccessPoint *active_ap = NULL;
 	GSList *iter;
-#ifndef LXPANEL_PLUGIN
 	gboolean wifi_enabled = TRUE;
 	gboolean wifi_hw_enabled = TRUE;
-#endif
 	GSList *menu_items = NULL;  /* All menu items we'll be adding */
 	NMNetworkMenuItem *item, *active_item = NULL;
 	GtkWidget *widget;
@@ -1164,9 +1150,11 @@ wifi_available_dont_show_cb (NotifyNotification *notify,
 	if (!id || strcmp (id, "dont-show"))
 		return;
 
+#ifndef LXPANEL_PLUGIN
 	g_settings_set_boolean (applet->gsettings,
 	                        PREF_SUPPRESS_WIFI_NETWORKS_AVAILABLE,
 	                        TRUE);
+#endif
 }
 
 
@@ -1290,9 +1278,11 @@ queue_avail_access_point_notification (NMDevice *device)
 	if (data->id != 0)
 		return;
 
+#ifndef LXPANEL_PLUGIN
 	if (g_settings_get_boolean (data->applet->gsettings,
 	                            PREF_SUPPRESS_WIFI_NETWORKS_AVAILABLE))
 		return;
+#endif
 
 	data->id = g_timeout_add_seconds (3, idle_check_avail_access_point_notification, data);
 }
@@ -1850,9 +1840,3 @@ applet_device_wifi_get_class (NMApplet *applet)
 	return dclass;
 }
 
-#ifdef LXPANEL_PLUGIN
-void clear_aps (NMApplet *applet)
-{
-	if (applet->ap_list != NULL) _active_ap_set_destroy (applet->ap_list);
-}
-#endif

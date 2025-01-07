@@ -46,7 +46,363 @@ extern gboolean with_agent;
 #endif
 extern gboolean with_appindicator;
 
+#define BINDIR "/usr/bin"
+#define HAVE_LIBNOTIFY_07 1
+
 G_DEFINE_TYPE (NMApplet, nma, G_TYPE_APPLICATION)
+
+#ifdef LXPANEL_PLUGIN
+static gboolean has_usable_wifi (NMApplet *applet);
+static void applet_connection_info_cb (NMApplet *applet);
+static void nma_edit_connections_cb (void);
+static void nma_set_wifi_enabled_cb (GtkWidget *widget, NMApplet *applet);
+static inline NMADeviceClass *get_device_class (NMDevice *device, NMApplet *applet);
+static char *get_tip_for_device_state (NMDevice *device, NMDeviceState state, NMConnection *connection);
+static void nma_menu_add_separator_item (GtkWidget *menu);
+
+
+static void activate_hotspot_cb (GObject *client, GAsyncResult *result, gpointer user_data)
+{
+	GError *error = NULL;
+	NMActiveConnection *active;
+
+	active = nm_client_activate_connection_finish (NM_CLIENT (client), result, &error);
+	g_clear_object (&active);
+	if (error)
+	{
+		const char *text = _("Failed to activate connection");
+		char *err_text = g_strdup_printf ("(%d) %s", error->code, error->message ? error->message : _("Unknown error"));
+
+		g_warning ("%s: %s", text, err_text);
+		utils_show_error_dialog (_("Connection failure"), text, err_text, FALSE, NULL);
+		g_free (err_text);
+		g_error_free (error);
+	}
+	applet_schedule_update_icon (NM_APPLET (user_data));
+}
+
+static void activate_hotspot (GtkMenuItem *item, gpointer user_data)
+{
+	NMApplet *applet = (NMApplet *) user_data;
+	NMConnection *con;
+	NMDevice *dev;
+	const GPtrArray *all_devices;
+	int i;
+
+	// the connection path is stored as the name of the menu item widget - get the relevant connection
+	con = NM_CONNECTION (nm_client_get_connection_by_path (applet->nm_client, gtk_widget_get_name (GTK_WIDGET (item))));
+	if (!con) return;
+
+	// now find a device which can use that connection
+	all_devices = nm_client_get_devices (applet->nm_client);
+	for (i = 0; all_devices && (i < all_devices->len); i++)
+	{
+		dev = all_devices->pdata[i];
+		if (nm_device_connection_valid (dev, con)) break;
+		dev = NULL;
+	}
+	if (!dev) return;
+
+	// activate the connection with the found device - ap is NULL, as already in the connection
+	nm_client_activate_connection_async (applet->nm_client, con, dev, NULL, NULL, activate_hotspot_cb, applet);
+}
+
+static int add_hotspots (const GPtrArray *all_devices, const GPtrArray *all_connections, GtkWidget *menu, NMApplet *applet)
+{
+	const GPtrArray *act_conns;
+	int i, n_devices = 0;
+	GtkWidget *item, *hbox, *lbl, *icon, *sec;
+	char *ssid_utf8;
+	NMConnection *con;
+	NMSettingWireless *s_wire;
+	GBytes *ssid;
+	gboolean dev_ok = FALSE;
+
+	// is there a usable wifi device?
+	for (i = 0; all_devices && (i < all_devices->len); i++)
+	{
+		NMDevice *device = all_devices->pdata[i];
+
+		if (nm_device_get_device_type (device) == NM_DEVICE_TYPE_WIFI && !nma_menu_device_check_unusable (device))
+			dev_ok = TRUE;
+	}
+	if (!dev_ok) return 0;
+
+	// don't show hotspots if one is active
+	act_conns = nm_client_get_active_connections (applet->nm_client);
+	for (i = 0; act_conns && (i < act_conns->len); i++)
+	{
+		NMActiveConnection *ac = act_conns->pdata[i];
+		con = NM_CONNECTION (nm_active_connection_get_connection (ac));
+		s_wire = nm_connection_get_setting_wireless (con);
+		if (!s_wire || !NM_IS_SETTING_WIRELESS (s_wire)) continue;
+		if (!g_strcmp0 (nm_setting_wireless_get_mode (s_wire), "ap")) return 0;
+	}
+
+	// find any ap connections and add to menu
+	for (i = 0; all_connections && (i < all_connections->len); i++)
+	{
+		con = NM_CONNECTION (all_connections->pdata[i]);
+		s_wire = nm_connection_get_setting_wireless (con);
+		if (!s_wire || !NM_IS_SETTING_WIRELESS (s_wire)) continue;
+		if (g_strcmp0 (nm_setting_wireless_get_mode (s_wire), "ap")) continue;
+
+		if (!n_devices) nma_menu_add_separator_item (menu);
+
+		item = gtk_check_menu_item_new ();
+		hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
+		gtk_container_add (GTK_CONTAINER (item), hbox);
+
+		ssid = nm_setting_wireless_get_ssid (s_wire);
+		ssid_utf8 = nm_utils_ssid_to_utf8 (g_bytes_get_data (ssid, NULL), g_bytes_get_size (ssid));
+		lbl = gtk_label_new (ssid_utf8);
+		g_free (ssid_utf8);
+		gtk_label_set_xalign (GTK_LABEL (lbl), 0.0);
+		gtk_label_set_yalign (GTK_LABEL (lbl), 0.5);
+		gtk_box_pack_start (GTK_BOX (hbox), lbl, TRUE, TRUE, 0);
+
+		icon = gtk_image_new ();
+		wrap_set_menu_icon (applet, icon, "network-wireless-hotspot");
+		gtk_box_pack_end (GTK_BOX (hbox), icon, FALSE, TRUE, 0);
+
+		sec = gtk_image_new ();
+		NMSettingWirelessSecurity *s_sec = nm_connection_get_setting_wireless_security (con);
+		if (s_sec) wrap_set_menu_icon (applet, sec, "network-wireless-encrypted");
+		gtk_box_pack_end (GTK_BOX (hbox), sec, FALSE, TRUE, 0);
+
+		g_signal_connect (item, "activate", G_CALLBACK (activate_hotspot), applet);
+		gtk_widget_set_name (item, nm_connection_get_path (con));
+		gtk_menu_shell_append (GTK_MENU_SHELL (menu), GTK_WIDGET (item));
+		gtk_widget_show_all (GTK_WIDGET (item));
+
+		n_devices++;
+	}
+	return n_devices;
+}
+
+static void nma_menu_add_wifi_switch_item (GtkWidget *menu, NMApplet *applet)
+{
+	GtkWidget *menu_item = gtk_menu_item_new_with_mnemonic (nm_client_wireless_get_enabled (applet->nm_client) ? _("_Turn Off Wireless LAN") : _("_Turn On Wireless LAN"));
+	gtk_widget_show_all (menu_item);
+	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+	g_signal_connect (menu_item, "activate", G_CALLBACK (nma_set_wifi_enabled_cb), applet);
+}
+
+static void set_country (GObject *o, gpointer data)
+{
+    if (fork () == 0)
+    {
+        char *args[] = { "rc_gui", "-w", NULL };
+        execvp ("rc_gui", args);
+    }
+}
+
+char *get_ip (NMDevice* device)
+{
+	// get the IP4 address
+	NMIPConfig *ip4_config = nm_device_get_ip4_config (device);
+	if (ip4_config)
+	{
+		const GPtrArray *addresses = nm_ip_config_get_addresses (ip4_config);
+		if (addresses && addresses->len)
+		{
+			NMIPAddress *addr = (NMIPAddress *) g_ptr_array_index (addresses, 0);
+			if (addr) return g_strdup_printf (_("IP : %s"), nm_ip_address_get_address (addr));
+		}
+	}
+	else
+	{
+		// get the IP6 address if there is no IP4 address
+		NMIPConfig *ip6_config = nm_device_get_ip6_config (device);
+		if (ip6_config)
+		{
+			const GPtrArray *addresses = nm_ip_config_get_addresses (ip6_config);
+			if (addresses && addresses->len)
+			{
+				NMIPAddress *addr = (NMIPAddress *) g_ptr_array_index (addresses, 0);
+				if (addr) return g_strdup_printf (_("IP : %s"), nm_ip_address_get_address (addr));
+			}
+		}
+	}
+	return NULL;
+}
+
+static char *get_tooltip (NMApplet *applet)
+{
+	char *out, *tmp, *ip, *ret = NULL;
+	const char *icon_name;
+	int i;
+
+	g_return_val_if_fail (NM_IS_APPLET (applet), NULL);
+
+	// loop through all current connnections
+	const GPtrArray *connections = nm_client_get_active_connections (applet->nm_client);
+	if (!connections || !connections->len) return NULL;
+
+	for (i = 0; i < connections->len; i++)
+	{
+		NMActiveConnection *aconn = g_ptr_array_index (connections, i);
+
+		// find the connection
+		NMConnection *connection = (NMConnection *) nm_active_connection_get_connection (aconn);
+		if (!connection) continue;
+
+		// find the device
+		const GPtrArray *devices = nm_active_connection_get_devices (aconn);
+		if (!devices || !devices->len) continue;
+		NMDevice *device = g_ptr_array_index (devices, 0);
+
+		// find device state and class
+		NMDeviceState state = nm_device_get_state (device);
+		NMADeviceClass *dclass = get_device_class (device, applet);
+
+		// filter out virtual devices
+		if (!nm_device_get_hw_address (device)) continue;
+
+		// filter out VPNs
+		if (NM_IS_VPN_CONNECTION (aconn)) continue;
+
+		// filter out loopback
+		if (nm_device_get_device_type (device) == NM_DEVICE_TYPE_LOOPBACK) continue;
+
+		// get the standard tooltip for the device, state and connection
+		icon_name = NULL;
+		out = NULL;
+		if (dclass) dclass->get_icon (device, state, connection, NULL, &icon_name, &out, applet);
+
+		// get the fallback tooltip if get_icon didn't supply one
+		if (!out) out = get_tip_for_device_state (device, state, connection);
+
+		if (out)
+		{
+			// append the new tooltip to any we already have
+			if (!ret) ret = g_strdup_printf ("%s", out);
+			else
+			{
+				tmp = g_strdup_printf ("%s\n%s", ret, out);
+				g_free (ret);
+				ret = tmp;
+			}
+			g_free (out);
+
+			ip = get_ip (device);
+			if (ip)
+			{
+				tmp = g_strdup_printf ("%s\n%s", ret, ip);
+				g_free (ip);
+				g_free (ret);
+				ret = tmp;
+			}
+		}
+	}
+	return ret;
+}
+
+static void applet_common_get_device_icon_lxp (gboolean wifi, NMDeviceState state,
+	GdkPixbuf **out_pixbuf, char **out_icon_name, NMApplet *applet)
+{
+	char *name;
+	int stage = -1;
+	int lim;
+
+	switch (state) {
+	case NM_DEVICE_STATE_PREPARE:
+	case NM_DEVICE_STATE_CONFIG:
+	case NM_DEVICE_STATE_NEED_AUTH:
+		stage = 0;
+		break;
+	case NM_DEVICE_STATE_IP_CONFIG:
+		stage = 1;
+		break;
+	default:
+		break;
+	}
+
+	if (stage >= 0)
+	{
+		if (stage == 0)
+		{
+			if (wifi)
+			{
+				lim = 4;
+				if (applet->animation_step > lim) applet->animation_step = 0;
+				switch (applet->animation_step)
+				{
+					case 0 : 	name = g_strdup_printf ("network-wireless-connected-00");
+								break;
+					case 1 : 	name = g_strdup_printf ("network-wireless-connected-25");
+								break;
+					case 2 : 	name = g_strdup_printf ("network-wireless-connected-50");
+								break;
+					case 3 : 	name = g_strdup_printf ("network-wireless-connected-75");
+								break;
+					case 4 : 	name = g_strdup_printf ("network-wireless-connected-100");
+								break;
+					default : 	name = g_strdup_printf ("network-wireless-connected-00");
+								break;
+				}
+			}
+			else
+			{
+				lim = 2;
+				if (applet->animation_step > lim) applet->animation_step = 0;
+				switch (applet->animation_step)
+				{
+					case 0 : 	name = g_strdup_printf ("network-transmit");
+								break;
+					case 1 : 	name = g_strdup_printf ("network-receive");
+								break;
+					case 2 : 	name = g_strdup_printf ("network-idle");
+								break;
+					default : 	name = g_strdup_printf ("network-transmit");
+								break;
+				}
+			}
+		}
+		else
+		{
+			lim = 1;
+			if (applet->animation_step > lim) applet->animation_step = 0;
+			if (wifi)
+			{
+				switch (applet->animation_step)
+				{
+					case 0 : 	name = g_strdup_printf ("network-wireless-connected-00");
+								break;
+					case 1 : 	name = g_strdup_printf ("network-wireless-connected-100");
+								break;
+					default : 	name = g_strdup_printf ("network-wireless-connected-00");
+								break;
+				}
+			}
+			else
+			{
+				switch (applet->animation_step)
+				{
+					case 0 : 	name = g_strdup_printf ("network-transmit-receive");
+								break;
+					case 1 : 	name = g_strdup_printf ("network-idle");
+								break;
+					default : 	name = g_strdup_printf ("network-transmit-receive");
+								break;
+				}
+			}
+		}
+
+		if (out_pixbuf)
+			*out_pixbuf = nm_g_object_ref (nma_icon_check_and_load (name, applet));
+		if (out_icon_name)
+			*out_icon_name = name;
+		else
+			g_free (name);
+
+		applet->animation_step++;
+		if (applet->animation_step > lim)
+			applet->animation_step = 0;
+	}
+}
+#endif
+
 
 /********************************************************************/
 
@@ -713,7 +1069,6 @@ applet_clear_notify (NMApplet *applet)
 #endif
 }
 
-#ifndef LXPANEL_PLUGIN
 static gboolean
 applet_notify_server_has_actions (void)
 {
@@ -736,7 +1091,6 @@ applet_notify_server_has_actions (void)
 
 	return has_actions;
 }
-#endif
 
 void
 applet_do_notify (NMApplet *applet,
@@ -830,7 +1184,9 @@ notify_dont_show_cb (NotifyNotification *notify,
 	    && strcmp (id, PREF_DISABLE_VPN_NOTIFICATIONS))
 		return;
 
+#ifndef LXPANEL_PLUGIN
 	g_settings_set_boolean (applet->gsettings, id, TRUE);
+#endif
 }
 
 void applet_do_notify_with_pref (NMApplet *applet,
@@ -839,8 +1195,10 @@ void applet_do_notify_with_pref (NMApplet *applet,
                                  const char *icon,
                                  const char *pref)
 {
+#ifndef LXPANEL_PLUGIN
 	if (g_settings_get_boolean (applet->gsettings, pref))
 		return;
+#endif
 
 	applet_do_notify (applet, NOTIFY_URGENCY_LOW, summary, message, icon, pref,
 	                  _("Don’t show this message again"),
@@ -1122,7 +1480,6 @@ nma_menu_vpn_item_clicked (GtkMenuItem *item, gpointer user_data)
  * Signal function called when user clicks "Configure VPN..."
  *
  */
-#ifndef LXPANEL_PLUGIN
 static void
 nma_menu_configure_vpn_item_activate (GtkMenuItem *item, gpointer user_data)
 {
@@ -1130,7 +1487,6 @@ nma_menu_configure_vpn_item_activate (GtkMenuItem *item, gpointer user_data)
 
 	g_spawn_async (NULL, (gchar **) argv, NULL, 0, NULL, NULL, NULL, NULL);
 }
-#endif
 
 /*
  * nma_menu_add_vpn_item_activate
@@ -1470,127 +1826,6 @@ add_device_items (NMDeviceType type, const GPtrArray *all_devices,
 	return n_devices;
 }
 
-#ifdef LXPANEL_PLUGIN
-static void activate_hotspot_cb (GObject *client, GAsyncResult *result, gpointer user_data)
-{
-	GError *error = NULL;
-	NMActiveConnection *active;
-
-	active = nm_client_activate_connection_finish (NM_CLIENT (client), result, &error);
-	g_clear_object (&active);
-	if (error)
-	{
-		const char *text = _("Failed to activate connection");
-		char *err_text = g_strdup_printf ("(%d) %s", error->code, error->message ? error->message : _("Unknown error"));
-
-		g_warning ("%s: %s", text, err_text);
-		utils_show_error_dialog (_("Connection failure"), text, err_text, FALSE, NULL);
-		g_free (err_text);
-		g_error_free (error);
-	}
-	applet_schedule_update_icon (NM_APPLET (user_data));
-}
-
-static void activate_hotspot (GtkMenuItem *item, gpointer user_data)
-{
-	NMApplet *applet = (NMApplet *) user_data;
-	NMConnection *con;
-	NMDevice *dev;
-	const GPtrArray *all_devices;
-	int i;
-
-	// the connection path is stored as the name of the menu item widget - get the relevant connection
-	con = NM_CONNECTION (nm_client_get_connection_by_path (applet->nm_client, gtk_widget_get_name (GTK_WIDGET (item))));
-	if (!con) return;
-
-	// now find a device which can use that connection
-	all_devices = nm_client_get_devices (applet->nm_client);
-	for (i = 0; all_devices && (i < all_devices->len); i++)
-	{
-		dev = all_devices->pdata[i];
-		if (nm_device_connection_valid (dev, con)) break;
-		dev = NULL;
-	}
-	if (!dev) return;
-
-	// activate the connection with the found device - ap is NULL, as already in the connection
-	nm_client_activate_connection_async (applet->nm_client, con, dev, NULL, NULL, activate_hotspot_cb, applet);
-}
-
-static int add_hotspots (const GPtrArray *all_devices, const GPtrArray *all_connections, GtkWidget *menu, NMApplet *applet)
-{
-	const GPtrArray *act_conns;
-	int i, n_devices = 0;
-	GtkWidget *item, *hbox, *lbl, *icon, *sec;
-	char *ssid_utf8;
-	NMConnection *con;
-	NMSettingWireless *s_wire;
-	GBytes *ssid;
-	gboolean dev_ok = FALSE;
-
-	// is there a usable wifi device?
-	for (i = 0; all_devices && (i < all_devices->len); i++)
-	{
-		NMDevice *device = all_devices->pdata[i];
-
-		if (nm_device_get_device_type (device) == NM_DEVICE_TYPE_WIFI && !nma_menu_device_check_unusable (device))
-			dev_ok = TRUE;
-	}
-	if (!dev_ok) return 0;
-
-	// don't show hotspots if one is active
-	act_conns = nm_client_get_active_connections (applet->nm_client);
-	for (i = 0; act_conns && (i < act_conns->len); i++)
-	{
-		NMActiveConnection *ac = act_conns->pdata[i];
-		con = NM_CONNECTION (nm_active_connection_get_connection (ac));
-		s_wire = nm_connection_get_setting_wireless (con);
-		if (!s_wire || !NM_IS_SETTING_WIRELESS (s_wire)) continue;
-		if (!g_strcmp0 (nm_setting_wireless_get_mode (s_wire), "ap")) return 0;
-	}
-
-	// find any ap connections and add to menu
-	for (i = 0; all_connections && (i < all_connections->len); i++)
-	{
-		con = NM_CONNECTION (all_connections->pdata[i]);
-		s_wire = nm_connection_get_setting_wireless (con);
-		if (!s_wire || !NM_IS_SETTING_WIRELESS (s_wire)) continue;
-		if (g_strcmp0 (nm_setting_wireless_get_mode (s_wire), "ap")) continue;
-
-		if (!n_devices) nma_menu_add_separator_item (menu);
-
-		item = gtk_check_menu_item_new ();
-		hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
-		gtk_container_add (GTK_CONTAINER (item), hbox);
-
-		ssid = nm_setting_wireless_get_ssid (s_wire);
-		ssid_utf8 = nm_utils_ssid_to_utf8 (g_bytes_get_data (ssid, NULL), g_bytes_get_size (ssid));
-		lbl = gtk_label_new (ssid_utf8);
-		g_free (ssid_utf8);
-		gtk_label_set_xalign (GTK_LABEL (lbl), 0.0);
-		gtk_label_set_yalign (GTK_LABEL (lbl), 0.5);
-		gtk_box_pack_start (GTK_BOX (hbox), lbl, TRUE, TRUE, 0);
-
-		icon = gtk_image_new ();
-		lxpanel_plugin_set_menu_icon (applet->panel, icon, "network-wireless-hotspot");
-		gtk_box_pack_end (GTK_BOX (hbox), icon, FALSE, TRUE, 0);
-
-		sec = gtk_image_new ();
-		NMSettingWirelessSecurity *s_sec = nm_connection_get_setting_wireless_security (con);
-		if (s_sec) lxpanel_plugin_set_menu_icon (applet->panel, sec, "network-wireless-encrypted");
-		gtk_box_pack_end (GTK_BOX (hbox), sec, FALSE, TRUE, 0);
-
-		g_signal_connect (item, "activate", G_CALLBACK (activate_hotspot), applet);
-		gtk_widget_set_name (item, nm_connection_get_path (con));
-		gtk_menu_shell_append (GTK_MENU_SHELL (menu), GTK_WIDGET (item));
-		gtk_widget_show_all (GTK_WIDGET (item));
-
-		n_devices++;
-	}
-	return n_devices;
-}
-#endif
-
 static void
 nma_menu_add_devices (GtkWidget *menu, NMApplet *applet)
 {
@@ -1660,12 +1895,6 @@ get_vpn_connections (NMApplet *applet)
 	return vpn_connections;
 }
 
-#ifdef LXPANEL_PLUGIN
-static gboolean has_usable_wifi (NMApplet *applet);
-static void applet_connection_info_cb (NMApplet *applet);
-static void nma_edit_connections_cb (void);
-#endif
-
 static void
 nma_menu_add_vpn_submenu (GtkWidget *menu, NMApplet *applet)
 {
@@ -1689,14 +1918,13 @@ nma_menu_add_vpn_submenu (GtkWidget *menu, NMApplet *applet)
 	gtk_widget_show (GTK_WIDGET (item));
 
 #ifdef LXPANEL_PLUGIN
-	if (has_usable_wifi (applet)) {
+	if (applet->country_set && has_usable_wifi (applet)) {
 		/* Add the "Hidden Wi-Fi network..." entry */
 		nma_menu_add_hidden_network_item (GTK_WIDGET (vpn_menu), applet);
 		nma_menu_add_create_hotspot_item (GTK_WIDGET (vpn_menu), applet);
 		nma_menu_add_separator_item (GTK_WIDGET (vpn_menu));
 	}
 #endif
-
 	list = get_vpn_connections (applet);
 	for (i = 0; i < list->len; i++) {
 		NMConnection *connection = NM_CONNECTION (list->pdata[i]);
@@ -1778,6 +2006,7 @@ nma_set_wifi_enabled_cb (GtkWidget *widget, NMApplet *applet)
 	gboolean state;
 
 	g_return_if_fail (applet != NULL);
+
 #ifdef LXPANEL_PLUGIN
 	state = ! nm_client_wireless_get_enabled (applet->nm_client);
 #else
@@ -1818,6 +2047,7 @@ nma_set_notifications_enabled_cb (GtkWidget *widget, NMApplet *applet)
 
 	state = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget));
 
+#ifndef LXPANEL_PLUGIN
 	g_settings_set_boolean (applet->gsettings,
 	                        PREF_DISABLE_CONNECTED_NOTIFICATIONS,
 	                        !state);
@@ -1830,6 +2060,7 @@ nma_set_notifications_enabled_cb (GtkWidget *widget, NMApplet *applet)
 	g_settings_set_boolean (applet->gsettings,
 	                        PREF_SUPPRESS_WIFI_NETWORKS_AVAILABLE,
 	                        !state);
+#endif
 }
 
 static gboolean
@@ -1856,27 +2087,6 @@ has_usable_wifi (NMApplet *applet)
 	return FALSE;
 }
 
-#ifdef LXPANEL_PLUGIN
-void
-nma_menu_add_wifi_switch_item (GtkWidget *menu, NMApplet *applet)
-{
-	GtkWidget *menu_item = gtk_menu_item_new_with_mnemonic (nm_client_wireless_get_enabled (applet->nm_client) ? _("_Turn Off Wireless LAN") : _("_Turn On Wireless LAN"));
-	gtk_widget_show_all (menu_item);
-	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
-	g_signal_connect (menu_item, "activate", G_CALLBACK (nma_set_wifi_enabled_cb), applet);
-}
-
-static void set_country (GObject *o, gpointer data)
-{
-    if (fork () == 0)
-    {
-        setenv ("SUDO_ASKPASS", "/usr/lib/rc-gui/pwdrcg.sh", 1);
-        char *args[] = { "sudo", "-AE", "rc_gui", "-w", NULL };
-        execvp ("sudo", args);
-    }
-}
-#endif
-
 /*
  * nma_menu_show_cb
  *
@@ -1900,27 +2110,28 @@ static void nma_menu_show_cb (GtkWidget *menu, NMApplet *applet)
 		return;
 	}
 
-	if (!applet->country_set)
-	{
-		nma_menu_add_text_item (menu, _("Wi-Fi country is not set"));
-		GtkWidget *item = gtk_menu_item_new_with_label (_("Click here to set Wi-Fi country"));
-		g_signal_connect (G_OBJECT (item), "activate", G_CALLBACK (set_country), NULL);
-		gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
-		gtk_widget_show (item);
-		return;
-	}
-
 	if (nm_client_get_state (applet->nm_client) == NM_STATE_ASLEEP) {
 		nma_menu_add_text_item (menu, _("Networking disabled"));
 		return;
 	}
 
 #ifdef LXPANEL_PLUGIN
-	nma_menu_add_wifi_switch_item (menu, applet);
-	nma_menu_add_separator_item (menu);
+	if (!applet->country_set)
+	{
+		GtkWidget *item = gtk_menu_item_new_with_label (_("Click here to set Wi-Fi country"));
+		g_signal_connect (G_OBJECT (item), "activate", G_CALLBACK (set_country), NULL);
+		gtk_widget_set_tooltip_text (item, _("Wi-Fi country must be set to connect to Wi-Fi networks"));
+		gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+		gtk_widget_show (item);
+		nma_menu_add_separator_item (menu);
+	}
+	else
+	{
+		nma_menu_add_wifi_switch_item (menu, applet);
+		nma_menu_add_separator_item (menu);
+		nma_menu_add_devices (menu, applet);
+	}
 #endif
-
-	nma_menu_add_devices (menu, applet);
 
 #ifndef LXPANEL_PLUGIN
 	if (has_usable_wifi (applet)) {
@@ -2038,11 +2249,13 @@ nma_context_menu_update (NMApplet *applet)
 		/* Enabled notifications */
 		g_signal_handler_block (G_OBJECT (applet->notifications_enabled_item),
 			                    applet->notifications_enabled_toggled_id);
+#ifndef LXPANEL_PLUGIN
 		if (   g_settings_get_boolean (applet->gsettings, PREF_DISABLE_CONNECTED_NOTIFICATIONS)
 			&& g_settings_get_boolean (applet->gsettings, PREF_DISABLE_DISCONNECTED_NOTIFICATIONS)
 			&& g_settings_get_boolean (applet->gsettings, PREF_DISABLE_VPN_NOTIFICATIONS)
 			&& g_settings_get_boolean (applet->gsettings, PREF_SUPPRESS_WIFI_NETWORKS_AVAILABLE))
 			notifications_enabled = FALSE;
+#endif
 		gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (applet->notifications_enabled_item), notifications_enabled);
 		g_signal_handler_unblock (G_OBJECT (applet->notifications_enabled_item),
 			                      applet->notifications_enabled_toggled_id);
@@ -2374,7 +2587,6 @@ foo_set_icon (NMApplet *applet, guint32 layer, GdkPixbuf *pixbuf, const char *ic
 
 	g_return_if_fail (layer == ICON_LAYER_LINK || layer == ICON_LAYER_VPN);
 
-#ifndef LXPANEL_PLUGIN
 #ifdef WITH_APPINDICATOR
 	if (INDICATOR_ENABLED (applet)) {
 		/* FIXME: We rely on the fact that VPN icon gets drawn later and therefore
@@ -2382,13 +2594,12 @@ foo_set_icon (NMApplet *applet, guint32 layer, GdkPixbuf *pixbuf, const char *ic
 		 * icon and the VPN icon.
 		 */
 		if (icon_name == NULL && layer == ICON_LAYER_LINK)
-			icon_name = "network-offline";
+			icon_name = "nm-no-connection";
 		if (icon_name != NULL && g_strcmp0 (app_indicator_get_icon (applet->app_indicator), icon_name) != 0)
 			app_indicator_set_icon_full (applet->app_indicator, icon_name, applet->tip);
 		return;
 	}
 #endif  /* WITH_APPINDICATOR */
-#endif
 
 	/* Load the pixbuf by icon name */
 	if (icon_name && !pixbuf)
@@ -2516,8 +2727,12 @@ foo_device_state_changed_cb (NMDevice *device,
 	applet_common_device_state_changed (device, new_state, old_state, reason, applet);
 
 	if (   dclass
+#ifdef LXPANEL_PLUGIN
+	    && new_state == NM_DEVICE_STATE_ACTIVATED) {
+#else
 	    && new_state == NM_DEVICE_STATE_ACTIVATED
 	    && !g_settings_get_boolean (applet->gsettings, PREF_DISABLE_CONNECTED_NOTIFICATIONS)) {
+#endif
 		NMConnection *connection;
 		char *str = NULL;
 
@@ -2822,7 +3037,6 @@ mm1_client_setup (NMApplet *applet)
 
 #endif /* WITH_WWAN */
 
-#ifndef LXPANEL_PLUGIN
 static void
 applet_common_get_device_icon (NMDeviceState state,
                                GdkPixbuf **out_pixbuf,
@@ -2861,115 +3075,6 @@ applet_common_get_device_icon (NMDeviceState state,
 			applet->animation_step = 0;
 	}
 }
-
-#else
-static void
-applet_common_get_device_icon_lxp (gboolean wifi, NMDeviceState state,
-                               GdkPixbuf **out_pixbuf,
-                               char **out_icon_name,
-                               NMApplet *applet)
-{
-	char *name;
-	int stage = -1;
-	int lim;
-
-	switch (state) {
-	case NM_DEVICE_STATE_PREPARE:
-	case NM_DEVICE_STATE_CONFIG:
-	case NM_DEVICE_STATE_NEED_AUTH:
-		stage = 0;
-		break;
-	case NM_DEVICE_STATE_IP_CONFIG:
-		stage = 1;
-		break;
-	default:
-		break;
-	}
-
-	if (stage >= 0)
-	{
-		if (stage == 0)
-		{
-			if (wifi)
-			{
-				lim = 4;
-				if (applet->animation_step > lim) applet->animation_step = 0;
-				switch (applet->animation_step)
-				{
-					case 0 : 	name = g_strdup_printf ("network-wireless-connected-00");
-								break;
-					case 1 : 	name = g_strdup_printf ("network-wireless-connected-25");
-								break;
-					case 2 : 	name = g_strdup_printf ("network-wireless-connected-50");
-								break;
-					case 3 : 	name = g_strdup_printf ("network-wireless-connected-75");
-								break;
-					case 4 : 	name = g_strdup_printf ("network-wireless-connected-100");
-								break;
-					default : 	name = g_strdup_printf ("network-wireless-connected-00");
-								break;
-				}
-			}
-			else
-			{
-				lim = 2;
-				if (applet->animation_step > lim) applet->animation_step = 0;
-				switch (applet->animation_step)
-				{
-					case 0 : 	name = g_strdup_printf ("network-transmit");
-								break;
-					case 1 : 	name = g_strdup_printf ("network-receive");
-								break;
-					case 2 : 	name = g_strdup_printf ("network-idle");
-								break;
-					default : 	name = g_strdup_printf ("network-transmit");
-								break;
-				}
-			}
-		}
-		else
-		{
-			lim = 1;
-			if (applet->animation_step > lim) applet->animation_step = 0;
-			if (wifi)
-			{
-				switch (applet->animation_step)
-				{
-					case 0 : 	name = g_strdup_printf ("network-wireless-connected-00");
-								break;
-					case 1 : 	name = g_strdup_printf ("network-wireless-connected-100");
-								break;
-					default : 	name = g_strdup_printf ("network-wireless-connected-00");
-								break;
-				}
-			}
-			else
-			{
-				switch (applet->animation_step)
-				{
-					case 0 : 	name = g_strdup_printf ("network-transmit-receive");
-								break;
-					case 1 : 	name = g_strdup_printf ("network-idle");
-								break;
-					default : 	name = g_strdup_printf ("network-transmit-receive");
-								break;
-				}
-			}
-		}
-
-		if (out_pixbuf)
-			*out_pixbuf = nm_g_object_ref (nma_icon_check_and_load (name, applet));
-		if (out_icon_name)
-			*out_icon_name = name;
-		else
-			g_free (name);
-
-		applet->animation_step++;
-		if (applet->animation_step > lim)
-			applet->animation_step = 0;
-	}
-}
-#endif
 
 static char *
 get_tip_for_device_state (NMDevice *device,
@@ -3059,108 +3164,6 @@ out:
 #endif
 }
 
-#ifdef LXPANEL_PLUGIN
-char *get_ip (NMDevice* device)
-{
-	// get the IP4 address
-	NMIPConfig *ip4_config = nm_device_get_ip4_config (device);
-	if (ip4_config)
-	{
-		const GPtrArray *addresses = nm_ip_config_get_addresses (ip4_config);
-		if (addresses && addresses->len)
-		{
-			NMIPAddress *addr = (NMIPAddress *) g_ptr_array_index (addresses, 0);
-			if (addr) return g_strdup_printf (_("IP : %s"), nm_ip_address_get_address (addr));
-		}
-	}
-	else
-	{
-		// get the IP6 address if there is no IP4 address
-		NMIPConfig *ip6_config = nm_device_get_ip6_config (device);
-		if (ip6_config)
-		{
-			const GPtrArray *addresses = nm_ip_config_get_addresses (ip6_config);
-			if (addresses && addresses->len)
-			{
-				NMIPAddress *addr = (NMIPAddress *) g_ptr_array_index (addresses, 0);
-				if (addr) return g_strdup_printf (_("IP : %s"), nm_ip_address_get_address (addr));
-			}
-		}
-	}
-	return NULL;
-}
-
-static char *get_tooltip (NMApplet *applet)
-{
-	char *out, *tmp, *ip, *ret = NULL;
-	const char *icon_name;
-	int i;
-
-	g_return_val_if_fail (NM_IS_APPLET (applet), NULL);
-
-	// loop through all current connnections
-	const GPtrArray *connections = nm_client_get_active_connections (applet->nm_client);
-	if (!connections || !connections->len) return NULL;
-
-	for (i = 0; i < connections->len; i++)
-	{
-		NMActiveConnection *aconn = g_ptr_array_index (connections, i);
-
-		// find the connection
-		NMConnection *connection = (NMConnection *) nm_active_connection_get_connection (aconn);
-		if (!connection) continue;
-
-		// find the device
-		const GPtrArray *devices = nm_active_connection_get_devices (aconn);
-		if (!devices || !devices->len) continue;
-		NMDevice *device = g_ptr_array_index (devices, 0);
-
-		// find device state and class
-		NMDeviceState state = nm_device_get_state (device);
-		NMADeviceClass *dclass = get_device_class (device, applet);
-
-		// filter out virtual devices
-		if (!nm_device_get_hw_address (device)) continue;
-
-		// filter out VPNs
-		if (NM_IS_VPN_CONNECTION (aconn)) continue;
-
-		// filter out loopback
-		if (nm_device_get_device_type (device) == NM_DEVICE_TYPE_LOOPBACK) continue;
-
-		// get the standard tooltip for the device, state and connection
-		out = NULL;
-		if (dclass) dclass->get_icon (device, state, connection, NULL, &icon_name, &out, applet);
-
-		// get the fallback tooltip if get_icon didn't supply one
-		if (!out) out = get_tip_for_device_state (device, state, connection);
-
-		if (out)
-		{
-			// append the new tooltip to any we already have
-			if (!ret) ret = g_strdup_printf ("%s", out);
-			else
-			{
-				tmp = g_strdup_printf ("%s\n%s", ret, out);
-				g_free (ret);
-				ret = tmp;
-			}
-			g_free (out);
-
-			ip = get_ip (device);
-			if (ip)
-			{
-				tmp = g_strdup_printf ("%s\n%s", ret, ip);
-				g_free (ip);
-				g_free (ret);
-				ret = tmp;
-			}
-		}
-	}
-	return ret;
-}
-#endif
-
 static char *
 get_tip_for_vpn (NMActiveConnection *active, NMVpnConnectionState state, NMApplet *applet)
 {
@@ -3219,12 +3222,12 @@ applet_update_icon (gpointer user_data)
 	if (!nm_running)
 		state = NM_STATE_UNKNOWN;
 
-#ifndef LXPANEL_PLUGIN
 #ifdef WITH_APPINDICATOR
 	if (INDICATOR_ENABLED (applet))
 		app_indicator_set_status (applet->app_indicator, nm_running ? APP_INDICATOR_STATUS_ACTIVE : APP_INDICATOR_STATUS_PASSIVE);
 	else
 #endif  /* WITH_APPINDICATOR */
+#ifndef LXPANEL_PLUGIN
 	{
 		gtk_status_icon_set_visible (applet->status_icon, applet->visible);
 	}
@@ -3331,6 +3334,8 @@ applet_update_icon (gpointer user_data)
 void
 applet_schedule_update_icon (NMApplet *applet)
 {
+	if (applet->killing) return;
+
 	if (!applet->update_icon_id)
 		applet->update_icon_id = g_idle_add (applet_update_icon, applet);
 }
@@ -3669,6 +3674,7 @@ static void nma_icons_init (NMApplet *applet)
 #endif
 		applet->icon_theme = gtk_icon_theme_get_default ();
 
+#ifndef LXPANEL_PLUGIN
 	/* If not done yet, append our search path */
 	path_appended = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (applet->icon_theme),
 	                                 "NMAIconPathAppended"));
@@ -3678,13 +3684,13 @@ static void nma_icons_init (NMApplet *applet)
 		                   "NMAIconPathAppended",
 		                   GINT_TO_POINTER (TRUE));
 	}
+#endif
 
 	g_signal_connect (applet->icon_theme, "changed", G_CALLBACK (nma_icon_theme_changed), applet);
 
 	nma_icons_reload (applet);
 }
 
-#ifndef LXPANEL_PLUGIN
 static void
 status_icon_screen_changed_cb (GtkStatusIcon *icon,
                                GParamSpec *pspec,
@@ -3692,7 +3698,6 @@ status_icon_screen_changed_cb (GtkStatusIcon *icon,
 {
 	nma_icons_init (applet);
 }
-#endif
 
 #ifdef LXPANEL_PLUGIN
 void
@@ -3705,7 +3710,11 @@ status_icon_size_changed_cb (GtkStatusIcon *icon,
 #endif
 {
 #ifdef LXPANEL_PLUGIN
+#ifdef LXPLUG
 	int size = panel_get_safe_icon_size (applet->panel);
+#else
+	int size = applet->icon_size;
+#endif
 #endif
 	g_debug ("%s(): status icon size %d requested", __func__, size);
 
@@ -3758,7 +3767,11 @@ status_icon_activate_cb (GtkStatusIcon *icon, NMApplet *applet)
 
 	/* Display the new menu */
 #ifdef LXPANEL_PLUGIN
+#ifdef LXPLUG
 	gtk_menu_popup_at_widget (GTK_MENU (applet->menu), applet->plugin, GDK_GRAVITY_SOUTH_WEST, GDK_GRAVITY_NORTH_WEST, NULL);
+#else
+	show_menu_with_kbd (applet->plugin, applet->menu);
+#endif
 #else
 	gtk_menu_popup (GTK_MENU (applet->menu), NULL, NULL,
 	                gtk_status_icon_position_menu, icon,
@@ -3766,7 +3779,6 @@ status_icon_activate_cb (GtkStatusIcon *icon, NMApplet *applet)
 #endif
 }
 
-#ifndef LXPANEL_PLUGIN
 static void
 status_icon_popup_menu_cb (GtkStatusIcon *icon,
                            guint button,
@@ -3783,18 +3795,16 @@ status_icon_popup_menu_cb (GtkStatusIcon *icon,
 			gtk_status_icon_position_menu, icon,
 			button, activate_time);
 }
-#endif
 
 static gboolean
 setup_widgets (NMApplet *applet)
 {
 	GtkMenu *menu;
 
-#ifndef LXPANEL_PLUGIN
 #ifdef WITH_APPINDICATOR
 	if (with_appindicator) {
 		applet->app_indicator = app_indicator_new ("nm-applet",
-		                                           "network-offline",
+		                                           "nm-no-connection",
 		                                           APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
 		if (!applet->app_indicator)
 			return FALSE;
@@ -3803,6 +3813,7 @@ setup_widgets (NMApplet *applet)
 	}
 #endif  /* WITH_APPINDICATOR */
 
+#ifndef LXPANEL_PLUGIN
 	/* Fall back to status icon if indicator isn't enabled or built */
 	if (!INDICATOR_ENABLED (applet)) {
 		applet->status_icon = gtk_status_icon_new ();
@@ -3832,7 +3843,6 @@ setup_widgets (NMApplet *applet)
 	return TRUE;
 }
 
-#ifndef LXPANEL_PLUGIN
 static void
 applet_embedded_cb (GObject *object, GParamSpec *pspec, gpointer user_data)
 {
@@ -3841,7 +3851,6 @@ applet_embedded_cb (GObject *object, GParamSpec *pspec, gpointer user_data)
 	g_debug ("applet now %s the notification area",
 	         embedded ? "embedded in" : "removed from");
 }
-#endif
 
 static void
 register_agent (NMApplet *applet)
@@ -3894,13 +3903,11 @@ applet_gsettings_show_changed (GSettings *settings,
 
 /****************************************************************/
 
-#ifndef LXPANEL_PLUGIN
 static void
 applet_activate (GApplication *app, gpointer user_data)
 {
 	/* Nothing to do, but glib requires this handler */
 }
-#endif
 
 #ifdef LXPANEL_PLUGIN
 void
@@ -3998,8 +4005,6 @@ applet_startup (GApplication *app, gpointer user_data)
 #ifndef LXPANEL_PLUGIN
 	g_application_hold (G_APPLICATION (applet));
 #endif
-
-	applet->ap_list = NULL;
 }
 
 #ifdef LXPANEL_PLUGIN
@@ -4010,9 +4015,6 @@ static void finalize (GObject *object)
 {
 #ifdef LXPANEL_PLUGIN
 	applet->killing = TRUE;
-	// clear the current access point list and related handlers
-	clear_aps (applet);
-
 	// disconnect all device handlers
 	const GPtrArray *devices = nm_client_get_devices (applet->nm_client);
 	for (int i = 0; devices && (i < devices->len); i++)
@@ -4034,11 +4036,9 @@ static void finalize (GObject *object)
 	nm_clear_g_source (&applet->update_icon_id);
 	nm_clear_g_source (&applet->wifi_scan_id);
 
-#ifndef LXPANEL_PLUGIN
 #ifdef WITH_APPINDICATOR
 	g_clear_object (&applet->app_indicator);
 #endif /* WITH_APPINDICATOR */
-#endif
 	nm_clear_g_source (&applet->update_menu_id);
 
 #ifndef LXPANEL_PLUGIN
@@ -4061,7 +4061,9 @@ static void finalize (GObject *object)
 #endif
 
 	g_clear_object (&applet->info_dialog_ui);
+#ifndef LXPANEL_PLUGIN
 	g_clear_object (&applet->gsettings);
+#endif
 	g_clear_object (&applet->nm_client);
 
 #if WITH_WWAN
@@ -4077,9 +4079,9 @@ static void finalize (GObject *object)
 
 static void nma_init (NMApplet *applet)
 {
+#ifndef LXPANEL_PLUGIN
 	applet->icon_size = 16;
 
-#ifndef LXPANEL_PLUGIN
 	g_signal_connect (applet, "startup", G_CALLBACK (applet_startup), NULL);
 	g_signal_connect (applet, "activate", G_CALLBACK (applet_activate), NULL);
 #endif

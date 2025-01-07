@@ -37,7 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 #include <glib/gi18n.h>
 
+#ifdef LXPLUG
 #include "plugin.h"
+#endif
 #include "nm-default.h"
 #include "applet.h"
 
@@ -64,9 +66,14 @@ static int wifi_country_set (void)
 }
 
 /* Handler for system config changed message from panel */
+#ifdef LXPLUG
 static void nm_configuration_changed (LXPanel *panel, GtkWidget *p)
 {
     NMApplet *nm = lxpanel_plugin_get_data (p);
+#else
+void netman_update_display (NMApplet *nm)
+{
+#endif
     if (nm->active)
         status_icon_size_changed_cb (nm);
     else
@@ -74,6 +81,7 @@ static void nm_configuration_changed (LXPanel *panel, GtkWidget *p)
 }
 
 /* Handler for menu button click */
+#ifdef LXPLUG
 static gboolean nm_button_press_event (GtkWidget *widget, GdkEventButton *event, LXPanel *panel)
 {
     NMApplet *nm = lxpanel_plugin_get_data (widget);
@@ -85,11 +93,35 @@ static gboolean nm_button_press_event (GtkWidget *widget, GdkEventButton *event,
     }
     else return FALSE;
 }
+#else
+static void netman_button_press_event (GtkButton *, NMApplet *nm)
+{
+    if (pressed != PRESS_LONG) status_icon_activate_cb (nm);
+    pressed = PRESS_NONE;
+}
+
+static void netman_gesture_pressed (GtkGestureLongPress *, gdouble x, gdouble y, NMApplet *)
+{
+    pressed = PRESS_LONG;
+    press_x = x;
+    press_y = y;
+}
+
+static void netman_gesture_end (GtkGestureLongPress *, GdkEventSequence *, NMApplet *nm)
+{
+    if (pressed == PRESS_LONG) pass_right_click (nm->plugin, press_x, press_y);
+}
+#endif
 
 /* Handler for control message */
+#ifdef LXPLUG
 static gboolean nm_control_msg (GtkWidget *plugin, const char *cmd)
 {
     NMApplet *nm = lxpanel_plugin_get_data (plugin);
+#else
+gboolean nm_control_msg (NMApplet *nm, const char *cmd)
+{
+#endif
 
     if (!g_strcmp0 (cmd, "menu"))
     {
@@ -104,7 +136,9 @@ static gboolean nm_control_msg (GtkWidget *plugin, const char *cmd)
     return TRUE;
 }
 
+
 /* Plugin destructor. */
+#ifdef LXPLUG
 static void nm_destructor (gpointer user_data)
 {
     NMApplet *nm = (NMApplet *) user_data;
@@ -113,8 +147,21 @@ static void nm_destructor (gpointer user_data)
     finalize (nm);
     g_free (nm);
 }
+#else
+void netman_destructor (gpointer user_data)
+{
+    NMApplet *nm = (NMApplet *) user_data;
+
+    /* Deallocate memory. */
+    finalize (nm);
+    if (nm->gesture) g_object_unref (nm->gesture);
+    g_object_unref (nm);
+    //g_free (nm);
+}
+#endif
 
 /* Plugin constructor. */
+#ifdef LXPLUG
 static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
 {
     /* Allocate and initialize plugin context */
@@ -131,6 +178,10 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
     nm->settings = settings;
     nm->plugin = gtk_button_new ();
     lxpanel_plugin_set_data (nm->plugin, nm, nm_destructor);
+#else
+void netman_init (NMApplet *nm)
+{
+#endif
 
     /* Allocate icon as a child of top level */
     nm->status_icon = gtk_image_new ();
@@ -138,9 +189,21 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
 
     /* Set up button */
     gtk_button_set_relief (GTK_BUTTON (nm->plugin), GTK_RELIEF_NONE);
+#ifndef LXPLUG
+    g_signal_connect (nm->plugin, "clicked", G_CALLBACK (netman_button_press_event), nm);
+
+    /* Set up long press */
+    nm->gesture = gtk_gesture_long_press_new (nm->plugin);
+    gtk_gesture_single_set_touch_only (GTK_GESTURE_SINGLE (nm->gesture), touch_only);
+    g_signal_connect (nm->gesture, "pressed", G_CALLBACK (netman_gesture_pressed), nm);
+    g_signal_connect (nm->gesture, "end", G_CALLBACK (netman_gesture_end), nm);
+    gtk_event_controller_set_propagation_phase (GTK_EVENT_CONTROLLER (nm->gesture), GTK_PHASE_BUBBLE);
+#endif
 
     /* Set up variables */
+#ifdef LXPLUG
     nm->icon_size = panel_get_safe_icon_size (panel);
+#endif
     nm->country_set = wifi_country_set ();
 
     if (system ("ps ax | grep NetworkManager | grep -qv grep"))
@@ -156,9 +219,11 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
 
     /* Show the widget and return */
     gtk_widget_show_all (nm->plugin);
+#ifdef LXPLUG
     return nm->plugin;
+#endif
 }
-
+#ifdef LXPLUG
 FM_DEFINE_MODULE (lxpanel_gtk, netman)
 
 /* Plugin descriptor. */
@@ -171,3 +236,5 @@ LXPanelPluginInit fm_module_init_lxpanel_gtk = {
     .control = nm_control_msg,
     .gettext_package = GETTEXT_PACKAGE
 };
+#endif
+

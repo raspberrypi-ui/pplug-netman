@@ -35,7 +35,22 @@
 
 #define LXPANEL_PLUGIN
 #ifdef LXPANEL_PLUGIN
+#ifdef LXPLUG
 #include "plugin.h"
+#define wrap_new_menu_item(plugin,text,maxlen,icon) lxpanel_plugin_new_menu_item(plugin->panel,text,maxlen,icon)
+#define wrap_set_menu_icon(plugin,image,icon) lxpanel_plugin_set_menu_icon(plugin->panel,image,icon)
+#define wrap_set_taskbar_icon(plugin,image,icon) lxpanel_plugin_set_taskbar_icon(plugin->panel,image,icon)
+#define wrap_show_menu(plugin,menu) gtk_menu_popup_at_widget(GTK_MENU(menu),plugin,GDK_GRAVITY_SOUTH_WEST,GDK_GRAVITY_NORTH_WEST,NULL)
+#else
+#include "lxutils.h"
+#define lxpanel_notify(panel,msg) lxpanel_notify(msg)
+#define lxpanel_plugin_update_menu_icon(item,icon) update_menu_icon(item,icon)
+#define lxpanel_plugin_append_menu_icon(item,icon) append_menu_icon(item,icon)
+#define wrap_new_menu_item(plugin,text,maxlen,icon) new_menu_item(text,maxlen,icon,plugin->icon_size)
+#define wrap_set_menu_icon(plugin,image,icon) set_menu_icon(image,icon,plugin->icon_size)
+#define wrap_set_taskbar_icon(plugin,image,icon) set_taskbar_icon(image,icon,plugin->icon_size)
+#define wrap_show_menu(plugin,menu) show_menu_with_kbd(plugin,menu)
+#endif
 #endif
 
 #define NM_TYPE_APPLET              (nma_get_type())
@@ -74,16 +89,21 @@ typedef struct NMADeviceClass NMADeviceClass;
  *
  */
 typedef struct {
+	GApplication parent;
 #ifdef LXPANEL_PLUGIN
-    GtkWidget *plugin;              /* Back pointer to widget */
-    LXPanel *panel;                 /* Back pointer to panel */
-    config_setting_t *settings;     /* Plugin settings */
-    GSList *ap_list;
-    gboolean active;
-    gboolean killing;
+	GtkWidget *plugin;              /* Back pointer to widget */
+	gboolean active;
+#ifdef LXPLUG
+    	LXPanel *panel;                 /* Back pointer to panel */
+    	config_setting_t *settings;     /* Plugin settings */
+#else
+	gboolean bottom;
+	GtkGesture *gesture;
+#endif
+	GtkWidget *vpn_menu;
+	gboolean killing;
 	gboolean country_set;
 #endif
-	GApplication parent;
 
 	NMClient *nm_client;
 	AppletAgent *agent;
@@ -134,16 +154,13 @@ typedef struct {
 	guint           update_menu_id;
 
 #ifdef LXPANEL_PLUGIN
-	GtkWidget * status_icon;
+	GtkWidget *     status_icon;
 #else
 	GtkStatusIcon * status_icon;
 #endif
 
 	GtkWidget *     menu;
 	GtkWidget *     context_menu;
-#ifdef LXPANEL_PLUGIN
-	GtkWidget *		vpn_menu;
-#endif
 
 	GtkWidget *     notifications_enabled_item;
 	guint           notifications_enabled_toggled_id;
@@ -159,11 +176,7 @@ typedef struct {
 	GtkWidget *     connections_menu_item;
 
 	GtkBuilder *    info_dialog_ui;
-#ifdef LXPANEL_PLUGIN
-	int notification;
-#else
 	NotifyNotification* notification;
-#endif
 
 	/* Tracker objects for secrets requests */
 	GSList *        secrets_reqs;
@@ -333,5 +346,12 @@ void applet_add_default_connection_item (NMDevice *device,
 
 #ifdef LXPANEL_PLUGIN
 char *get_ip (NMDevice* device);
+#endif
+
+#ifndef LXPLUG
+extern void netman_init (NMApplet *nm);
+extern void netman_update_display (NMApplet *nm);
+extern gboolean nm_control_msg (NMApplet *nm, const char *cmd);
+extern void netman_destructor (gpointer user_data);
 #endif
 #endif

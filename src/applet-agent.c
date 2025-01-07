@@ -29,16 +29,16 @@ static const SecretSchema network_manager_secret_schema = {
 	}
 };
 
+G_DEFINE_TYPE (AppletAgent, applet_agent, NM_TYPE_SECRET_AGENT_OLD);
+
+#define APPLET_AGENT_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), APPLET_TYPE_AGENT, AppletAgentPrivate))
+
 typedef struct {
 	GHashTable *requests;
 	gboolean vpn_only;
 
 	gboolean disposed;
 } AppletAgentPrivate;
-
-G_DEFINE_TYPE_WITH_CODE (AppletAgent, applet_agent, NM_TYPE_SECRET_AGENT_OLD, G_ADD_PRIVATE (AppletAgent));
-
-#define APPLET_AGENT_GET_PRIVATE(o) ((AppletAgentPrivate *) applet_agent_get_instance_private ((AppletAgent *) o))
 
 enum {
 	GET_SECRETS,
@@ -574,7 +574,7 @@ save_one_secret (Request *r,
                  NMSetting *setting,
                  const char *key,
                  const char *secret,
-                 const char *display_name)
+                 const char *display_name1)
 {
 	GHashTable *attrs;
 	char *alt_display_name = NULL;
@@ -593,11 +593,11 @@ save_one_secret (Request *r,
 	attrs = _create_keyring_add_attr_list (r->connection,
 	                                       setting_name,
 	                                       key,
-	                                       display_name ? NULL : &alt_display_name);
+	                                       display_name1 ? NULL : &alt_display_name);
 	g_assert (attrs);
 
 	secret_password_storev (&network_manager_secret_schema, attrs, NULL,
-	                        display_name ? display_name : alt_display_name, secret,
+	                        display_name1 ? display_name1 : alt_display_name, secret,
 	                        r->cancellable, save_secret_cb, r);
 	r->keyring_calls++;
 
@@ -611,7 +611,7 @@ vpn_secret_iter_cb (const char *key, const char *secret, gpointer user_data)
 	Request *r = user_data;
 	NMSetting *setting;
 	const char *service_name, *id;
-	char *display_name;
+	char *display_name1;
 
 	if (secret && strlen (secret)) {
 		setting = nm_connection_get_setting (r->connection, NM_TYPE_SETTING_VPN);
@@ -621,12 +621,12 @@ vpn_secret_iter_cb (const char *key, const char *secret, gpointer user_data)
 		id = nm_connection_get_id (r->connection);
 		g_assert (id);
 
-		display_name = g_strdup_printf ("VPN %s secret for %s/%s/" NM_SETTING_VPN_SETTING_NAME,
+		display_name1 = g_strdup_printf ("VPN %s secret for %s/%s/" NM_SETTING_VPN_SETTING_NAME,
 		                                key,
 		                                id,
 		                                service_name);
-		save_one_secret (r, setting, key, secret, display_name);
-		g_free (display_name);
+		save_one_secret (r, setting, key, secret, display_name1);
+		g_free (display_name1);
 	}
 }
 
@@ -638,9 +638,7 @@ write_one_secret_to_keyring (NMSetting *setting,
                              gpointer user_data)
 {
 	Request *r = user_data;
-#ifndef G_DISABLE_CHECKS
 	GType type = G_VALUE_TYPE (value);
-#endif
 	const char *secret;
 
 	/* Non-secrets obviously don't get saved in the keyring */
@@ -819,6 +817,8 @@ applet_agent_class_init (AppletAgentClass *agent_class)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (agent_class);
 	NMSecretAgentOldClass *parent_class = NM_SECRET_AGENT_OLD_CLASS (agent_class);
+
+	g_type_class_add_private (agent_class, sizeof (AppletAgentPrivate));
 
 	/* virtual methods */
 	object_class->dispose = dispose;
