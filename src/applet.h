@@ -83,8 +83,8 @@ typedef struct {
 	GtkWidget *plugin;              /* Back pointer to widget */
 	gboolean active;
 #ifdef LXPLUG
-    	LXPanel *panel;                 /* Back pointer to panel */
-    	config_setting_t *settings;     /* Plugin settings */
+    LXPanel *panel;                 /* Back pointer to panel */
+    config_setting_t *settings;     /* Plugin settings */
 #else
 	gboolean bottom;
 	GtkGesture *gesture;

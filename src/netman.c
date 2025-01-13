@@ -1,12 +1,5 @@
-/*
- * Network Manager plugin for LXPanel
- *
- * Copyright for relevant code as for LXPanel
- *
- */
-
-/*
-Copyright (c) 2022 Raspberry Pi (Trading) Ltd.
+/*============================================================================
+Copyright (c) 2022-2025 Raspberry Pi Holdings Ltd.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,14 +23,17 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+============================================================================*/
 
 #include <locale.h>
 #include <glib/gi18n.h>
 
 #ifdef LXPLUG
 #include "plugin.h"
+#else
+#include "lxutils.h"
 #endif
+
 #include "nm-default.h"
 #include "applet.h"
 
@@ -63,24 +59,13 @@ static int wifi_country_set (void)
     return 1;
 }
 
-/* Handler for system config changed message from panel */
-#ifdef LXPLUG
-static void nm_configuration_changed (LXPanel *panel, GtkWidget *p)
-{
-    NMApplet *nm = lxpanel_plugin_get_data (p);
-#else
-void netman_update_display (NMApplet *nm)
-{
-#endif
-    if (nm->active)
-        status_icon_size_changed_cb (nm);
-    else
-        gtk_widget_hide (nm->plugin);
-}
+/*----------------------------------------------------------------------------*/
+/* wf-panel plugin functions                                                  */
+/*----------------------------------------------------------------------------*/
 
-/* Handler for menu button click */
+/* Handler for button click */
 #ifdef LXPLUG
-static gboolean nm_button_press_event (GtkWidget *widget, GdkEventButton *event, LXPanel *panel)
+static gboolean nm_button_press_event (GtkWidget *widget, GdkEventButton *event, LXPanel *)
 {
     NMApplet *nm = lxpanel_plugin_get_data (widget);
 
@@ -98,6 +83,7 @@ static void netman_button_press_event (GtkButton *, NMApplet *nm)
     pressed = PRESS_NONE;
 }
 
+/* Handler for long press gesture */
 static void netman_gesture_pressed (GtkGestureLongPress *, gdouble x, gdouble y, NMApplet *)
 {
     pressed = PRESS_LONG;
@@ -111,16 +97,18 @@ static void netman_gesture_end (GtkGestureLongPress *, GdkEventSequence *, NMApp
 }
 #endif
 
-/* Handler for control message */
-#ifdef LXPLUG
-static gboolean nm_control_msg (GtkWidget *plugin, const char *cmd)
+/* Handler for system config changed message from panel */
+void netman_update_display (NMApplet *nm)
 {
-    NMApplet *nm = lxpanel_plugin_get_data (plugin);
-#else
+    if (nm->active)
+        status_icon_size_changed_cb (nm);
+    else
+        gtk_widget_hide (nm->plugin);
+}
+
+/* Handler for control message */
 gboolean nm_control_msg (NMApplet *nm, const char *cmd)
 {
-#endif
-
     if (!g_strcmp0 (cmd, "menu"))
     {
         if (nm->menu && gtk_widget_get_visible (nm->menu)) gtk_widget_hide (nm->menu);
@@ -132,21 +120,6 @@ gboolean nm_control_msg (NMApplet *nm, const char *cmd)
         nm->country_set = wifi_country_set ();
     }
     return TRUE;
-}
-
-/* Plugin destructor. */
-void netman_destructor (gpointer user_data)
-{
-    NMApplet *nm = (NMApplet *) user_data;
-
-    /* Deallocate memory. */
-    finalize (nm);
-#ifndef LXPLUG
-    if (nm->gesture) g_object_unref (nm->gesture);
-    g_object_unref (nm);
-#else
-    g_free (nm);
-#endif
 }
 
 void netman_init (NMApplet *nm)
@@ -189,8 +162,25 @@ void netman_init (NMApplet *nm)
     gtk_widget_show_all (nm->plugin);
 }
 
+void netman_destructor (gpointer user_data)
+{
+    NMApplet *nm = (NMApplet *) user_data;
+
+    finalize (nm);
+
+#ifndef LXPLUG
+    if (nm->gesture) g_object_unref (nm->gesture);
+    g_object_unref (nm);
+#else
+    g_free (nm);
+#endif
+}
+
+/*----------------------------------------------------------------------------*/
+/* LXPanel plugin functions                                                   */
+/*----------------------------------------------------------------------------*/
 #ifdef LXPLUG
-/* Plugin constructor. */
+
 static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
 {
     /* Allocate and initialize plugin context */
@@ -211,17 +201,33 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
     return nm->plugin;
 }
 
+/* Handler for system config changed message from panel */
+static void nm_configuration_changed (LXPanel *, GtkWidget *p)
+{
+    NMApplet *nm = lxpanel_plugin_get_data (p);
+    netman_update_display (nm);
+}
+
+/* Handler for control message */
+static gboolean nm_control (GtkWidget *plugin, const char *cmd)
+{
+    NMApplet *nm = lxpanel_plugin_get_data (plugin);
+    return nm_control_msg (nm, cmd);
+}
+
 FM_DEFINE_MODULE (lxpanel_gtk, netman)
 
-/* Plugin descriptor. */
+/* Plugin descriptor */
 LXPanelPluginInit fm_module_init_lxpanel_gtk = {
     .name = N_("Network Manager"),
     .description = N_("Controller for Network Manager"),
     .new_instance = nm_constructor,
     .reconfigure = nm_configuration_changed,
     .button_press_event = nm_button_press_event,
-    .control = nm_control_msg,
+    .control = nm_control,
     .gettext_package = GETTEXT_PACKAGE
 };
 #endif
 
+/* End of file */
+/*----------------------------------------------------------------------------*/
