@@ -37,12 +37,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "nm-default.h"
 #include "applet.h"
 
-/* Private context for plugin */
+/*----------------------------------------------------------------------------*/
+/* Plug-in global data                                                        */
+/*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*/
+/* Prototypes                                                                 */
+/*----------------------------------------------------------------------------*/
 
 extern void applet_startup (NMApplet *applet);
 extern void status_icon_size_changed_cb (NMApplet *applet);
 extern void status_icon_activate_cb (NMApplet *applet);
 extern void finalize (NMApplet *applet);
+
+/*----------------------------------------------------------------------------*/
+/* Function definitions                                                       */
+/*----------------------------------------------------------------------------*/
 
 static int wifi_country_set (void)
 {
