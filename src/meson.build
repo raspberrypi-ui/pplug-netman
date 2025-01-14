@@ -43,7 +43,7 @@ ldeps = [ gtk, netman, nma, secret, notify ]
 
 lincdir = include_directories('/usr/include/lxpanel')
 
-largs = [ '-DLXPLUG', '-DPACKAGE_DATA_DIR="' + lresource_dir + '"', '-DGETTEXT_PACKAGE="lxplug_' + meson.project_name() + '"', '-D_GNU_SOURCE', '-DENABLE_GTK3', '-DG_DISABLE_ASSERT', '-DG_DISABLE_CHECKS', '-DG_DISABLE_CAST_CHECKS' ]
+largs = [ '-DLXPLUG', '-DPACKAGE_DATA_DIR="' + lresource_dir + '"', '-DGETTEXT_PACKAGE="lxplug_' + meson.project_name() + '"', '-DENABLE_GTK3', '-DG_DISABLE_ASSERT', '-DG_DISABLE_CHECKS', '-DG_DISABLE_CAST_CHECKS' ]
 
 shared_module(meson.project_name(), lsources,
         dependencies: ldeps,
