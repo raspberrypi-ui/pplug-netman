@@ -92,19 +92,6 @@ static void netman_button_press_event (GtkButton *, NMApplet *nm)
     if (pressed != PRESS_LONG) status_icon_activate_cb (nm);
     pressed = PRESS_NONE;
 }
-
-/* Handler for long press gesture */
-static void netman_gesture_pressed (GtkGestureLongPress *, gdouble x, gdouble y, NMApplet *)
-{
-    pressed = PRESS_LONG;
-    press_x = x;
-    press_y = y;
-}
-
-static void netman_gesture_end (GtkGestureLongPress *, GdkEventSequence *, NMApplet *nm)
-{
-    if (pressed == PRESS_LONG) pass_right_click (nm->plugin, press_x, press_y);
-}
 #endif
 
 /* Handler for system config changed message from panel */
@@ -144,11 +131,7 @@ void netman_init (NMApplet *nm)
     g_signal_connect (nm->plugin, "clicked", G_CALLBACK (netman_button_press_event), nm);
 
     /* Set up long press */
-    nm->gesture = gtk_gesture_long_press_new (nm->plugin);
-    gtk_gesture_single_set_touch_only (GTK_GESTURE_SINGLE (nm->gesture), touch_only);
-    g_signal_connect (nm->gesture, "pressed", G_CALLBACK (netman_gesture_pressed), nm);
-    g_signal_connect (nm->gesture, "end", G_CALLBACK (netman_gesture_end), nm);
-    gtk_event_controller_set_propagation_phase (GTK_EVENT_CONTROLLER (nm->gesture), GTK_PHASE_BUBBLE);
+    nm->gesture = add_long_press (nm->plugin);
 #endif
 
     /* Set up variables */
