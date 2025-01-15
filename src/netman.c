@@ -74,25 +74,11 @@ static int wifi_country_set (void)
 /*----------------------------------------------------------------------------*/
 
 /* Handler for button click */
-#ifdef LXPLUG
-static gboolean nm_button_press_event (GtkWidget *widget, GdkEventButton *event, LXPanel *)
+static void netman_button_clicked (GtkWidget *, NMApplet *nm)
 {
-    NMApplet *nm = lxpanel_plugin_get_data (widget);
-
-    if (event->button == 1)
-    {
-        status_icon_activate_cb (nm);
-        return TRUE;
-    }
-    else return FALSE;
+    CHECK_LONGPRESS
+    status_icon_activate_cb (nm);
 }
-#else
-static void netman_button_press_event (GtkButton *, NMApplet *nm)
-{
-    if (pressed != PRESS_LONG) status_icon_activate_cb (nm);
-    pressed = PRESS_NONE;
-}
-#endif
 
 /* Handler for system config changed message from panel */
 void netman_update_display (NMApplet *nm)
@@ -128,7 +114,7 @@ void netman_init (NMApplet *nm)
     /* Set up button */
     gtk_button_set_relief (GTK_BUTTON (nm->plugin), GTK_RELIEF_NONE);
 #ifndef LXPLUG
-    g_signal_connect (nm->plugin, "clicked", G_CALLBACK (netman_button_press_event), nm);
+    g_signal_connect (nm->plugin, "clicked", G_CALLBACK (netman_button_clicked), nm);
 
     /* Set up long press */
     nm->gesture = add_long_press (nm->plugin, NULL, NULL);
@@ -194,10 +180,22 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
     return nm->plugin;
 }
 
-/* Handler for system config changed message from panel */
-static void nm_configuration_changed (LXPanel *, GtkWidget *p)
+/* Handler for button press */
+static gboolean nm_button_press_event (GtkWidget *plugin, GdkEventButton *event, LXPanel *)
 {
-    NMApplet *nm = lxpanel_plugin_get_data (p);
+    NMApplet *nm = lxpanel_plugin_get_data (plugin);
+    if (event->button == 1)
+    {
+        netman_button_clicked (plugin, nm);
+        return TRUE;
+    }
+    else return FALSE;
+}
+
+/* Handler for system config changed message from panel */
+static void nm_configuration_changed (LXPanel *, GtkWidget *plugin)
+{
+    NMApplet *nm = lxpanel_plugin_get_data (plugin);
     netman_update_display (nm);
 }
 
