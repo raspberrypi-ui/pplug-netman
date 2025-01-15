@@ -131,7 +131,7 @@ void netman_init (NMApplet *nm)
     g_signal_connect (nm->plugin, "clicked", G_CALLBACK (netman_button_press_event), nm);
 
     /* Set up long press */
-    nm->gesture = add_long_press (nm->plugin);
+    nm->gesture = add_long_press (nm->plugin, NULL, NULL);
 #endif
 
     /* Set up variables */
