@@ -1,21 +1,31 @@
-Source: lxplug-netman
+Source: pplug-netman
 Section: x11
 Priority: optional
 Maintainer: Simon Long <simon@raspberrypi.com>
 Build-Depends:
- debhelper (>= 9), dh-autoreconf, intltool, libgtk-3-dev (>= 3.24),
- libiw-dev [linux-any], libmenu-cache-dev | libmenu-cache1-dev,
- libwnck-3-dev, libfm-gtk-dev (>= 1.3.2-1+rpt1), lxpanel-dev (>= 0.10.1-1+rpt1),
- libsecret-1-dev (>= 0.18), libnm-dev (>= 1.15), libnma-dev (>= 1.8.30-1+rpt1),
- libnotify-dev (>= 0.7)
-Standards-Version: 4.3.0
-Homepage: http://raspberrypi.org/
+ debhelper-compat (= 13), meson,
+ libgtk-3-dev (>= 3.24), libgtkmm-3.0-dev (>= 3.24),
+ lxpanel-dev (>= 0.10.1-2+rpt21), wf-panel-pi-dev (>=0.92),
+ libgtk-layer-shell-dev (>= 0.6.0), libglm-dev,
+ libsecret-1-dev (>= 0.18), libnm-dev (>= 1.15),
+ libnma-dev (>= 1.8.30-1+rpt1), libnotify-dev (>= 0.7)
+Standards-Version: 4.5.1
+Homepage: http://raspberrypi.com/
 
 Package: lxplug-netman
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, lxmenu-data, libgtk-3-0 (>= 3.24),
- lxpanel (>= 0.10.1-1+rpt1), lxpanel-data (>= 0.10.1-1+rpt1), libfm-modules (>= 1.3.2-1+rpt1)
+Depends: ${shlibs:Depends}, ${misc:Depends},
+ lxpanel (>= 0.10.1-2+rpt21), lxpanel-data (>= 0.10.1-2+rpt21)
 Recommends: lp-connection-editor
 Description: Network Manager plugin for lxpanel
- Plugin for lxpanel to use Network Manager for wired and wireless networking.
+ Plugin for lxpanel to control Network Manager for wired and wireless networking.
+ Based on GNOME's network-manager-applet.
+
+Package: wfplug-netman
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},
+ wf-panel-pi (>=0.92)
+Recommends: lp-connection-editor
+Description: Network Manager plugin for wf-panel-pi
+ Plugin for wf-panel-pi to control Network Manager for wired and wireless networking.
  Based on GNOME's network-manager-applet.
