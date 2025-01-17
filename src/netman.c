@@ -107,6 +107,10 @@ gboolean nm_control_msg (NMApplet *nm, const char *cmd)
 
 void netman_init (NMApplet *nm)
 {
+    setlocale (LC_ALL, "");
+    bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
+    bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+
     /* Allocate icon as a child of top level */
     nm->status_icon = gtk_image_new ();
     gtk_container_add (GTK_CONTAINER (nm->plugin), nm->status_icon);
@@ -164,10 +168,6 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
 {
     /* Allocate and initialize plugin context */
     NMApplet *nm = g_new0 (NMApplet, 1);
-
-    setlocale (LC_ALL, "");
-    bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
-    bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 
     /* Allocate top level widget and set into plugin widget pointer. */
     nm->panel = panel;
