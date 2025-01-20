@@ -3710,11 +3710,7 @@ status_icon_size_changed_cb (GtkStatusIcon *icon,
 #endif
 {
 #ifdef LXPANEL_PLUGIN
-#ifdef LXPLUG
-	int size = panel_get_safe_icon_size (applet->panel);
-#else
 	int size = applet->icon_size;
-#endif
 #endif
 	g_debug ("%s(): status icon size %d requested", __func__, size);
 

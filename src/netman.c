@@ -129,9 +129,6 @@ void netman_init (NMApplet *nm)
 #endif
 
     /* Set up variables */
-#ifdef LXPLUG
-    nm->icon_size = panel_get_safe_icon_size (nm->panel);
-#endif
     nm->country_set = wifi_country_set ();
 
     if (system ("ps ax | grep NetworkManager | grep -qv grep"))
@@ -179,6 +176,8 @@ static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
     nm->plugin = gtk_button_new ();
     lxpanel_plugin_set_data (nm->plugin, nm, netman_destructor);
 
+    nm->icon_size = panel_get_safe_icon_size (nm->panel);
+
     netman_init (nm);
 
     return nm->plugin;
@@ -200,6 +199,7 @@ static gboolean nm_button_press_event (GtkWidget *plugin, GdkEventButton *event,
 static void nm_configuration_changed (LXPanel *, GtkWidget *plugin)
 {
     NMApplet *nm = lxpanel_plugin_get_data (plugin);
+    nm->icon_size = panel_get_safe_icon_size (nm->panel);
     netman_update_display (nm);
 }
 
