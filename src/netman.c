@@ -168,7 +168,7 @@ void netman_destructor (gpointer user_data)
 static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
 {
     /* Allocate and initialize plugin context */
-    NMApplet *nm = g_new0 (NMApplet, 1);
+    NMApplet *nm = (NMApplet *) g_object_new (NM_TYPE_APPLET, NULL);
 
     /* Allocate top level widget and set into plugin widget pointer. */
     nm->panel = panel;
