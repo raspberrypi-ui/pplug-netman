@@ -617,7 +617,7 @@ static void disconnect_prompt (WifiMenuItemInfo *info, const char *name)
 
 	textdomain (GETTEXT_PACKAGE);
 
-	builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/lxpanel-modal.ui");
+	builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/lxplug-netman.ui");
 
 	GtkWidget *disc_dlg = (GtkWidget *) gtk_builder_get_object (builder, "modal");
 	buffer = g_strdup_printf (_("Do you want to disconnect from the wireless network '%s'?"), name);
