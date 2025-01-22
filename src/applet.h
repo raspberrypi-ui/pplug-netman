@@ -92,6 +92,7 @@ typedef struct {
 	GtkWidget *vpn_menu;
 	gboolean killing;
 	gboolean country_set;
+	const char *to_disconnect;
 #endif
 
 	NMClient *nm_client;

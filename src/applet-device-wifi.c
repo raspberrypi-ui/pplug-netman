@@ -599,7 +599,7 @@ static void handle_ok (GtkButton *button, gpointer user_data)
 	NMApplet *applet = (NMApplet *) user_data;
 	GtkWidget *wid = GTK_WIDGET (button);
 	while (!GTK_IS_WINDOW (wid)) wid = gtk_widget_get_parent (wid);
-	applet_menu_item_disconnect_helper (nm_client_get_device_by_path (applet->nm_client, gtk_widget_get_name (wid)), applet);
+	applet_menu_item_disconnect_helper (nm_client_get_device_by_path (applet->nm_client, applet->to_disconnect), applet);
 	gtk_widget_destroy (wid);
 }
 
@@ -627,7 +627,7 @@ static void disconnect_prompt (WifiMenuItemInfo *info, const char *name)
 	gtk_widget_hide (GTK_WIDGET (gtk_builder_get_object (builder, "modal_pb")));
 	g_object_unref (builder);
 
-	gtk_widget_set_name (disc_dlg, nm_object_get_path (NM_OBJECT (info->device)));
+	info->applet->to_disconnect = nm_object_get_path (NM_OBJECT (info->device));
 	gtk_widget_show (disc_dlg);
 	g_free (buffer);
 }
