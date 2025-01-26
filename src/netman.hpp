@@ -32,11 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <gtkmm/button.h>
 
 extern "C" {
+#include "lxutils.h"
 #include "applet.h"
-extern void netman_init (NMApplet *nm);
-extern void netman_update_display (NMApplet *nm);
-extern gboolean nm_control_msg (NMApplet *nm, const char *cmd);
-extern void netman_destructor (gpointer user_data);
 }
 
 class WayfireNetman : public WayfireWidget
