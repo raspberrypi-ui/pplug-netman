@@ -34,8 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "lxutils.h"
 #endif
 
-#include "nm-default.h"
-#include "applet.h"
+#include "netman.h"
 
 /*----------------------------------------------------------------------------*/
 /* Typedefs and macros                                                        */

@@ -1,5 +1,5 @@
 /*============================================================================
-Copyright (c) 2024 Raspberry Pi Holdings Ltd.
+Copyright (c) 2022-2025 Raspberry Pi Holdings Ltd.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,39 +25,20 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ============================================================================*/
 
-#ifndef WIDGETS_NETMAN_HPP
-#define WIDGETS_NETMAN_HPP
+#include "applet.h"
 
-#include <widget.hpp>
-#include <gtkmm/button.h>
+/*----------------------------------------------------------------------------*/
+/* Typedefs and macros                                                        */
+/*----------------------------------------------------------------------------*/
 
-extern "C" {
-#include "lxutils.h"
-#include "netman.h"
-}
+/*----------------------------------------------------------------------------*/
+/* Prototypes                                                                 */
+/*----------------------------------------------------------------------------*/
 
-class WayfireNetman : public WayfireWidget
-{
-    std::unique_ptr <Gtk::Button> plugin;
-
-    WfOption <int> icon_size {"panel/icon_size"};
-    WfOption <std::string> bar_pos {"panel/position"};
-    sigc::connection icon_timer;
-
-    /* plugin */
-    NMApplet *nm;
-
-  public:
-
-    void init (Gtk::HBox *container) override;
-    void command (const char *cmd) override;
-    virtual ~WayfireNetman ();
-    void icon_size_changed_cb (void);
-    void bar_pos_changed_cb (void);
-    bool set_icon (void);
-};
-
-#endif /* end of include guard: WIDGETS_NETMAN_HPP */
+extern void netman_init (NMApplet *nm);
+extern void netman_update_display (NMApplet *nm);
+extern gboolean nm_control_msg (NMApplet *nm, const char *cmd);
+extern void netman_destructor (gpointer user_data);
 
 /* End of file */
 /*----------------------------------------------------------------------------*/
