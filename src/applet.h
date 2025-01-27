@@ -80,16 +80,17 @@ typedef struct NMADeviceClass NMADeviceClass;
 typedef struct {
 	GApplication parent;
 #ifdef LXPANEL_PLUGIN
-	GtkWidget *plugin;              /* Back pointer to widget */
-	gboolean active;
+	GtkWidget *plugin;
+
 #ifdef LXPLUG
     LXPanel *panel;                 /* Back pointer to panel */
     config_setting_t *settings;     /* Plugin settings */
 #else
-	gboolean bottom;
+	gboolean bottom;				/* Variables used under wf-panel */
 	GtkGesture *gesture;
 #endif
 	GtkWidget *vpn_menu;
+	gboolean active;
 	gboolean killing;
 	gboolean country_set;
 	const char *to_disconnect;
@@ -337,5 +338,10 @@ void applet_add_default_connection_item (NMDevice *device,
 #ifdef LXPANEL_PLUGIN
 char *get_ip (NMDevice* device);
 #endif
+
+extern void applet_startup (NMApplet *applet);
+extern void applet_finalize (NMApplet *applet);
+extern void status_icon_size_changed_cb (NMApplet *applet);
+extern void status_icon_activate_cb (NMApplet *applet);
 
 #endif

@@ -41,17 +41,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*/
-/* Plug-in global data                                                        */
+/* Global data                                                                */
 /*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*/
 /* Prototypes                                                                 */
 /*----------------------------------------------------------------------------*/
 
-extern void applet_startup (NMApplet *applet);
-extern void status_icon_size_changed_cb (NMApplet *applet);
-extern void status_icon_activate_cb (NMApplet *applet);
-extern void finalize (NMApplet *applet);
+static int wifi_country_set (void);
+static void netman_button_clicked (GtkWidget *, NMApplet *nm);
 
 /*----------------------------------------------------------------------------*/
 /* Function definitions                                                       */
@@ -93,7 +91,7 @@ void netman_update_display (NMApplet *nm)
 }
 
 /* Handler for control message */
-gboolean nm_control_msg (NMApplet *nm, const char *cmd)
+gboolean netman_control_msg (NMApplet *nm, const char *cmd)
 {
     if (!g_strcmp0 (cmd, "menu"))
     {
@@ -149,7 +147,7 @@ void netman_destructor (gpointer user_data)
 {
     NMApplet *nm = (NMApplet *) user_data;
 
-    finalize (nm);
+    applet_finalize (nm);
 
 #ifndef LXPLUG
     if (nm->gesture) g_object_unref (nm->gesture);
@@ -206,7 +204,7 @@ static void nm_configuration_changed (LXPanel *, GtkWidget *plugin)
 static gboolean nm_control (GtkWidget *plugin, const char *cmd)
 {
     NMApplet *nm = lxpanel_plugin_get_data (plugin);
-    return nm_control_msg (nm, cmd);
+    return netman_control_msg (nm, cmd);
 }
 
 FM_DEFINE_MODULE (lxpanel_gtk, netman)

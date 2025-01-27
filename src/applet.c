@@ -4000,7 +4000,7 @@ applet_startup (GApplication *app, gpointer user_data)
 }
 
 #ifdef LXPANEL_PLUGIN
-void finalize (NMApplet *applet)
+void applet_finalize (NMApplet *applet)
 #else
 static void finalize (GObject *object)
 #endif
