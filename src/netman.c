@@ -120,9 +120,6 @@ void netman_init (NMApplet *nm)
     gtk_button_set_relief (GTK_BUTTON (nm->plugin), GTK_RELIEF_NONE);
 #ifndef LXPLUG
     g_signal_connect (nm->plugin, "clicked", G_CALLBACK (netman_button_clicked), nm);
-
-    /* Set up long press */
-    nm->gesture = add_long_press (nm->plugin, NULL, NULL);
 #endif
 
     /* Set up variables */
@@ -150,7 +147,6 @@ void netman_destructor (gpointer user_data)
     applet_finalize (nm);
 
 #ifndef LXPLUG
-    if (nm->gesture) g_object_unref (nm->gesture);
     g_object_unref (nm);
 #else
     g_free (nm);

@@ -87,7 +87,6 @@ typedef struct {
     config_setting_t *settings;     /* Plugin settings */
 #else
 	gboolean bottom;				/* Variables used under wf-panel */
-	GtkGesture *gesture;
 #endif
 	GtkWidget *vpn_menu;
 	gboolean active;
