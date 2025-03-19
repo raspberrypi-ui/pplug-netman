@@ -166,7 +166,11 @@ typedef struct {
 	GtkWidget *     connections_menu_item;
 
 	GtkBuilder *    info_dialog_ui;
+#ifdef LXPANEL_PLUGIN
+	int	notification;
+#else
 	NotifyNotification* notification;
+#endif
 
 	/* Tracker objects for secrets requests */
 	GSList *        secrets_reqs;

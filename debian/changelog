@@ -1,3 +1,9 @@
+pplug-netman (0.14) bookworm; urgency=medium
+
+  * Fix some warnings
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 19 Mar 2025 07:51:13 +0000
+
 pplug-netman (0.13) bookworm; urgency=medium
 
   * First hybrid package version
