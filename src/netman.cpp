@@ -60,6 +60,8 @@ void WayfireNetman::command (const char *cmd)
 
 bool WayfireNetman::set_icon (void)
 {
+    if (!nm->icon_cache) return true;
+
     netman_update_display (nm);
     return false;
 }

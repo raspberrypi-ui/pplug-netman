@@ -130,6 +130,9 @@ void netman_init (NMApplet *nm)
     g_signal_connect (nm->plugin, "clicked", G_CALLBACK (netman_button_clicked), nm);
 #endif
 
+    /* Set up variables */
+    nm->icon_cache = NULL;
+
     g_idle_add (start_applet, nm);
 
     /* Show the widget and return */
