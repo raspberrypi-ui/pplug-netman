@@ -84,10 +84,7 @@ static void netman_button_clicked (GtkWidget *, NMApplet *nm)
 /* Handler for system config changed message from panel */
 void netman_update_display (NMApplet *nm)
 {
-    if (nm->active)
-        status_icon_size_changed_cb (nm);
-    else
-        gtk_widget_hide (nm->plugin);
+    status_icon_size_changed_cb (nm);
 }
 
 /* Handler for control message */
@@ -106,6 +103,17 @@ gboolean netman_control_msg (NMApplet *nm, const char *cmd)
     return TRUE;
 }
 
+static gboolean start_applet (gpointer data)
+{
+    NMApplet *nm = (NMApplet *) data;
+
+    nm->country_set = wifi_country_set ();
+
+    applet_startup (nm);
+
+    return FALSE;
+}
+
 void netman_init (NMApplet *nm)
 {
     setlocale (LC_ALL, "");
@@ -122,19 +130,7 @@ void netman_init (NMApplet *nm)
     g_signal_connect (nm->plugin, "clicked", G_CALLBACK (netman_button_clicked), nm);
 #endif
 
-    /* Set up variables */
-    nm->country_set = wifi_country_set ();
-
-    if (system ("ps ax | grep NetworkManager | grep -qv grep"))
-    {
-        nm->active = FALSE;
-        g_message ("netman: network manager service not running; plugin hidden");
-    }
-    else
-    {
-        nm->active = TRUE;
-        applet_startup (nm);
-    }
+    g_idle_add (start_applet, nm);
 
     /* Show the widget and return */
     gtk_widget_show_all (nm->plugin);

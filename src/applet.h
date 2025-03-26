@@ -89,7 +89,6 @@ typedef struct {
 	gboolean bottom;				/* Variables used under wf-panel */
 #endif
 	GtkWidget *vpn_menu;
-	gboolean active;
 	gboolean killing;
 	gboolean country_set;
 	const char *to_disconnect;
