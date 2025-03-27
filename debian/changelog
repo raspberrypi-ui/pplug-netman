@@ -1,3 +1,9 @@
+pplug-netman (0.15) bookworm; urgency=medium
+
+  * Run applet init on idle at start
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 27 Mar 2025 09:57:31 +0000
+
 pplug-netman (0.14) bookworm; urgency=medium
 
   * Fix some warnings
