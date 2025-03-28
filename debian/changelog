@@ -1,3 +1,9 @@
+pplug-netman (0.16) bookworm; urgency=medium
+
+  * Load dummy icon at start
+
+ -- Simon Long <simon@raspberrypi.com>  Fri, 28 Mar 2025 11:14:38 +0000
+
 pplug-netman (0.15) bookworm; urgency=medium
 
   * Run applet init on idle at start
