@@ -123,6 +123,7 @@ void netman_init (NMApplet *nm)
     /* Allocate icon as a child of top level */
     nm->status_icon = gtk_image_new ();
     gtk_container_add (GTK_CONTAINER (nm->plugin), nm->status_icon);
+    wrap_set_taskbar_icon (nm, nm->status_icon, "network-idle");
 
     /* Set up button */
     gtk_button_set_relief (GTK_BUTTON (nm->plugin), GTK_RELIEF_NONE);

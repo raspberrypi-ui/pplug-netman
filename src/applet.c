@@ -3622,7 +3622,7 @@ nma_icons_reload (NMApplet *applet)
 
 	g_return_if_fail (applet->icon_size > 0);
 
-	g_hash_table_remove_all (applet->icon_cache);
+	if (applet->icon_cache) g_hash_table_remove_all (applet->icon_cache);
 	nma_icons_free (applet);
 
 	if (applet->fallback_icon)
