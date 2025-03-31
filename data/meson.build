@@ -3,4 +3,27 @@ install_data('lxplug-netman.ui', install_dir: lui_dir)
 wui_dir = join_paths(wresource_dir, 'ui')
 install_data('lxplug-netman.ui', install_dir: wui_dir)
 
+prefix = get_option('prefix')
+bindir = join_paths(prefix, get_option('bindir'))
+libdir = join_paths(prefix, get_option('libdir'))
+libexecdir = join_paths(prefix, get_option('libexecdir'))
+datadir = join_paths(prefix, get_option('datadir'))
+includedir = join_paths(prefix, get_option('includedir'))
+
+conf = configuration_data()
+conf.set('prefix', prefix)
+conf.set('exec_prefix', prefix)
+conf.set('libdir', libdir)
+conf.set('bindir', bindir)
+conf.set('libexecdir', libexecdir)
+conf.set('datarootdir', datadir)
+conf.set('datadir', datadir)
+conf.set('includedir', includedir)
+
+genschema = configure_file(output: 'org.gnome.nm-applet.gschema.xml', input: 'org.gnome.nm-applet.gschema.xml.in', configuration: conf)
+schemasdir = join_paths(datadir, 'glib-2.0/schemas')
+install_data(genschema, install_dir: schemasdir)
+
+gnome = import('gnome')
+gnome.post_install(glib_compile_schemas: true)
 

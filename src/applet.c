@@ -1060,14 +1060,14 @@ applet_do_notify (NMApplet *applet,
 	g_return_if_fail (title != NULL);
 	g_return_if_fail (body != NULL);
 
+	if (pref && g_settings_get_boolean (applet->gsettings, pref))
+		return;
+
 #ifdef LXPANEL_PLUGIN
 	escaped = utils_escape_notify_body (body);
 	applet->notification = lxpanel_notify (applet->panel, escaped);
 	g_free (escaped);
 #else
-	if (pref && g_settings_get_boolean (applet->gsettings, pref))
-		return;
-
 	if (INDICATOR_ENABLED (applet)) {
 #ifdef WITH_APPINDICATOR
 		if (app_indicator_get_status (applet->app_indicator) == APP_INDICATOR_STATUS_PASSIVE)
@@ -1944,7 +1944,6 @@ nma_set_notifications_enabled_cb (GtkWidget *widget, NMApplet *applet)
 
 	state = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget));
 
-#ifndef LXPANEL_PLUGIN
 	g_settings_set_boolean (applet->gsettings,
 	                        PREF_DISABLE_CONNECTED_NOTIFICATIONS,
 	                        !state);
@@ -1957,7 +1956,6 @@ nma_set_notifications_enabled_cb (GtkWidget *widget, NMApplet *applet)
 	g_settings_set_boolean (applet->gsettings,
 	                        PREF_SUPPRESS_WIFI_NETWORKS_AVAILABLE,
 	                        !state);
-#endif
 }
 
 static gboolean
@@ -2151,13 +2149,11 @@ nma_context_menu_update (NMApplet *applet)
 		/* Enabled notifications */
 		g_signal_handler_block (G_OBJECT (applet->notifications_enabled_item),
 			                    applet->notifications_enabled_toggled_id);
-#ifndef LXPANEL_PLUGIN
 		if (   g_settings_get_boolean (applet->gsettings, PREF_DISABLE_CONNECTED_NOTIFICATIONS)
 			&& g_settings_get_boolean (applet->gsettings, PREF_DISABLE_DISCONNECTED_NOTIFICATIONS)
 			&& g_settings_get_boolean (applet->gsettings, PREF_DISABLE_VPN_NOTIFICATIONS)
 			&& g_settings_get_boolean (applet->gsettings, PREF_SUPPRESS_WIFI_NETWORKS_AVAILABLE))
 			notifications_enabled = FALSE;
-#endif
 		gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (applet->notifications_enabled_item), notifications_enabled);
 		g_signal_handler_unblock (G_OBJECT (applet->notifications_enabled_item),
 			                      applet->notifications_enabled_toggled_id);
@@ -2629,12 +2625,8 @@ foo_device_state_changed_cb (NMDevice *device,
 	applet_common_device_state_changed (device, new_state, old_state, reason, applet);
 
 	if (   dclass
-#ifdef LXPANEL_PLUGIN
-	    && new_state == NM_DEVICE_STATE_ACTIVATED) {
-#else
 	    && new_state == NM_DEVICE_STATE_ACTIVATED
 	    && !g_settings_get_boolean (applet->gsettings, PREF_DISABLE_CONNECTED_NOTIFICATIONS)) {
-#endif
 		NMConnection *connection;
 		char *str = NULL;
 
@@ -3129,11 +3121,13 @@ applet_update_icon (gpointer user_data)
 		app_indicator_set_status (applet->app_indicator, nm_running ? APP_INDICATOR_STATUS_ACTIVE : APP_INDICATOR_STATUS_PASSIVE);
 	else
 #endif  /* WITH_APPINDICATOR */
-#ifndef LXPANEL_PLUGIN
 	{
+#ifdef LXPANEL_PLUGIN
+		gtk_widget_set_visible (applet->status_icon, applet->visible);
+#else
 		gtk_status_icon_set_visible (applet->status_icon, applet->visible);
-	}
 #endif
+	}
 
 	switch (state) {
 	case NM_STATE_UNKNOWN:
@@ -3810,8 +3804,10 @@ applet_gsettings_show_changed (GSettings *settings,
 
 	applet->visible = g_settings_get_boolean (settings, key);
 
-#ifndef LXPANEL_PLUGIN
 	if (applet->status_icon)
+#ifdef LXPANEL_PLUGIN
+		gtk_widget_set_visible (applet->status_icon, applet->visible);
+#else
 		gtk_status_icon_set_visible (applet->status_icon, applet->visible);
 #endif
 }
@@ -3870,14 +3866,10 @@ applet_startup (GApplication *app, gpointer user_data)
 		return;
 	}
 
-#ifdef LXPANEL_PLUGIN
-	applet->visible = TRUE;
-#else
 	applet->gsettings = g_settings_new (APPLET_PREFS_SCHEMA);
 	applet->visible = g_settings_get_boolean (applet->gsettings, PREF_SHOW_APPLET);
 	g_signal_connect (applet->gsettings, "changed::show-applet",
 	                  G_CALLBACK (applet_gsettings_show_changed), applet);
-#endif
 
 	foo_client_setup (applet);
 
@@ -3982,9 +3974,7 @@ static void finalize (GObject *object)
 		applet_secrets_request_free ((SecretsRequest *) applet->secrets_reqs->data);
 
 	g_clear_object (&applet->info_dialog_ui);
-#ifndef LXPANEL_PLUGIN
 	g_clear_object (&applet->gsettings);
-#endif
 	g_clear_object (&applet->nm_client);
 
 #if WITH_WWAN
