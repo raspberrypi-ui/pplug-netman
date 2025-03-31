@@ -19,8 +19,9 @@ conf.set('libexecdir', libexecdir)
 conf.set('datarootdir', datadir)
 conf.set('datadir', datadir)
 conf.set('includedir', includedir)
+conf.set('GETTEXT_PACKAGE', 'lxplug_' + meson.project_name())
 
-genschema = configure_file(output: 'org.gnome.nm-applet.gschema.xml', input: 'org.gnome.nm-applet.gschema.xml.in', configuration: conf)
+genschema = configure_file(output: 'org.rpi.nm-applet.gschema.xml', input: 'org.rpi.nm-applet.gschema.xml.in', configuration: conf)
 schemasdir = join_paths(datadir, 'glib-2.0/schemas')
 install_data(genschema, install_dir: schemasdir)
 

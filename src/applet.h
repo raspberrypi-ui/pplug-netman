@@ -57,7 +57,7 @@ typedef struct {
 	GApplicationClass parent_class;
 } NMAppletClass;
 
-#define APPLET_PREFS_SCHEMA                       "org.gnome.nm-applet"
+#define APPLET_PREFS_SCHEMA                       "org.rpi.nm-applet"
 #define PREF_DISABLE_CONNECTED_NOTIFICATIONS      "disable-connected-notifications"
 #define PREF_DISABLE_DISCONNECTED_NOTIFICATIONS   "disable-disconnected-notifications"
 #define PREF_DISABLE_VPN_NOTIFICATIONS            "disable-vpn-notifications"
