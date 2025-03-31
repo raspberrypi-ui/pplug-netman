@@ -40,7 +40,11 @@
 #define _nm_fallthrough
 #endif
 
+#define VERSION "0.1"
+
 #define typeof __typeof__
+
+#define gtk_misc_set_alignment(label,x,y) gtk_label_set_xalign(GTK_LABEL(label),x);gtk_label_set_yalign(GTK_LABEL(label),y)
 
 /*****************************************************************************/
 
@@ -1306,6 +1310,5 @@ nm_close (int fd)
 	nm_assert (r != -1 || fd < 0 || errno != EBADF);
 	return r;
 }
-
 
 #endif /* __NM_MACROS_INTERNAL_H__ */

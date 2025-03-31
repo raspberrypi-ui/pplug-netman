@@ -18,7 +18,6 @@
 #include "utils.h"
 #include "nma-bar-code-widget.h"
 
-#define VERSION "0.1"
 
 static void
 info_dialog_show_error (const char *err)
@@ -122,12 +121,7 @@ create_info_label (const char *text)
 	GtkWidget *label;
 
 	label = gtk_label_new (text ? text : "");
-#ifdef LXPANEL_PLUGIN
-	gtk_label_set_xalign (GTK_LABEL (label), 1.0);
-	gtk_label_set_yalign (GTK_LABEL (label), 0.0);
-#else
 	gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.0);
-#endif
 	gtk_style_context_add_class (gtk_widget_get_style_context (label),
 	                             "dim-label");
 	return label;
@@ -139,12 +133,7 @@ create_info_value (const char *text)
 	GtkWidget *label;
 
 	label = gtk_label_new (text ? text : "");
-#ifdef LXPANEL_PLUGIN
-	gtk_label_set_xalign (GTK_LABEL (label), 1.0);
-	gtk_label_set_yalign (GTK_LABEL (label), 0.0);
-#else
 	gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
-#endif
 	gtk_label_set_selectable (GTK_LABEL (label), TRUE);
 	return label;
 }
@@ -236,7 +225,7 @@ create_info_label_security (NMConnection *connection)
 			else if (!strcmp (key_mgmt, "wpa-none"))
 				label = g_strdup (_("WPA/WPA2"));
 			else if (!strcmp (key_mgmt, "wpa-psk"))
-				label = g_strdup (_("WPA/WPA2"));
+				label = g_strdup (_("WPA/WPA2/WPA3"));
 			else if (!strcmp (key_mgmt, "sae"))
 				label = g_strdup (_("WPA3"));
 			else

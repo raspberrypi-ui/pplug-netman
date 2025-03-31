@@ -286,6 +286,10 @@ unlock_dialog_new (NMDevice *device,
 	if (info->dialog)
 		return;
 
+	if (g_settings_get_boolean (info->applet->gsettings,
+	                            PREF_SUPPRESS_BROADBAND_UNLOCK_PROMPT))
+		return;
+
 	/* We can only unlock PIN or PUK here */
 	lock = mm_modem_get_unlock_required (info->mm_modem);
 	if (lock == MM_MODEM_LOCK_SIM_PIN)
@@ -805,11 +809,11 @@ notify_connected (NMDevice *device,
                   const char *msg,
                   NMApplet *applet)
 {
-	applet_do_notify_with_pref (applet,
-	                            _("Connection Established"),
-	                            msg ? msg : _("You are now connected to the Mobile Broadband network."),
-	                            "network-cellular-connected",
-	                            PREF_DISABLE_CONNECTED_NOTIFICATIONS);
+	applet_do_notify (applet,
+	                  _("Connection Established"),
+	                  msg ? msg : _("You are now connected to the Mobile Broadband network."),
+	                  "network-cellular-connected",
+	                  PREF_DISABLE_CONNECTED_NOTIFICATIONS);
 }
 
 /********************************************************************/
@@ -946,17 +950,17 @@ modem_state_changed (MMModem *object,
 		/* Notify about new registration info */
 		mb_state = broadband_state_to_mb_state (info);
 		if (mb_state == MB_STATE_HOME) {
-			applet_do_notify_with_pref (info->applet,
-			                            _("Mobile Broadband network."),
-			                            _("You are now registered on the home network."),
-			                            signal_strength_icon,
-			                            PREF_DISABLE_CONNECTED_NOTIFICATIONS);
+			applet_do_notify (info->applet,
+			                  _("Mobile Broadband network."),
+			                  _("You are now registered on the home network."),
+			                  signal_strength_icon,
+			                  PREF_DISABLE_CONNECTED_NOTIFICATIONS);
 		} else if (mb_state == MB_STATE_ROAMING) {
-			applet_do_notify_with_pref (info->applet,
-			                            _("Mobile Broadband network."),
-			                            _("You are now registered on a roaming network."),
-			                            signal_strength_icon,
-			                            PREF_DISABLE_CONNECTED_NOTIFICATIONS);
+			applet_do_notify (info->applet,
+			                  _("Mobile Broadband network."),
+			                  _("You are now registered on a roaming network."),
+			                  signal_strength_icon,
+			                  PREF_DISABLE_CONNECTED_NOTIFICATIONS);
 		}
 	}
 }

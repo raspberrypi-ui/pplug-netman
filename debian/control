@@ -8,7 +8,7 @@ Build-Depends:
  lxpanel-dev (>= 0.10.1-2+rpt21), wf-panel-pi-dev (>=0.92),
  libgtk-layer-shell-dev (>= 0.6.0), libglm-dev,
  libsecret-1-dev (>= 0.18), libnm-dev (>= 1.15),
- libnma-dev (>= 1.8.30-1+rpt1), libnotify-dev (>= 0.7)
+ libnma-dev (>= 1.8.30-1+rpt1)
 Standards-Version: 4.5.1
 Homepage: http://raspberrypi.com/
 

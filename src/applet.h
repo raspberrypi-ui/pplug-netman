@@ -15,8 +15,6 @@
 
 #include <net/ethernet.h>
 
-#include <libnotify/notify.h>
-
 #ifdef WITH_APPINDICATOR
 #if USE_AYATANA_INDICATORS
 #include <libayatana-appindicator/app-indicator.h>
@@ -65,6 +63,7 @@ typedef struct {
 #define PREF_DISABLE_VPN_NOTIFICATIONS            "disable-vpn-notifications"
 #define PREF_DISABLE_WIFI_CREATE                  "disable-wifi-create"
 #define PREF_SUPPRESS_WIFI_NETWORKS_AVAILABLE     "suppress-wireless-networks-available"
+#define PREF_SUPPRESS_BROADBAND_UNLOCK_PROMPT     "suppress-broadband-unlock-prompt"
 #define PREF_SHOW_APPLET                          "show-applet"
 
 #define ICON_LAYER_LINK                           0
@@ -167,8 +166,6 @@ typedef struct {
 	GtkBuilder *    info_dialog_ui;
 #ifdef LXPANEL_PLUGIN
 	int	notification;
-#else
-	NotifyNotification* notification;
 #endif
 
 	/* Tracker objects for secrets requests */
@@ -292,20 +289,10 @@ NMRemoteConnection *applet_get_exported_connection_for_device (NMDevice *device,
 NMDevice *applet_get_device_for_connection (NMApplet *applet, NMConnection *connection);
 
 void applet_do_notify (NMApplet *applet,
-                       NotifyUrgency urgency,
-                       const char *summary,
-                       const char *message,
-                       const char *icon,
-                       const char *action1,
-                       const char *action1_label,
-                       NotifyActionCallback action1_cb,
-                       gpointer action1_user_data);
-
-void applet_do_notify_with_pref (NMApplet *applet,
-                                 const char *summary,
-                                 const char *message,
-                                 const char *icon,
-                                 const char *pref);
+                       const char *title,
+                       const char *body,
+                       const char *icon_name,
+                       const char *pref);
 
 GtkWidget * applet_new_menu_item_helper (NMConnection *connection,
                                          NMConnection *active,

@@ -3,7 +3,6 @@ gtkmm = dependency('gtkmm-3.0', version: '>=3.24')
 netman = dependency('libnm')
 nma = dependency('libnma')
 secret = dependency('libsecret-1')
-notify = dependency('libnotify')
 
 lsources = files(
   'netman.c',
@@ -39,7 +38,7 @@ lsources += gnome.compile_resources(
   dependencies: resource_data
 )
 
-ldeps = [ gtk, netman, nma, secret, notify ]
+ldeps = [ gtk, netman, nma, secret ]
 
 lincdir = include_directories('/usr/include/lxpanel')
 
@@ -56,7 +55,7 @@ shared_module(meson.project_name(), lsources,
 
 wsources = lsources + 'netman.cpp'
 
-wdeps = [ gtkmm, netman, nma, secret, notify ]
+wdeps = [ gtkmm, netman, nma, secret ]
 
 wincdir = include_directories('/usr/include/wf-panel-pi')
 

@@ -206,12 +206,7 @@ nma_menu_add_hidden_network_item (GtkWidget *menu, NMApplet *applet)
 
 	menu_item = gtk_menu_item_new ();
 	label = gtk_label_new_with_mnemonic (_("_Connect to Hidden Wi-Fi Network…"));
-#ifdef LXPANEL_PLUGIN
-	gtk_label_set_xalign (GTK_LABEL (label), 0.0);
-	gtk_label_set_yalign (GTK_LABEL (label), 0.5);
-#else
 	gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
-#endif
 	gtk_container_add (GTK_CONTAINER (menu_item), label);
 	gtk_widget_show_all (menu_item);
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
@@ -264,12 +259,7 @@ nma_menu_add_create_network_item (GtkWidget *menu, NMApplet *applet)
 
 	menu_item = gtk_menu_item_new ();
 	label = gtk_label_new_with_mnemonic (_("Create _New Wi-Fi Network…"));
-#ifdef LXPANEL_PLUGIN
-	gtk_label_set_xalign (GTK_LABEL (label), 0.0);
-	gtk_label_set_yalign (GTK_LABEL (label), 0.5);
-#else
 	gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
-#endif
 	gtk_container_add (GTK_CONTAINER (menu_item), label);
 	gtk_widget_show_all (menu_item);
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
@@ -394,16 +384,16 @@ get_ssid_utf8 (NMAccessPoint *ap)
 }
 
 /* List known trojan networks that should never be shown to the user */
-static const char *blacklisted_ssids[] = {
+static const char *denylisted_ssids[] = {
 	/* http://www.npr.org/templates/story/story.php?storyId=130451369 */
 	"Free Public Wi-Fi",
 	NULL
 };
 
 static gboolean
-is_blacklisted_ssid (GBytes *ssid)
+is_denylisted_ssid (GBytes *ssid)
 {
-	return is_ssid_in_list (ssid, blacklisted_ssids);
+	return is_ssid_in_list (ssid, denylisted_ssids);
 }
 
 static void
@@ -512,10 +502,16 @@ wifi_new_auto_connection (NMDevice *device,
 
 	connection = nm_simple_connection_new ();
 
-	/* Make the new connection available only for the current user */
 	s_con = (NMSettingConnection *) nm_setting_connection_new ();
-	//nm_setting_connection_add_permission (s_con, "user", g_get_user_name (), NULL);
 	nm_connection_add_setting (connection, NM_SETTING (s_con));
+
+	if (applet->permissions[NM_CLIENT_PERMISSION_SETTINGS_MODIFY_SYSTEM]
+	    != NM_CLIENT_PERMISSION_RESULT_YES) {
+		/* Make the new connection available only for the current user */
+#ifndef LXPANEL_PLUGIN
+		nm_setting_connection_add_permission (s_con, "user", g_get_user_name (), NULL);
+#endif
+	}
 
 	ssid = nm_access_point_get_ssid (ap);
 	if (   (nm_access_point_get_mode (ap) == NM_802_11_MODE_INFRA)
@@ -779,11 +775,11 @@ get_menu_item_for_ap (NMDeviceWifi *device,
 	GBytes *ssid;
 	struct dup_data dup_data = { NULL, NULL };
 
-	/* Don't add BSSs that hide their SSID or are blacklisted */
+	/* Don't add BSSs that hide their SSID or are denylisted */
 	ssid = nm_access_point_get_ssid (ap);
 	if (   !ssid
 	    || nm_utils_is_empty_ssid (g_bytes_get_data (ssid, NULL), g_bytes_get_size (ssid))
-	    || is_blacklisted_ssid (ssid))
+	    || is_denylisted_ssid (ssid))
 		return NULL;
 
 	/* Find out if this AP is a member of a larger network that all uses the
@@ -1138,24 +1134,6 @@ notify_ap_prop_changed_cb (NMAccessPoint *ap,
 	}
 }
 
-static void
-wifi_available_dont_show_cb (NotifyNotification *notify,
-			                 gchar *id,
-			                 gpointer user_data)
-{
-	NMApplet *applet = NM_APPLET (user_data);
-
-	if (!id || strcmp (id, "dont-show"))
-		return;
-
-#ifndef LXPANEL_PLUGIN
-	g_settings_set_boolean (applet->gsettings,
-	                        PREF_SUPPRESS_WIFI_NETWORKS_AVAILABLE,
-	                        TRUE);
-#endif
-}
-
-
 struct ap_notification_data 
 {
 	NMApplet *applet;
@@ -1256,14 +1234,11 @@ idle_check_avail_access_point_notification (gpointer datap)
 #endif
 
 	applet_do_notify (applet,
-	                  NOTIFY_URGENCY_LOW,
 	                  _("Wi-Fi Networks Available"),
 	                  _("Use the network menu to connect to a Wi-Fi network"),
-	                  "network-wireless-connected-100",
-	                  "dont-show",
-	                  _("Don’t show this message again"),
-	                  wifi_available_dont_show_cb,
-	                  applet);
+	                  "nm-device-wireless",
+	                  PREF_SUPPRESS_WIFI_NETWORKS_AVAILABLE);
+
 	return FALSE;
 }
 
@@ -1455,9 +1430,11 @@ wifi_notify_connected (NMDevice *device,
 		ssid_msg = tmp;
 	}
 #endif
-	applet_do_notify_with_pref (applet, _("Connection Established"),
-	                            ssid_msg, signal_strength_icon,
-	                            PREF_DISABLE_CONNECTED_NOTIFICATIONS);
+	applet_do_notify (applet,
+	                  _("Connection Established"),
+	                  ssid_msg,
+	                  signal_strength_icon,
+	                  PREF_DISABLE_CONNECTED_NOTIFICATIONS);
 	g_free (ssid_msg);
 	g_free (esc_ssid);
 }
@@ -1538,12 +1515,9 @@ activate_existing_cb (GObject *client,
 	g_clear_object (&active);
 	if (error) {
 		const char *text = _("Failed to activate connection");
-		char *err_text = g_strdup_printf ("(%d) %s", error->code,
-		                                  error->message ? error->message : _("Unknown error"));
+		const char *err_text = error->message ? error->message : _("Unknown error");
 
-		g_warning ("%s: %s", text, err_text);
 		utils_show_error_dialog (_("Connection failure"), text, err_text, FALSE, NULL);
-		g_free (err_text);
 		g_error_free (error);
 	}
 	applet_schedule_update_icon (NM_APPLET (user_data));
@@ -1561,12 +1535,9 @@ activate_new_cb (GObject *client,
 	g_clear_object (&active);
 	if (error) {
 		const char *text = _("Failed to add new connection");
-		char *err_text = g_strdup_printf ("(%d) %s", error->code,
-		                                  error->message ? error->message : _("Unknown error"));
+		const char *err_text = error->message ? error->message : _("Unknown error");
 
-		g_warning ("%s: %s", text, err_text);
 		utils_show_error_dialog (_("Connection failure"), text, err_text, FALSE, NULL);
-		g_free (err_text);
 		g_error_free (error);
 	}
 	applet_schedule_update_icon (NM_APPLET (user_data));
