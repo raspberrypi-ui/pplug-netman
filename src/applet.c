@@ -1060,14 +1060,14 @@ applet_do_notify (NMApplet *applet,
 	g_return_if_fail (title != NULL);
 	g_return_if_fail (body != NULL);
 
-	if (pref && g_settings_get_boolean (applet->gsettings, pref))
-		return;
-
 #ifdef LXPANEL_PLUGIN
 	escaped = utils_escape_notify_body (body);
 	applet->notification = lxpanel_notify (applet->panel, escaped);
 	g_free (escaped);
 #else
+	if (pref && g_settings_get_boolean (applet->gsettings, pref))
+		return;
+
 	if (INDICATOR_ENABLED (applet)) {
 #ifdef WITH_APPINDICATOR
 		if (app_indicator_get_status (applet->app_indicator) == APP_INDICATOR_STATUS_PASSIVE)

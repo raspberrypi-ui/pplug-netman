@@ -1236,7 +1236,7 @@ idle_check_avail_access_point_notification (gpointer datap)
 	applet_do_notify (applet,
 	                  _("Wi-Fi Networks Available"),
 	                  _("Use the network menu to connect to a Wi-Fi network"),
-	                  "nm-device-wireless",
+	                  "network-wireless-connected-100",
 	                  PREF_SUPPRESS_WIFI_NETWORKS_AVAILABLE);
 
 	return FALSE;
