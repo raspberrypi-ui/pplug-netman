@@ -1158,11 +1158,7 @@ idle_check_avail_access_point_notification (gpointer datap)
 	const GPtrArray *aps;
 	GPtrArray *all_connections;
 	GPtrArray *connections;
-#ifdef LXPANEL_PLUGIN
-	gint64 t_usec;
-#else
-	GTimeVal timeval;
-#endif
+	struct timeval tv;
 	gboolean have_unused_access_point = FALSE;
 	gboolean have_no_autoconnect_points = TRUE;
 
@@ -1174,16 +1170,9 @@ idle_check_avail_access_point_notification (gpointer datap)
 	if (nm_device_get_state (NM_DEVICE (device)) != NM_DEVICE_STATE_DISCONNECTED)
 		return FALSE;
 
-#ifdef LXPANEL_PLUGIN
-	t_usec = g_get_real_time ();
-	t_usec /= G_USEC_PER_SEC;
-	if ((t_usec - data->last_notification_time) < 60*60) /* Notify at most once an hour */
-		return FALSE;
-#else
-	g_get_current_time (&timeval);
-	if ((timeval.tv_sec - data->last_notification_time) < 60*60) /* Notify at most once an hour */
+	gettimeofday (&tv, NULL);
+	if ((tv.tv_sec - data->last_notification_time) < 60*60) /* Notify at most once an hour */
 		return FALSE;	
-#endif
 
 	all_connections = applet_get_all_connections (applet);
 	connections = nm_device_filter_connections (NM_DEVICE (device), all_connections);
@@ -1224,14 +1213,8 @@ idle_check_avail_access_point_notification (gpointer datap)
 		return FALSE;
 
 	/* Avoid notifying too often */
-#ifdef LXPANEL_PLUGIN
-	t_usec = g_get_real_time ();
-	t_usec /= G_USEC_PER_SEC;
-	data->last_notification_time = t_usec;
-#else
-	g_get_current_time (&timeval);
-	data->last_notification_time = timeval.tv_sec;
-#endif
+	gettimeofday (&tv, NULL);
+	data->last_notification_time = tv.tv_sec;
 
 	applet_do_notify (applet,
 	                  _("Wi-Fi Networks Available"),
@@ -1251,11 +1234,9 @@ queue_avail_access_point_notification (NMDevice *device)
 	if (data->id != 0)
 		return;
 
-#ifndef LXPANEL_PLUGIN
 	if (g_settings_get_boolean (data->applet->gsettings,
 	                            PREF_SUPPRESS_WIFI_NETWORKS_AVAILABLE))
 		return;
-#endif
 
 	data->id = g_timeout_add_seconds (3, idle_check_avail_access_point_notification, data);
 }

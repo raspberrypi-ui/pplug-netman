@@ -97,10 +97,8 @@ update_icon (NMNetworkMenuItem *item, NMApplet *applet)
 {
 	NMNetworkMenuItemPrivate *priv = NM_NETWORK_MENU_ITEM_GET_PRIVATE (item);
 	gs_unref_object GdkPixbuf *icon_free = NULL, *icon_free2 = NULL;
-#ifndef LXPANEL_PLUGIN
 	GdkPixbuf *icon;
 	int icon_size, scale;
-#endif
 	const char *icon_name = NULL;
 
 	if (priv->is_adhoc)

@@ -82,15 +82,16 @@ typedef struct {
 	GtkWidget *plugin;
 
 #ifdef LXPLUG
-    LXPanel *panel;                 /* Back pointer to panel */
-    config_setting_t *settings;     /* Plugin settings */
+	LXPanel *panel;                 /* Back pointer to panel */
+	config_setting_t *settings;     /* Plugin settings */
 #else
-	gboolean bottom;				/* Variables used under wf-panel */
+	gboolean bottom;		/* Variables used under wf-panel */
 #endif
 	GtkWidget *vpn_menu;
 	gboolean killing;
 	gboolean country_set;
 	const char *to_disconnect;
+	int notification;
 #endif
 
 	NMClient *nm_client;
@@ -164,9 +165,6 @@ typedef struct {
 	GtkWidget *     connections_menu_item;
 
 	GtkBuilder *    info_dialog_ui;
-#ifdef LXPANEL_PLUGIN
-	int	notification;
-#endif
 
 	/* Tracker objects for secrets requests */
 	GSList *        secrets_reqs;
@@ -326,11 +324,10 @@ void applet_add_default_connection_item (NMDevice *device,
 
 #ifdef LXPANEL_PLUGIN
 char *get_ip (NMDevice* device);
-#endif
-
 extern void applet_startup (NMApplet *applet);
 extern void applet_finalize (NMApplet *applet);
 extern void status_icon_size_changed_cb (NMApplet *applet);
 extern void status_icon_activate_cb (NMApplet *applet);
+#endif
 
 #endif

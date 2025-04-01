@@ -1050,10 +1050,8 @@ applet_do_notify (NMApplet *applet,
                   const char *icon_name,
                   const char *pref)
 {
-#ifndef LXPANEL_PLUGIN
 	gs_unref_object GNotification *notify = NULL;
 	GIcon *icon;
-#endif
 	char *escaped;
 
 	g_return_if_fail (applet != NULL);
@@ -3219,7 +3217,7 @@ applet_update_icon (gpointer user_data)
 
 	if (applet->status_icon) {
 #ifdef LXPANEL_PLUGIN
-		gtk_widget_set_tooltip_text (applet->status_icon, applet->tip);
+			gtk_widget_set_tooltip_text (applet->status_icon, applet->tip);
 #else
 			gtk_status_icon_set_tooltip_text (applet->status_icon, applet->tip);
 			gtk_status_icon_set_title (applet->status_icon, applet->tip);
