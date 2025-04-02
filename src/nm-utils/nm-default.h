@@ -37,6 +37,10 @@
 
 /* always include these headers for our internal source files. */
 
+#ifndef ___CONFIG_H__
+#define ___CONFIG_H__
+#include <config.h>
+#endif
 
 #include <stdlib.h>
 #include <glib.h>
