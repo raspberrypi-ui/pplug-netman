@@ -80,18 +80,17 @@ typedef struct {
 	GApplication parent;
 #ifdef LXPANEL_PLUGIN
 	GtkWidget *plugin;
-
+	GtkWidget *vpn_menu;
+	gboolean killing;
+	gboolean country_set;
+	const char *to_disconnect;
+	int notification;
 #ifdef LXPLUG
 	LXPanel *panel;                 /* Back pointer to panel */
 	config_setting_t *settings;     /* Plugin settings */
 #else
 	gboolean bottom;		/* Variables used under wf-panel */
 #endif
-	GtkWidget *vpn_menu;
-	gboolean killing;
-	gboolean country_set;
-	const char *to_disconnect;
-	int notification;
 #endif
 
 	NMClient *nm_client;

@@ -17,18 +17,20 @@ lsources = files(
   'applet-dialogs.c',
   'ethernet-dialog.c',
   'mobile-helpers.c',
-  'utils.c',
-  'eap-method.c',
-  'nm-compat.c',
-  'nm-shared-utils.c'
+  'utils/utils.c',
+  'wireless-security/eap-method.c',
+  'nm-utils/nm-compat.c',
+  'nm-utils/nm-shared-utils.c'
 )
 
 resource_data = files(
   '8021x.ui',
-  'ce-page-dsl.ui',
+  'connection-editor/ce-page-dsl.ui',
   'gsm-unlock.ui',
   'info.ui'
 )
+
+incdirs = include_directories('utils', 'wireless-security', 'nm-utils')
 
 gnome = import('gnome')
 
@@ -40,9 +42,9 @@ lsources += gnome.compile_resources(
 
 ldeps = [ gtk, netman, nma, secret ]
 
-lincdir = include_directories('/usr/include/lxpanel')
+lincdir = [ incdirs, include_directories('/usr/include/lxpanel') ]
 
-largs = [ '-DLXPLUG', '-DPACKAGE_DATA_DIR="' + lresource_dir + '"', '-DGETTEXT_PACKAGE="lxplug_' + meson.project_name() + '"', '-DENABLE_GTK3', '-DG_DISABLE_ASSERT', '-DG_DISABLE_CHECKS', '-DG_DISABLE_CAST_CHECKS' ]
+largs = [ '-DLXPLUG', '-DPACKAGE_DATA_DIR="' + lresource_dir + '"', '-DGETTEXT_PACKAGE="lxplug_' + meson.project_name() + '"', '-DENABLE_GTK3', '-DVERSION=0.1', '-DG_DISABLE_ASSERT', '-DG_DISABLE_CHECKS', '-DG_DISABLE_CAST_CHECKS' ]
 
 shared_module(meson.project_name(), lsources,
         dependencies: ldeps,
@@ -57,9 +59,9 @@ wsources = lsources + 'netman.cpp'
 
 wdeps = [ gtkmm, netman, nma, secret ]
 
-wincdir = include_directories('/usr/include/wf-panel-pi')
+wincdir = [ incdirs, include_directories('/usr/include/wf-panel-pi') ]
 
-wargs = [ '-DPLUGIN_NAME="' + meson.project_name() + '"', '-DPACKAGE_DATA_DIR="' + wresource_dir + '"', '-DGETTEXT_PACKAGE="wfplug_' + meson.project_name() +'"', '-DENABLE_GTK3' ]
+wargs = [ '-DPLUGIN_NAME="' + meson.project_name() + '"', '-DPACKAGE_DATA_DIR="' + wresource_dir + '"', '-DGETTEXT_PACKAGE="wfplug_' + meson.project_name() +'"', '-DENABLE_GTK3', '-DVERSION=0.1' ]
 
 shared_module('lib' + meson.project_name(), wsources,
         dependencies: wdeps,

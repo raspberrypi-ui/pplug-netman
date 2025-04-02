@@ -70,14 +70,8 @@ gboolean   nm_network_menu_item_find_dupe (NMNetworkMenuItem *item,
 void       nm_network_menu_item_add_dupe (NMNetworkMenuItem *item,
                                           NMAccessPoint *ap);
 
-#ifdef LXPANEL_PLUGIN
-void       nm_network_menu_item_set_active (NMNetworkMenuItem * item,
-                                            gboolean active,
-                                            NMApplet *applet);
-#else
 void       nm_network_menu_item_set_active (NMNetworkMenuItem * item,
                                             gboolean active);
-#endif
 
 gboolean   nm_network_menu_item_get_has_connections (NMNetworkMenuItem *item);
 

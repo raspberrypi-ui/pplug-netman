@@ -123,7 +123,7 @@ ethernet_notify_connected (NMDevice *device,
 	applet_do_notify (applet,
 	                  _("Connection Established"),
 	                  msg ? msg : _("You are now connected to the ethernet network."),
-	                  "network-transmit-receive",
+	                  "nm-device-wired",
 	                  PREF_DISABLE_CONNECTED_NOTIFICATIONS);
 }
 
@@ -162,7 +162,7 @@ ethernet_get_icon (NMDevice *device,
 		*tip = g_strdup_printf (_("Requesting an ethernet network address for “%s”…"), id);
 		break;
 	case NM_DEVICE_STATE_ACTIVATED:
-		*out_icon_name = "network-transmit-receive";
+		*out_icon_name = "nm-device-wired";
 		*tip = g_strdup_printf (_("Ethernet network connection “%s” active"), id);
 		break;
 	default:
@@ -313,7 +313,7 @@ pppoe_get_secrets (SecretsRequest *req, GError **error)
 
 	builder = gtk_builder_new ();
 
-	if (!gtk_builder_add_from_resource (builder, "/org/freedesktop/network-manager-applet/ce-page-dsl.ui", &tmp_error)) {
+	if (!gtk_builder_add_from_resource (builder, "/org/freedesktop/network-manager-applet/connection-editor/ce-page-dsl.ui", &tmp_error)) {
 		g_set_error (error,
 		             NM_SECRET_AGENT_ERROR,
 		             NM_SECRET_AGENT_ERROR_FAILED,

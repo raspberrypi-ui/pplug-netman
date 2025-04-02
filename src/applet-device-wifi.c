@@ -908,6 +908,7 @@ wifi_add_menu_item (NMDevice *device,
 	GSList *menu_items = NULL;  /* All menu items we'll be adding */
 	NMNetworkMenuItem *item, *active_item = NULL;
 	GtkWidget *widget;
+	GtkWidget *subitem;
 #ifdef LXPANEL_PLUGIN
 	gboolean active_hotspot = FALSE;
 #endif
@@ -944,9 +945,8 @@ wifi_add_menu_item (NMDevice *device,
 		if (active_ap) {
 			active_item = item = get_menu_item_for_ap (wdev, active_ap, connections, NULL, applet);
 			if (item) {
+				nm_network_menu_item_set_active (item, TRUE);
 #ifdef LXPANEL_PLUGIN
-				nm_network_menu_item_set_active (item, TRUE, applet);
-
 				const GPtrArray *act_conns = nm_client_get_active_connections (applet->nm_client);
 				for (i = 0; act_conns && (i < act_conns->len); i++)
 				{
@@ -960,8 +960,6 @@ wifi_add_menu_item (NMDevice *device,
 						active_hotspot = TRUE;
 					}
 				}
-#else
-				nm_network_menu_item_set_active (item, TRUE);
 #endif
 				menu_items = g_slist_append (menu_items, item);
 
@@ -971,7 +969,9 @@ wifi_add_menu_item (NMDevice *device,
 		}
 	}
 
-#ifndef LXPANEL_PLUGIN
+#ifdef LXPANEL_PLUGIN
+	if (active_hotspot) goto out;
+#else
 	/* Notify user of unmanaged or unavailable device */
 	wifi_enabled = nm_client_wireless_get_enabled (applet->nm_client);
 	wifi_hw_enabled = nm_client_wireless_hardware_get_enabled (applet->nm_client);
@@ -983,8 +983,6 @@ wifi_add_menu_item (NMDevice *device,
 		gtk_menu_shell_append (GTK_MENU_SHELL (menu), widget);
 		gtk_widget_show (widget);
 	}
-#else
-	if (active_hotspot) goto out;
 #endif
 
 	/* If disabled or rfkilled or whatever, nothing left to do */
@@ -1007,6 +1005,32 @@ wifi_add_menu_item (NMDevice *device,
 	if (active_item)
 		menu_items = g_slist_remove (menu_items, active_item);
 
+#ifndef LXPANEL_PLUGIN
+	subitem = gtk_menu_item_new_with_mnemonic (_("_Available networks"));
+
+	if (g_slist_length (menu_items)) {
+		GtkWidget *submenu;
+		GSList *sorted_subitems;
+
+		submenu = gtk_menu_new ();
+		gtk_menu_item_set_submenu (GTK_MENU_ITEM (subitem), submenu);
+
+		/* Sort the subitems alphabetically and by importance */
+		sorted_subitems = g_slist_copy (menu_items);
+		sorted_subitems = g_slist_sort (sorted_subitems, sort_by_name);
+		sorted_subitems = g_slist_sort (sorted_subitems, sort_toplevel);
+
+		/* Add menu items */
+		for (iter = sorted_subitems; iter; iter = g_slist_next (iter))
+			gtk_menu_shell_append (GTK_MENU_SHELL (submenu), GTK_WIDGET (iter->data));
+		g_slist_free (sorted_subitems);
+	} else
+		gtk_widget_set_sensitive (subitem, FALSE);
+
+	gtk_menu_shell_append (GTK_MENU_SHELL (menu), subitem);
+	gtk_widget_show_all (subitem);
+
+#else
 	/* Sort all the rest of the menu items for the top-level menu */
 	menu_items = g_slist_sort (menu_items, sort_toplevel);
 
@@ -1014,10 +1038,6 @@ wifi_add_menu_item (NMDevice *device,
 		GSList *submenu_items = NULL;
 		GSList *topmenu_items = NULL;
 		guint32 num_for_toplevel = 5;
-
-#ifndef LXPANEL_PLUGIN
-		applet_menu_item_add_complex_separator_helper (menu, applet, _("Available"));
-#endif
 
 		if (g_slist_length (menu_items) == (num_for_toplevel + 1))
 			num_for_toplevel++;
@@ -1061,7 +1081,7 @@ wifi_add_menu_item (NMDevice *device,
 			gtk_widget_show_all (subitem);
 		}
 	}
-
+#endif
 out:
 	g_slist_free (menu_items);
 	return TRUE;
@@ -1158,7 +1178,7 @@ idle_check_avail_access_point_notification (gpointer datap)
 	const GPtrArray *aps;
 	GPtrArray *all_connections;
 	GPtrArray *connections;
-	struct timeval tv;
+	GTimeVal timeval;
 	gboolean have_unused_access_point = FALSE;
 	gboolean have_no_autoconnect_points = TRUE;
 
@@ -1170,8 +1190,8 @@ idle_check_avail_access_point_notification (gpointer datap)
 	if (nm_device_get_state (NM_DEVICE (device)) != NM_DEVICE_STATE_DISCONNECTED)
 		return FALSE;
 
-	gettimeofday (&tv, NULL);
-	if ((tv.tv_sec - data->last_notification_time) < 60*60) /* Notify at most once an hour */
+	g_get_current_time (&timeval);
+	if ((timeval.tv_sec - data->last_notification_time) < 60*60) /* Notify at most once an hour */
 		return FALSE;	
 
 	all_connections = applet_get_all_connections (applet);
@@ -1213,13 +1233,13 @@ idle_check_avail_access_point_notification (gpointer datap)
 		return FALSE;
 
 	/* Avoid notifying too often */
-	gettimeofday (&tv, NULL);
-	data->last_notification_time = tv.tv_sec;
+	g_get_current_time (&timeval);
+	data->last_notification_time = timeval.tv_sec;
 
 	applet_do_notify (applet,
 	                  _("Wi-Fi Networks Available"),
 	                  _("Use the network menu to connect to a Wi-Fi network"),
-	                  "network-wireless-connected-100",
+	                  "nm-device-wireless",
 	                  PREF_SUPPRESS_WIFI_NETWORKS_AVAILABLE);
 
 	return FALSE;
@@ -1396,7 +1416,7 @@ wifi_notify_connected (NMDevice *device,
 	esc_ssid = get_ssid_utf8 (ap);
 
 	if (!ap)
-		signal_strength_icon = "network-wireless-connected-100";
+		signal_strength_icon = "nm-device-wireless";
 	else
 		signal_strength_icon = mobile_helper_get_quality_icon_name (nm_access_point_get_strength (ap));
 

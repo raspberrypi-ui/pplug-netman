@@ -102,7 +102,7 @@ update_icon (NMNetworkMenuItem *item, NMApplet *applet)
 	const char *icon_name = NULL;
 
 	if (priv->is_adhoc)
-		icon_name = "network-wireless-connected-100";
+		icon_name = "nm-adhoc";
 #ifdef LXPANEL_PLUGIN
 	else if (priv->is_hotspot)
 		icon_name = "network-wireless-hotspot";
@@ -231,11 +231,7 @@ update_label (NMNetworkMenuItem *item, gboolean use_bold)
 }
 
 void
-#ifdef LXPANEL_PLUGIN
-nm_network_menu_item_set_active (NMNetworkMenuItem *item, gboolean active, NMApplet *applet)
-#else
 nm_network_menu_item_set_active (NMNetworkMenuItem *item, gboolean active)
-#endif
 {
 	g_return_if_fail (NM_IS_NETWORK_MENU_ITEM (item));
 

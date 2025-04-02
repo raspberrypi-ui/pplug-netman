@@ -40,11 +40,7 @@
 #define _nm_fallthrough
 #endif
 
-#define VERSION "0.1"
-
 #define typeof __typeof__
-
-#define gtk_misc_set_alignment(label,x,y) gtk_label_set_xalign(GTK_LABEL(label),x);gtk_label_set_yalign(GTK_LABEL(label),y)
 
 /*****************************************************************************/
 

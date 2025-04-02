@@ -97,15 +97,15 @@ const char *
 mobile_helper_get_quality_icon_name (guint32 quality)
 {
 	if (quality > 80)
-		return "network-wireless-connected-100";
+		return "nm-signal-100";
 	else if (quality > 55)
-		return "network-wireless-connected-75";
+		return "nm-signal-75";
 	else if (quality > 30)
-		return "network-wireless-connected-50";
+		return "nm-signal-50";
 	else if (quality > 5)
-		return "network-wireless-connected-25";
+		return "nm-signal-25";
 	else
-		return "network-wireless-connected-00";
+		return "nm-signal-00";
 }
 
 const char *
@@ -461,20 +461,12 @@ ask_for_pin (GtkEntry **out_secret_entry)
 	w = gtk_label_new (_("PIN code is needed for the mobile broadband device"));
 	gtk_box_pack_start (vbox, w, TRUE, TRUE, 0);
 
-#ifndef LXPANEL_PLUGIN
 	w = gtk_alignment_new (0.5, 0.5, 0, 1.0);
 	gtk_box_pack_start (vbox, w, TRUE, TRUE, 0);
-#endif
 
 	box = GTK_BOX (gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6));
 	gtk_container_set_border_width (GTK_CONTAINER (box), 6);
-#ifdef LXPANEL_PLUGIN
-	gtk_widget_set_halign (GTK_WIDGET (box), GTK_ALIGN_CENTER);
-	gtk_widget_set_valign (GTK_WIDGET (box), GTK_ALIGN_FILL);
-	gtk_box_pack_start (vbox, GTK_WIDGET (box), TRUE, TRUE, 0);
-#else
 	gtk_container_add (GTK_CONTAINER (w), GTK_WIDGET (box));
-#endif
 
 	gtk_box_pack_start (box, gtk_label_new ("PIN:"), FALSE, FALSE, 0);
 

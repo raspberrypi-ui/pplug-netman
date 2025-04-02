@@ -401,7 +401,6 @@ static void applet_common_get_device_icon_lxp (gboolean wifi, NMDeviceState stat
 }
 #endif
 
-
 /********************************************************************/
 
 static gboolean
@@ -2530,7 +2529,7 @@ foo_set_icon (NMApplet *applet, guint32 layer, GdkPixbuf *pixbuf, const char *ic
 			                      GDK_INTERP_NEAREST, 255);
 		}
 	} else
-		pixbuf = nma_icon_check_and_load ("network-offline", applet);
+		pixbuf = nma_icon_check_and_load ("nm-no-connection", applet);
 
 #ifdef LXPANEL_PLUGIN
 	gtk_image_set_from_pixbuf (GTK_IMAGE (applet->status_icon), pixbuf);
@@ -2682,7 +2681,7 @@ foo_client_state_changed_cb (NMClient *client, GParamSpec *pspec, gpointer user_
 	case NM_STATE_DISCONNECTED:
 		applet_do_notify (applet, _("Disconnected"),
 		                  _("The network connection has been disconnected."),
-		                  "network-offline",
+		                  "nm-no-connection",
 		                  PREF_DISABLE_DISCONNECTED_NOTIFICATIONS);
 		break;
 	default:
@@ -3130,11 +3129,11 @@ applet_update_icon (gpointer user_data)
 	switch (state) {
 	case NM_STATE_UNKNOWN:
 	case NM_STATE_ASLEEP:
-		icon_name = "network-offline";
+		icon_name = "nm-no-connection";
 		dev_tip = _("Networking disabled");
 		break;
 	case NM_STATE_DISCONNECTED:
-		icon_name = "network-offline";
+		icon_name = "nm-no-connection";
 		dev_tip = _("No network connection");
 		break;
 	default:
@@ -3146,7 +3145,7 @@ applet_update_icon (gpointer user_data)
 		icon_name = icon_name_free;
 		dev_tip = dev_tip_free;
 		if (!pixbuf && state == NM_STATE_CONNECTED_GLOBAL) {
-			icon_name = g_strdup ("network-transmit-receive");
+			icon_name = g_strdup ("nm-device-wired");
 			pixbuf = g_object_ref (nma_icon_check_and_load (icon_name, applet));
 		}
 		break;
@@ -3162,7 +3161,7 @@ applet_update_icon (gpointer user_data)
 	if (active_vpn) {
 		switch (vpn_state) {
 		case NM_VPN_CONNECTION_STATE_ACTIVATED:
-			icon_name = "network-vpn-lock";
+			icon_name = "nm-vpn-active-lock";
 #ifdef WITH_APPINDICATOR
 			if (INDICATOR_ENABLED (applet))
 				icon_name = icon_name_free = g_strdup_printf ("%s-secure", app_indicator_get_icon (applet->app_indicator));

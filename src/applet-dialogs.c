@@ -1191,20 +1191,12 @@ applet_mobile_password_dialog_new (NMConnection *connection,
 
 	gtk_box_pack_start (vbox, w, TRUE, TRUE, 0);
 
-#ifndef LXPANEL_PLUGIN
 	w = gtk_alignment_new (0.5, 0.5, 0, 1.0);
 	gtk_box_pack_start (vbox, w, TRUE, TRUE, 0);
-#endif
 
 	box = GTK_BOX (gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6));
 	gtk_container_set_border_width (GTK_CONTAINER (box), 6);
-#ifdef LXPANEL_PLUGIN
-	gtk_widget_set_halign (GTK_WIDGET (box), GTK_ALIGN_CENTER);
-	gtk_widget_set_valign (GTK_WIDGET (box), GTK_ALIGN_FILL);
-	gtk_box_pack_start (vbox, GTK_WIDGET (box), TRUE, TRUE, 0);
-#else
 	gtk_container_add (GTK_CONTAINER (w), GTK_WIDGET (box));
-#endif
 
 	gtk_box_pack_start (box, gtk_label_new (_("Password:")), FALSE, FALSE, 0);
 

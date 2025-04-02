@@ -41,11 +41,11 @@
 #include <stdlib.h>
 #include <glib.h>
 
+#include "nm-utils/nm-macros-internal.h"
+
 #include <nm-version.h>
 
 #include <gtk/gtk.h>
-
-#include "nm-macros-internal.h"
 
 #if ((NETWORKMANAGER_COMPILATION) & NM_NETWORKMANAGER_COMPILATION_LIB)
 #include <glib/gi18n-lib.h>

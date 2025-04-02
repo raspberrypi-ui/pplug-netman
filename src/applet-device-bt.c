@@ -74,7 +74,7 @@ bt_notify_connected (NMDevice *device,
 	applet_do_notify (applet,
 	                  _("Connection Established"),
 	                  msg ? msg : _("You are now connected to the mobile broadband network."),
-	                  "network-cellular-connected",
+	                  "nm-device-wwan",
 	                  PREF_DISABLE_CONNECTED_NOTIFICATIONS);
 }
 
@@ -113,7 +113,7 @@ bt_get_icon (NMDevice *device,
 		*tip = g_strdup_printf (_("Requesting a network address for “%s”…"), id);
 		break;
 	case NM_DEVICE_STATE_ACTIVATED:
-		*out_icon_name = "network-cellular-connected";
+		*out_icon_name = "nm-device-wwan";
 		*tip = g_strdup_printf (_("Mobile broadband connection “%s” active"), id);
 		break;
 	default:
