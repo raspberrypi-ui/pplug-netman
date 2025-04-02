@@ -83,7 +83,6 @@ typedef struct {
 	GtkWidget *vpn_menu;
 	gboolean killing;
 	gboolean country_set;
-	const char *to_disconnect;
 	int notification;
 #ifdef LXPLUG
 	LXPanel *panel;                 /* Back pointer to panel */
