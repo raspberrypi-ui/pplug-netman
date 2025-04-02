@@ -45,8 +45,6 @@ extern gboolean with_agent;
 #endif
 extern gboolean with_appindicator;
 
-#define BINDIR "/usr/bin"
-
 G_DEFINE_TYPE (NMApplet, nma, G_TYPE_APPLICATION)
 
 #ifdef LXPANEL_PLUGIN
