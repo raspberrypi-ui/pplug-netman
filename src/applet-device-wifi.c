@@ -610,13 +610,7 @@ wifi_menu_item_activate (GtkMenuItem *item, gpointer user_data)
 
 #ifdef LXPANEL_PLUGIN
 	if (info->ap == _active_ap_get (info->applet, NM_DEVICE (info->device)))
-	{
-		GList *ch1 = gtk_container_get_children (GTK_CONTAINER (item));
-		GList *ch2 = gtk_container_get_children (ch1->data);
-		disconnect_prompt (info, gtk_label_get_text (GTK_LABEL (ch2->data)));
-		g_list_free (ch2);
-		g_list_free (ch1);
-	}
+		disconnect_prompt (info, nm_network_menu_item_get_ssid ((NMNetworkMenuItem *) item));
 	else
 #endif
 	applet_menu_item_activate_helper (NM_DEVICE (info->device),
