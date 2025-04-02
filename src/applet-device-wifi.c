@@ -241,7 +241,11 @@ applet_wifi_create_wifi_network (NMApplet *applet)
 {
 	GtkWidget *dialog;
 
+#ifdef LXPANEL_PLUGIN
+	dialog = nma_wifi_dialog_new_for_hotspot (applet->nm_client);
+#else
 	dialog = nma_wifi_dialog_new_for_create (applet->nm_client);
+#endif
 	if (dialog) {
 		g_signal_connect (dialog, "response",
 		                  G_CALLBACK (wifi_dialog_response_cb),
@@ -258,7 +262,11 @@ nma_menu_add_create_network_item (GtkWidget *menu, NMApplet *applet)
 	GtkWidget *label;
 
 	menu_item = gtk_menu_item_new ();
+#ifdef LXPANEL_PLUGIN
+	label = gtk_label_new_with_mnemonic (_("Create Wi-Fi _Hotspot…"));
+#else
 	label = gtk_label_new_with_mnemonic (_("Create _New Wi-Fi Network…"));
+#endif
 	gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
 	gtk_container_add (GTK_CONTAINER (menu_item), label);
 	gtk_widget_show_all (menu_item);
@@ -270,44 +278,6 @@ nma_menu_add_create_network_item (GtkWidget *menu, NMApplet *applet)
 	if (!applet_wifi_can_create_wifi_network (applet))
 		gtk_widget_set_sensitive (GTK_WIDGET (menu_item), FALSE);
 }
-
-#ifdef LXPANEL_PLUGIN
-gboolean
-applet_wifi_create_wifi_hotspot (NMApplet *applet)
-{
-	GtkWidget *dialog;
-
-	dialog = nma_wifi_dialog_new_for_hotspot (applet->nm_client);
-	if (dialog) {
-		g_signal_connect (dialog, "response",
-		                  G_CALLBACK (wifi_dialog_response_cb),
-		                  applet);
-		show_ignore_focus_stealing_prevention (dialog);
-	}
-	return !!dialog;
-}
-
-void
-nma_menu_add_create_hotspot_item (GtkWidget *menu, NMApplet *applet)
-{
-	GtkWidget *menu_item;
-	GtkWidget *label;
-
-	menu_item = gtk_menu_item_new ();
-	label = gtk_label_new_with_mnemonic (_("Create Wi-Fi _Hotspot…"));
-	gtk_label_set_xalign (GTK_LABEL (label), 0.0);
-	gtk_label_set_yalign (GTK_LABEL (label), 0.5);
-	gtk_container_add (GTK_CONTAINER (menu_item), label);
-	gtk_widget_show_all (menu_item);
-	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
-	g_signal_connect_swapped (menu_item, "activate",
-	                          G_CALLBACK (applet_wifi_create_wifi_hotspot),
-	                          applet);
-
-	if (!applet_wifi_can_create_wifi_network (applet))
-		gtk_widget_set_sensitive (GTK_WIDGET (menu_item), FALSE);
-}
-#endif
 
 typedef struct {
 	NMApplet *applet;
@@ -1486,6 +1456,7 @@ wifi_get_icon (NMDevice *device,
 
 		if (ap) {
 			char *ssid = get_ssid_utf8 (ap);
+
 #ifdef LXPANEL_PLUGIN
 			NMSettingWireless *s_wire = nm_connection_get_setting_wireless (connection);
 			if (!g_strcmp0 (nm_setting_wireless_get_mode (s_wire), "ap"))
