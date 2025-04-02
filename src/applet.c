@@ -422,7 +422,7 @@ static void handle_cancel (GtkButton *button, gpointer user_data)
 	gtk_widget_destroy (wid);
 }
 
-void disconnect_prompt (NMApplet *applet, NMDeviceWifi *device, const char *name)
+void disconnect_prompt (NMDeviceWifi *device, NMApplet *applet, const char *name)
 {
 	GtkBuilder *builder;
 	char *buffer;

@@ -570,7 +570,7 @@ wifi_menu_item_activate (GtkMenuItem *item, gpointer user_data)
 
 #ifdef LXPANEL_PLUGIN
 	if (info->ap == _active_ap_get (info->applet, NM_DEVICE (info->device)))
-		disconnect_prompt (info->applet, info->device, nm_network_menu_item_get_ssid ((NMNetworkMenuItem *) item));
+		disconnect_prompt (info->device, info->applet, nm_network_menu_item_get_ssid ((NMNetworkMenuItem *) item));
 	else
 #endif
 	applet_menu_item_activate_helper (NM_DEVICE (info->device),
@@ -833,13 +833,27 @@ wifi_add_menu_item (NMDevice *device,
 	NMNetworkMenuItem *item, *active_item = NULL;
 	GtkWidget *widget;
 	GtkWidget *subitem;
-#ifdef LXPANEL_PLUGIN
-	gboolean active_hotspot = FALSE;
-#endif
 
 	wdev = NM_DEVICE_WIFI (device);
 	aps = nm_device_wifi_get_access_points (wdev);
 
+#ifdef LXPANEL_PLUGIN
+	if (multiple_devices)
+	{
+		const char *desc;
+		desc = nm_device_get_description (device);
+		if (aps && aps->len > 1)
+			text = g_strdup_printf (_("Wi-Fi Networks (%s)"), desc);
+		else
+			text = g_strdup_printf (_("Wi-Fi Network (%s)"), desc);
+		widget = applet_menu_item_create_device_item_helper (device, applet, text);
+		g_free (text);
+
+		gtk_widget_set_sensitive (widget, FALSE);
+		gtk_menu_shell_append (GTK_MENU_SHELL (menu), widget);
+		gtk_widget_show (widget);
+	}
+#else
 	if (multiple_devices) {
 		const char *desc;
 
@@ -848,10 +862,8 @@ wifi_add_menu_item (NMDevice *device,
 			text = g_strdup_printf (_("Wi-Fi Networks (%s)"), desc);
 		else
 			text = g_strdup_printf (_("Wi-Fi Network (%s)"), desc);
-#ifndef LXPANEL_PLUGIN
 	} else
 		text = g_strdup (ngettext ("Wi-Fi Network", "Wi-Fi Networks", aps ? aps->len : 0));
-#endif
 
 	widget = applet_menu_item_create_device_item_helper (device, applet, text);
 	g_free (text);
@@ -859,8 +871,6 @@ wifi_add_menu_item (NMDevice *device,
 	gtk_widget_set_sensitive (widget, FALSE);
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), widget);
 	gtk_widget_show (widget);
-#ifdef LXPANEL_PLUGIN
-	}
 #endif
 
 	/* Add the active AP if we're connected to something and the device is available */
@@ -881,7 +891,10 @@ wifi_add_menu_item (NMDevice *device,
 					if (!g_strcmp0 (nm_setting_wireless_get_mode (s_wire), "ap"))
 					{
 						nm_network_menu_item_set_hotspot (item, TRUE, applet);
-						active_hotspot = TRUE;
+						menu_items = g_slist_append (menu_items, item);
+						gtk_menu_shell_append (GTK_MENU_SHELL (menu), GTK_WIDGET (item));
+						gtk_widget_show_all (GTK_WIDGET (item));
+						goto out;
 					}
 				}
 #endif
@@ -893,9 +906,7 @@ wifi_add_menu_item (NMDevice *device,
 		}
 	}
 
-#ifdef LXPANEL_PLUGIN
-	if (active_hotspot) goto out;
-#else
+#ifndef LXPANEL_PLUGIN
 	/* Notify user of unmanaged or unavailable device */
 	wifi_enabled = nm_client_wireless_get_enabled (applet->nm_client);
 	wifi_hw_enabled = nm_client_wireless_hardware_get_enabled (applet->nm_client);
