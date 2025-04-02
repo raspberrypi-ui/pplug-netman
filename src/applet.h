@@ -322,6 +322,7 @@ void applet_add_default_connection_item (NMDevice *device,
 
 #ifdef LXPANEL_PLUGIN
 extern char *get_ip (NMDevice* device);
+extern void disconnect_prompt (NMApplet *applet, NMDeviceWifi *device, const char *name);
 extern void applet_startup (NMApplet *applet);
 extern void applet_finalize (NMApplet *applet);
 extern void status_icon_size_changed_cb (NMApplet *applet);

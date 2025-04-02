@@ -559,50 +559,6 @@ wifi_new_auto_connection (NMDevice *device,
 	return TRUE;
 }
 
-#ifdef LXPANEL_PLUGIN
-static void handle_ok (GtkButton *button, gpointer user_data)
-{
-	WifiMenuItemInfo *info = (WifiMenuItemInfo *) user_data;
-	GtkWidget *wid = GTK_WIDGET (button);
-	while (!GTK_IS_WINDOW (wid)) wid = gtk_widget_get_parent (wid);
-	applet_menu_item_disconnect_helper (nm_client_get_device_by_path (info->applet->nm_client, nm_object_get_path (NM_OBJECT (info->device))), info->applet);
-	g_free (info);
-	gtk_widget_destroy (wid);
-}
-
-static void handle_cancel (GtkButton *button, gpointer user_data)
-{
-	WifiMenuItemInfo *info = (WifiMenuItemInfo *) user_data;
-	GtkWidget *wid = GTK_WIDGET (button);
-	while (!GTK_IS_WINDOW (wid)) wid = gtk_widget_get_parent (wid);
-	g_free (info);
-	gtk_widget_destroy (wid);
-}
-
-static void disconnect_prompt (WifiMenuItemInfo *info, const char *name)
-{
-	GtkBuilder *builder;
-	char *buffer;
-	WifiMenuItemInfo *infcopy = g_malloc (sizeof (WifiMenuItemInfo));
-	memcpy (infcopy, info, sizeof (WifiMenuItemInfo));
-
-	textdomain (GETTEXT_PACKAGE);
-
-	builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/lxplug-netman.ui");
-
-	GtkWidget *disc_dlg = (GtkWidget *) gtk_builder_get_object (builder, "modal");
-	buffer = g_strdup_printf (_("Do you want to disconnect from the wireless network '%s'?"), name);
-	gtk_label_set_text (GTK_LABEL (gtk_builder_get_object (builder, "modal_msg")), buffer);
-	g_free (buffer);
-	g_signal_connect (gtk_builder_get_object (builder, "modal_ok"), "clicked", G_CALLBACK (handle_ok), infcopy);
-	g_signal_connect (gtk_builder_get_object (builder, "modal_cancel"), "clicked", G_CALLBACK (handle_cancel), infcopy);
-	gtk_widget_hide (GTK_WIDGET (gtk_builder_get_object (builder, "modal_pb")));
-	g_object_unref (builder);
-
-	gtk_widget_show (disc_dlg);
-}
-#endif
-
 static void
 wifi_menu_item_activate (GtkMenuItem *item, gpointer user_data)
 {
@@ -614,7 +570,7 @@ wifi_menu_item_activate (GtkMenuItem *item, gpointer user_data)
 
 #ifdef LXPANEL_PLUGIN
 	if (info->ap == _active_ap_get (info->applet, NM_DEVICE (info->device)))
-		disconnect_prompt (info, nm_network_menu_item_get_ssid ((NMNetworkMenuItem *) item));
+		disconnect_prompt (info->applet, info->device, nm_network_menu_item_get_ssid ((NMNetworkMenuItem *) item));
 	else
 #endif
 	applet_menu_item_activate_helper (NM_DEVICE (info->device),

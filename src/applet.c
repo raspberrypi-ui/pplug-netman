@@ -397,6 +397,54 @@ static void applet_common_get_device_icon_lxp (gboolean wifi, NMDeviceState stat
 			applet->animation_step = 0;
 	}
 }
+
+typedef struct {
+	NMApplet *applet;
+	NMDeviceWifi *device;
+} DisconnectInfo;
+
+static void handle_ok (GtkButton *button, gpointer user_data)
+{
+	DisconnectInfo *info = (DisconnectInfo *) user_data;
+	GtkWidget *wid = GTK_WIDGET (button);
+	while (!GTK_IS_WINDOW (wid)) wid = gtk_widget_get_parent (wid);
+	applet_menu_item_disconnect_helper (info->device, info->applet);
+	g_free (info);
+	gtk_widget_destroy (wid);
+}
+
+static void handle_cancel (GtkButton *button, gpointer user_data)
+{
+	DisconnectInfo *info = (DisconnectInfo *) user_data;
+	GtkWidget *wid = GTK_WIDGET (button);
+	while (!GTK_IS_WINDOW (wid)) wid = gtk_widget_get_parent (wid);
+	g_free (info);
+	gtk_widget_destroy (wid);
+}
+
+void disconnect_prompt (NMApplet *applet, NMDeviceWifi *device, const char *name)
+{
+	GtkBuilder *builder;
+	char *buffer;
+	DisconnectInfo *inf = g_malloc (sizeof (DisconnectInfo));
+	inf->applet = applet;
+	inf->device = device;
+
+	textdomain (GETTEXT_PACKAGE);
+
+	builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/lxplug-netman.ui");
+
+	GtkWidget *disc_dlg = (GtkWidget *) gtk_builder_get_object (builder, "modal");
+	buffer = g_strdup_printf (_("Do you want to disconnect from the wireless network '%s'?"), name);
+	gtk_label_set_text (GTK_LABEL (gtk_builder_get_object (builder, "modal_msg")), buffer);
+	g_free (buffer);
+	g_signal_connect (gtk_builder_get_object (builder, "modal_ok"), "clicked", G_CALLBACK (handle_ok), inf);
+	g_signal_connect (gtk_builder_get_object (builder, "modal_cancel"), "clicked", G_CALLBACK (handle_cancel), inf);
+	gtk_widget_hide (GTK_WIDGET (gtk_builder_get_object (builder, "modal_pb")));
+	g_object_unref (builder);
+
+	gtk_widget_show (disc_dlg);
+}
 #endif
 
 /********************************************************************/
