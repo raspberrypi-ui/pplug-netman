@@ -840,8 +840,7 @@ wifi_add_menu_item (NMDevice *device,
 #ifdef LXPANEL_PLUGIN
 	if (multiple_devices)
 	{
-		const char *desc;
-		desc = nm_device_get_description (device);
+		const char *desc = nm_device_get_description (device);
 		if (aps && aps->len > 1)
 			text = g_strdup_printf (_("Wi-Fi Networks (%s)"), desc);
 		else
@@ -940,36 +939,12 @@ wifi_add_menu_item (NMDevice *device,
 	if (active_item)
 		menu_items = g_slist_remove (menu_items, active_item);
 
-#ifndef LXPANEL_PLUGIN
-	subitem = gtk_menu_item_new_with_mnemonic (_("_Available networks"));
-
-	if (g_slist_length (menu_items)) {
-		GtkWidget *submenu;
-		GSList *sorted_subitems;
-
-		submenu = gtk_menu_new ();
-		gtk_menu_item_set_submenu (GTK_MENU_ITEM (subitem), submenu);
-
-		/* Sort the subitems alphabetically and by importance */
-		sorted_subitems = g_slist_copy (menu_items);
-		sorted_subitems = g_slist_sort (sorted_subitems, sort_by_name);
-		sorted_subitems = g_slist_sort (sorted_subitems, sort_toplevel);
-
-		/* Add menu items */
-		for (iter = sorted_subitems; iter; iter = g_slist_next (iter))
-			gtk_menu_shell_append (GTK_MENU_SHELL (submenu), GTK_WIDGET (iter->data));
-		g_slist_free (sorted_subitems);
-	} else
-		gtk_widget_set_sensitive (subitem, FALSE);
-
-	gtk_menu_shell_append (GTK_MENU_SHELL (menu), subitem);
-	gtk_widget_show_all (subitem);
-
-#else
+#ifdef LXPANEL_PLUGIN
 	/* Sort all the rest of the menu items for the top-level menu */
 	menu_items = g_slist_sort (menu_items, sort_toplevel);
 
-	if (g_slist_length (menu_items)) {
+	if (g_slist_length (menu_items))
+	{
 		GSList *submenu_items = NULL;
 		GSList *topmenu_items = NULL;
 		guint32 num_for_toplevel = 5;
@@ -995,7 +970,8 @@ wifi_add_menu_item (NMDevice *device,
 		topmenu_items = NULL;
 
 		/* If there are any submenu items, make a submenu for those */
-		if (submenu_items) {
+		if (submenu_items)
+		{
 			GtkWidget *subitem, *submenu;
 			GSList *sorted_subitems;
 
@@ -1016,6 +992,31 @@ wifi_add_menu_item (NMDevice *device,
 			gtk_widget_show_all (subitem);
 		}
 	}
+#else
+	subitem = gtk_menu_item_new_with_mnemonic (_("_Available networks"));
+
+	if (g_slist_length (menu_items)) {
+		GtkWidget *submenu;
+		GSList *sorted_subitems;
+
+		submenu = gtk_menu_new ();
+		gtk_menu_item_set_submenu (GTK_MENU_ITEM (subitem), submenu);
+
+		/* Sort the subitems alphabetically and by importance */
+		sorted_subitems = g_slist_copy (menu_items);
+		sorted_subitems = g_slist_sort (sorted_subitems, sort_by_name);
+		sorted_subitems = g_slist_sort (sorted_subitems, sort_toplevel);
+
+		/* Add menu items */
+		for (iter = sorted_subitems; iter; iter = g_slist_next (iter))
+			gtk_menu_shell_append (GTK_MENU_SHELL (submenu), GTK_WIDGET (iter->data));
+		g_slist_free (sorted_subitems);
+	} else
+		gtk_widget_set_sensitive (subitem, FALSE);
+
+	gtk_menu_shell_append (GTK_MENU_SHELL (menu), subitem);
+	gtk_widget_show_all (subitem);
+
 #endif
 out:
 	g_slist_free (menu_items);

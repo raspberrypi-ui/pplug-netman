@@ -3642,18 +3642,14 @@ status_icon_screen_changed_cb (GtkStatusIcon *icon,
 }
 
 #ifdef LXPANEL_PLUGIN
-void
-status_icon_size_changed_cb (NMApplet *applet)
+gboolean
 #else
 static gboolean
+#endif
 status_icon_size_changed_cb (GtkStatusIcon *icon,
                              gint size,
                              NMApplet *applet)
-#endif
 {
-#ifdef LXPANEL_PLUGIN
-	int size = applet->icon_size;
-#endif
 	g_debug ("%s(): status icon size %d requested", __func__, size);
 
 	/* icon_size may be 0 if for example the panel hasn't given us any space
@@ -3680,18 +3676,15 @@ status_icon_size_changed_cb (GtkStatusIcon *icon,
 
 	applet_schedule_update_icon (applet);
 
-#ifndef LXPANEL_PLUGIN
 	return TRUE;
-#endif
 }
 
 #ifdef LXPANEL_PLUGIN
 void
-status_icon_activate_cb (NMApplet *applet)
 #else
 static void
-status_icon_activate_cb (GtkStatusIcon *icon, NMApplet *applet)
 #endif
+status_icon_activate_cb (GtkStatusIcon *icon, NMApplet *applet)
 {
 	/* Have clicking on the applet act also as acknowledgement
 	 * of the notification.

@@ -49,10 +49,6 @@ GtkWidget* nm_network_menu_item_new (NMAccessPoint *ap,
                                      gboolean has_connections,
                                      NMApplet *applet);
 
-#ifdef LXPANEL_PLUGIN
-void nm_network_menu_item_set_hotspot (NMNetworkMenuItem *item, gboolean hotspot, NMApplet *applet);
-#endif
-
 const char *nm_network_menu_item_get_ssid (NMNetworkMenuItem *item);
 
 gboolean   nm_network_menu_item_get_is_adhoc (NMNetworkMenuItem *item);
@@ -74,6 +70,10 @@ void       nm_network_menu_item_set_active (NMNetworkMenuItem * item,
                                             gboolean active);
 
 gboolean   nm_network_menu_item_get_has_connections (NMNetworkMenuItem *item);
+
+#ifdef LXPANEL_PLUGIN
+void nm_network_menu_item_set_hotspot (NMNetworkMenuItem *item, gboolean hotspot, NMApplet *applet);
+#endif
 
 #endif /* __AP_MENU_ITEM_H__ */
 

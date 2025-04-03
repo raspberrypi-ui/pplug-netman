@@ -78,13 +78,13 @@ static int wifi_country_set (void)
 static void netman_button_clicked (GtkWidget *, NMApplet *nm)
 {
     CHECK_LONGPRESS
-    status_icon_activate_cb (nm);
+    status_icon_activate_cb (NULL, nm);
 }
 
 /* Handler for system config changed message from panel */
 void netman_update_display (NMApplet *nm)
 {
-    status_icon_size_changed_cb (nm);
+    status_icon_size_changed_cb (NULL, nm->icon_size, nm);
 }
 
 /* Handler for control message */
@@ -93,7 +93,7 @@ gboolean netman_control_msg (NMApplet *nm, const char *cmd)
     if (!g_strcmp0 (cmd, "menu"))
     {
         if (nm->menu && gtk_widget_get_visible (nm->menu)) gtk_widget_hide (nm->menu);
-        else if (nm_client_get_nm_running (nm->nm_client)) status_icon_activate_cb (nm);
+        else if (nm_client_get_nm_running (nm->nm_client)) status_icon_activate_cb (NULL, nm);
     }
 
     if (!g_strcmp0 (cmd, "cset"))

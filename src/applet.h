@@ -325,8 +325,8 @@ extern char *get_ip (NMDevice* device);
 extern void disconnect_prompt (NMDeviceWifi *device, NMApplet *applet, const char *name);
 extern void applet_startup (NMApplet *applet);
 extern void applet_finalize (NMApplet *applet);
-extern void status_icon_size_changed_cb (NMApplet *applet);
-extern void status_icon_activate_cb (NMApplet *applet);
+extern gboolean status_icon_size_changed_cb (GtkStatusIcon *icon, gint size, NMApplet *applet);
+extern void status_icon_activate_cb (GtkStatusIcon *icon, NMApplet *applet);
 #endif
 
 #endif
