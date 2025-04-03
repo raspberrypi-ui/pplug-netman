@@ -408,7 +408,7 @@ static void handle_ok (GtkButton *button, gpointer user_data)
 	DisconnectInfo *info = (DisconnectInfo *) user_data;
 	GtkWidget *wid = GTK_WIDGET (button);
 	while (!GTK_IS_WINDOW (wid)) wid = gtk_widget_get_parent (wid);
-	applet_menu_item_disconnect_helper (info->device, info->applet);
+	applet_menu_item_disconnect_helper (NM_DEVICE (info->device), info->applet);
 	g_free (info);
 	gtk_widget_destroy (wid);
 }
