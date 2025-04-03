@@ -1,3 +1,9 @@
+pplug-netman (0.17) bookworm; urgency=medium
+
+  * Update to network-manager-applet 1.36.0-3
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 03 Apr 2025 11:13:42 +0100
+
 pplug-netman (0.16) bookworm; urgency=medium
 
   * Load dummy icon at start
