@@ -1,5 +1,5 @@
 /*============================================================================
-Copyright (c) 2024 Raspberry Pi Holdings Ltd.
+Copyright (c) 2024 Raspberry Pi
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,6 @@ class WayfireNetman : public WayfireWidget
     Glib::RefPtr<Gtk::GestureLongPress> gesture;
 
     WfOption <int> icon_size {"panel/icon_size"};
-    WfOption <std::string> bar_pos {"panel/position"};
     sigc::connection icon_timer;
 
     /* plugin */
@@ -55,7 +54,6 @@ class WayfireNetman : public WayfireWidget
     void command (const char *cmd) override;
     virtual ~WayfireNetman ();
     void icon_size_changed_cb (void);
-    void bar_pos_changed_cb (void);
     bool set_icon (void);
 };
 

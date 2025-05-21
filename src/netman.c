@@ -1,5 +1,5 @@
 /*============================================================================
-Copyright (c) 2022-2025 Raspberry Pi Holdings Ltd.
+Copyright (c) 2022-2025 Raspberry Pi
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -43,6 +43,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*----------------------------------------------------------------------------*/
 /* Global data                                                                */
 /*----------------------------------------------------------------------------*/
+
+conf_table_t conf_table[1] = {
+    {CONF_TYPE_NONE, NULL, NULL, NULL}
+};
 
 /*----------------------------------------------------------------------------*/
 /* Prototypes                                                                 */
@@ -207,7 +211,7 @@ FM_DEFINE_MODULE (lxpanel_gtk, netman)
 
 /* Plugin descriptor */
 LXPanelPluginInit fm_module_init_lxpanel_gtk = {
-    .name = N_("Network Manager"),
+    .name = N_(PLUGIN_TITLE),
     .description = N_("Controller for Network Manager"),
     .new_instance = nm_constructor,
     .reconfigure = nm_configuration_changed,

@@ -1,5 +1,5 @@
 /*============================================================================
-Copyright (c) 2022-2025 Raspberry Pi Holdings Ltd.
+Copyright (c) 2022-2025 Raspberry Pi
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*----------------------------------------------------------------------------*/
 /* Typedefs and macros                                                        */
 /*----------------------------------------------------------------------------*/
+
+#define PLUGIN_TITLE "Network"
+
+extern conf_table_t conf_table[1];
 
 /*----------------------------------------------------------------------------*/
 /* Prototypes                                                                 */
