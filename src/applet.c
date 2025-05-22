@@ -1108,7 +1108,7 @@ applet_do_notify (NMApplet *applet,
 
 #ifdef LXPANEL_PLUGIN
 	escaped = utils_escape_notify_body (body);
-	applet->notification = lxpanel_notify (applet->panel, escaped);
+	applet->notification = wrap_notify (applet->panel, escaped);
 	g_free (escaped);
 #else
 	if (INDICATOR_ENABLED (applet)) {
@@ -3690,7 +3690,7 @@ status_icon_activate_cb (GtkStatusIcon *icon, NMApplet *applet)
 	 * of the notification.
 	 */
 #ifdef LXPANEL_PLUGIN
-	lxpanel_notify_clear (applet->notification);
+	wrap_notify_clear (applet->notification);
 #else
 	g_application_withdraw_notification (G_APPLICATION (applet), "nm-applet");
 #endif
@@ -3730,7 +3730,7 @@ status_icon_popup_menu_cb (GtkStatusIcon *icon,
 	 * of the notification.
 	 */
 #ifdef LXPANEL_PLUGIN
-	lxpanel_notify_clear (applet->notification);
+	wrap_notify_clear (applet->notification);
 #else
 	g_application_withdraw_notification (G_APPLICATION (applet), "nm-applet");
 #endif
