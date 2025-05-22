@@ -38,12 +38,6 @@ extern "C" {
     const char *package_name (void) { return GETTEXT_PACKAGE; };
 }
 
-void WayfireNetman::icon_size_changed_cb (void)
-{
-    nm->icon_size = icon_size;
-    netman_update_display (nm);
-}
-
 void WayfireNetman::command (const char *cmd)
 {
     netman_control_msg (nm, cmd);
@@ -51,6 +45,7 @@ void WayfireNetman::command (const char *cmd)
 
 bool WayfireNetman::set_icon (void)
 {
+    nm->icon_size = get_icon_size ();
     netman_update_display (nm);
     return false;
 }
@@ -65,7 +60,6 @@ void WayfireNetman::init (Gtk::HBox *container)
     /* Setup structure */
     nm = (NMApplet *) g_object_new (NM_TYPE_APPLET, NULL);
     nm->plugin = (GtkWidget *)((*plugin).gobj());
-    nm->icon_size = icon_size;
     icon_timer = Glib::signal_idle().connect (sigc::mem_fun (*this, &WayfireNetman::set_icon));
 
     /* Add long press for right click */
@@ -73,9 +67,6 @@ void WayfireNetman::init (Gtk::HBox *container)
 
     /* Initialise the plugin */
     netman_init (nm);
-
-    /* Setup callbacks */
-    icon_size.set_callback (sigc::mem_fun (*this, &WayfireNetman::icon_size_changed_cb));
 }
 
 WayfireNetman::~WayfireNetman()
