@@ -44,7 +44,7 @@ lsources += gnome.compile_resources(
 
 ldeps = [ gtk, lxpanel, netman, nma, secret ]
 
-largs = [ '-DPACKAGE_DATA_DIR="' + lresource_dir + '"', '-DGETTEXT_PACKAGE="lxplug_' + meson.project_name() + '"', '-DENABLE_GTK3', '-DVERSION=0.1', '-D___CONFIG_H__', '-DBINDIR="/usr/bin"', '-DG_DISABLE_ASSERT', '-DG_DISABLE_CHECKS', '-DG_DISABLE_CAST_CHECKS' ]
+largs = [ '-DPACKAGE_DATA_DIR="' + lresource_dir + '"', '-DGETTEXT_PACKAGE="lpplug_' + meson.project_name() + '"', '-DENABLE_GTK3', '-DVERSION=0.1', '-D___CONFIG_H__', '-DBINDIR="/usr/bin"', '-DG_DISABLE_ASSERT', '-DG_DISABLE_CHECKS', '-DG_DISABLE_CAST_CHECKS' ]
 
 shared_module(meson.project_name(), lsources,
         dependencies: ldeps,
