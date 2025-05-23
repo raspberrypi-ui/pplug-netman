@@ -17,8 +17,6 @@ src/applet-dialogs.h
 src/applet.h
 src/applet-vpn-request.c
 src/applet-vpn-request.h
-src/eap-method.c
-src/eap-method.h
 src/ethernet-dialog.c
 src/ethernet-dialog.h
 src/fallback-icon.h
@@ -29,20 +27,24 @@ src/mobile-helpers.c
 src/mobile-helpers.h
 src/netman.c
 src/netman.cpp
+src/netman.h
 src/netman.hpp
-src/nm-compat.c
-src/nm-compat.h
-src/nm-default.h
-src/nm-glib.h
-src/nm-libnm-compat.h
-src/nm-macros-internal.h
-src/nm-shared-utils.c
-src/nm-shared-utils.h
-src/nm-test-utils.h
-src/nm-vpn-editor-plugin-call.h
-src/utils.c
-src/utils.h
+src/nm-utils/nm-compat.c
+src/nm-utils/nm-compat.h
+src/nm-utils/nm-default.h
+src/nm-utils/nm-glib.h
+src/nm-utils/nm-libnm-compat.h
+src/nm-utils/nm-macros-internal.h
+src/nm-utils/nm-shared-utils.c
+src/nm-utils/nm-shared-utils.h
+src/nm-utils/nm-test-utils.h
+src/nm-utils/nm-vpn-editor-plugin-call.h
+src/utils/utils.c
+src/utils/utils.h
+src/wireless-security/eap-method.c
+src/wireless-security/eap-method.h
 [type: gettext/glade] src/8021x.ui
 [type: gettext/glade] src/gsm-unlock.ui
 [type: gettext/glade] src/info.ui
-[type: gettext/glade] src/ce-page-dsl.ui
+[type: gettext/glade] src/connection-editor/ce-page-dsl.ui
+[type: gettext/glade] data/lxplug-netman.ui
