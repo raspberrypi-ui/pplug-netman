@@ -1,3 +1,9 @@
+pplug-netman (0.18) trixie; urgency=medium
+
+  * Modify for lxpanel-pi
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 27 May 2025 07:36:07 +0100
+
 pplug-netman (0.17) bookworm; urgency=medium
 
   * Update to network-manager-applet 1.36.0-3
