@@ -188,8 +188,8 @@ static void set_country (GObject *o, gpointer data)
 {
     if (fork () == 0)
     {
-        char *args[] = { "rc_gui", "-w", NULL };
-        execvp ("rc_gui", args);
+        char *args[] = { "rpcc", "wifi_country", NULL };
+        execvp ("rpcc", args);
     }
 }
 
