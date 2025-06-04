@@ -27,6 +27,3 @@ install_data(genschema, install_dir: schemasdir)
 
 gnome = import('gnome')
 gnome.post_install(glib_compile_schemas: true)
-
-install_subdir('icons', install_dir: share_dir)
-gnome.post_install (gtk_update_icon_cache : true)
