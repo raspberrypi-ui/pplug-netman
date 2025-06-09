@@ -113,7 +113,7 @@ update_icon (NMNetworkMenuItem *item, NMApplet *applet)
 #ifdef LXPANEL_PLUGIN
         wrap_set_menu_icon (applet, priv->strength, icon_name);
 	wrap_set_menu_icon (applet, priv->encrypted, priv->is_encrypted ? "network-wireless-encrypted" : NULL);
-	wrap_set_menu_icon (applet, priv->fiveg, priv->int_freq > 2500 ? "5g" : NULL);
+	wrap_set_menu_icon (applet, priv->fiveg, priv->int_freq > 2500 ? (priv->int_freq > 5500 ? "network-6g" : "network-5g") : NULL);
 #else
 	scale = gtk_widget_get_scale_factor (GTK_WIDGET (item));
 	icon_size = 24;
