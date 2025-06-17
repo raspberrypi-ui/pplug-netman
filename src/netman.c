@@ -207,7 +207,7 @@ static gboolean nm_control (GtkWidget *plugin, const char *cmd)
     return netman_control_msg (nm, cmd);
 }
 
-int module_lxpanel_gtk_version = __FM_DEFINE_VERSION__(lxpanel_gtk);
+int module_lxpanel_gtk_version = 1;
 char module_name[] = PLUGIN_NAME;
 
 /* Plugin descriptor */
