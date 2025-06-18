@@ -1,0 +1,3 @@
+usr/lib/${DEB_HOST_MULTIARCH}/lxpanel-pi/netman.so
+usr/share/lxpanel-pi/ui/lxplug-netman.ui
+usr/share/locale/*/LC_MESSAGES/lpplug_netman.mo
