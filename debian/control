@@ -12,12 +12,12 @@ Build-Depends:
 Standards-Version: 4.5.1
 Homepage: http://raspberrypi.com/
 
-Package: lxplug-netman
+Package: lpplug-netman
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},
   lxpanel-pi, pplug-netman-schema, lp-connection-editor
-Description: Network Manager plugin for lxpanel
- Plugin for lxpanel to control Network Manager for wired and wireless networking.
+Description: Network Manager plugin for lxpanel-pi
+ Plugin for lxpanel-pi to control Network Manager for wired and wireless networking.
  Based on GNOME's network-manager-applet.
 
 Package: wfplug-netman
