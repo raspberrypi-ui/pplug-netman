@@ -3870,6 +3870,14 @@ applet_activate (GApplication *app, gpointer user_data)
 }
 
 #ifdef LXPANEL_PLUGIN
+gboolean status_icon_query_tooltip_cb (GtkWidget *self, gint x, gint y, gboolean keyboard_mode, GtkTooltip *tooltip, gpointer user_data)
+{
+	applet_update_icon (user_data);
+	return FALSE;
+}
+#endif
+
+#ifdef LXPANEL_PLUGIN
 void
 applet_startup (NMApplet *applet)
 #else
@@ -3960,6 +3968,10 @@ applet_startup (GApplication *app, gpointer user_data)
 
 #ifndef LXPANEL_PLUGIN
 	g_application_hold (G_APPLICATION (applet));
+#endif
+
+#ifdef LXPANEL_PLUGIN
+	g_signal_connect (applet->status_icon, "query-tooltip", G_CALLBACK (status_icon_query_tooltip_cb), applet);
 #endif
 }
 
