@@ -48,6 +48,7 @@ extern gboolean with_appindicator;
 G_DEFINE_TYPE (NMApplet, nma, G_TYPE_APPLICATION)
 
 #ifdef LXPANEL_PLUGIN
+static gboolean has_wifi (void);
 static gboolean has_usable_wifi (NMApplet *applet);
 static void applet_connection_info_cb (NMApplet *applet);
 static void nma_edit_connections_cb (void);
@@ -1858,7 +1859,7 @@ nma_menu_add_vpn_submenu (GtkWidget *menu, NMApplet *applet)
 	gtk_widget_show (GTK_WIDGET (item));
 
 #ifdef LXPANEL_PLUGIN
-	if (applet->country_set && has_usable_wifi (applet)) {
+	if (has_wifi () && applet->country_set && has_usable_wifi (applet)) {
 		/* Add the "Hidden Wi-Fi network..." entry */
 		nma_menu_add_hidden_network_item (GTK_WIDGET (vpn_menu), applet);
 		nma_menu_add_create_network_item (GTK_WIDGET (vpn_menu), applet);
@@ -2001,6 +2002,14 @@ nma_set_notifications_enabled_cb (GtkWidget *widget, NMApplet *applet)
 	                        !state);
 }
 
+#ifdef LXPANEL_PLUGIN
+static gboolean has_wifi (void)
+{
+	if (!pclose (popen ("rfkill list wifi | grep . > /dev/null", "r"))) return TRUE;
+	return FALSE;
+}
+#endif
+
 static gboolean
 has_usable_wifi (NMApplet *applet)
 {
@@ -2054,20 +2063,23 @@ static void nma_menu_show_cb (GtkWidget *menu, NMApplet *applet)
 	}
 
 #ifdef LXPANEL_PLUGIN
-	if (!applet->country_set)
+	if (has_wifi ())
 	{
-		GtkWidget *item = gtk_menu_item_new_with_label (_("Click here to set Wi-Fi country"));
-		g_signal_connect (G_OBJECT (item), "activate", G_CALLBACK (set_country), NULL);
-		gtk_widget_set_tooltip_text (item, _("Wi-Fi country must be set to connect to Wi-Fi networks"));
-		gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
-		gtk_widget_show (item);
-		nma_menu_add_separator_item (menu);
-	}
-	else
-	{
-		nma_menu_add_wifi_switch_item (menu, applet);
-		nma_menu_add_separator_item (menu);
-		nma_menu_add_devices (menu, applet);
+		if (!applet->country_set)
+		{
+			GtkWidget *item = gtk_menu_item_new_with_label (_("Click here to set Wi-Fi country"));
+			g_signal_connect (G_OBJECT (item), "activate", G_CALLBACK (set_country), NULL);
+			gtk_widget_set_tooltip_text (item, _("Wi-Fi country must be set to connect to Wi-Fi networks"));
+			gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+			gtk_widget_show (item);
+			nma_menu_add_separator_item (menu);
+		}
+		else
+		{
+			nma_menu_add_wifi_switch_item (menu, applet);
+			nma_menu_add_separator_item (menu);
+			nma_menu_add_devices (menu, applet);
+		}
 	}
 #else
 	nma_menu_add_devices (menu, applet);
