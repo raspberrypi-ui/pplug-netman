@@ -1,3 +1,9 @@
+pplug-netman (1.4) trixie; urgency=medium
+
+  * Simplify titles of multiple device sections
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 15 Sep 2025 13:51:46 +0100
+
 pplug-netman (1.3) trixie; urgency=medium
 
   * Hide wireless options if no wifi hardware present

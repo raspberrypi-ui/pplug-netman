@@ -841,16 +841,16 @@ wifi_add_menu_item (NMDevice *device,
 	if (multiple_devices)
 	{
 		const char *desc = nm_device_get_description (device);
-		if (aps && aps->len > 1)
-			text = g_strdup_printf (_("Wi-Fi Networks (%s)"), desc);
-		else
-			text = g_strdup_printf (_("Wi-Fi Network (%s)"), desc);
-		widget = applet_menu_item_create_device_item_helper (device, applet, text);
-		g_free (text);
-
+		widget = gtk_menu_item_new_with_label (desc);
 		gtk_widget_set_sensitive (widget, FALSE);
 		gtk_menu_shell_append (GTK_MENU_SHELL (menu), widget);
 		gtk_widget_show (widget);
+#if 0
+		// how to do submenus per device - problems updating...
+		GtkWidget *submenu = gtk_menu_new ();
+		gtk_menu_item_set_submenu (GTK_MENU_ITEM (widget), submenu);
+		menu = submenu;
+#endif
 	}
 #else
 	if (multiple_devices) {
