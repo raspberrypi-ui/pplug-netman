@@ -150,11 +150,7 @@ void netman_destructor (gpointer user_data)
 
     applet_finalize (nm);
 
-#ifndef LXPLUG
     g_object_unref (nm);
-#else
-    g_free (nm);
-#endif
 }
 
 /*----------------------------------------------------------------------------*/

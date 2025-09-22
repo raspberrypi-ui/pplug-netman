@@ -2005,7 +2005,7 @@ nma_set_notifications_enabled_cb (GtkWidget *widget, NMApplet *applet)
 #ifdef LXPANEL_PLUGIN
 static gboolean has_wifi (void)
 {
-	if (!system ("rfkill list wifi | grep -q .", "r")) return TRUE;
+	if (!system ("rfkill list wifi | grep -q .")) return TRUE;
 	return FALSE;
 }
 #endif
