@@ -1,3 +1,9 @@
+pplug-netman (1.5) trixie; urgency=medium
+
+  * Fix crash when removed from lxpanel
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 22 Sep 2025 08:23:24 +0100
+
 pplug-netman (1.4) trixie; urgency=medium
 
   * Simplify titles of multiple device sections
