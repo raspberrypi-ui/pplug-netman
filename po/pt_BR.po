@@ -19,6 +19,7 @@
 # Rafael Fontenelle <rafaelff@gnome.org>, 2013-2020.
 # Enrico Nicoletto <liverig@gmail.com>, 2013, 2014, 2020.
 # Henrique Machado Campos <henriquecamposrj@gmail.com>, 2020.
+# Eduardo Addad de Oliveira <eduardo@addadtech.com.br>, 2025.
 #
 msgid ""
 msgstr ""
@@ -52,6 +53,18 @@ msgstr "NetworkManager"
 #: nm-connection-editor.appdata.xml.in:8
 msgid "NetworkManager connection editor"
 msgstr "Editor de conexão NetworkManager"
+
+#: ../src/applet.c:185
+msgid "_Turn Off Wireless LAN"
+msgstr "_Desligar a rede sem fio"
+
+#: ../src/applet.c:185
+msgid "_Turn On Wireless LAN"
+msgstr "Ligar a rede sem fio"
+
+#: ../src/applet.c:1912
+msgid "_Advanced Options"
+msgstr "_Configurações avançadas"
 
 #: nm-connection-editor.appdata.xml.in:11
 msgid ""
