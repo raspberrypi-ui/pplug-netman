@@ -1,3 +1,9 @@
+pplug-netman (1.7) trixie; urgency=medium
+
+  * Use full path for rfkill
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 13 Oct 2025 15:04:12 +0100
+
 pplug-netman (1.6) trixie; urgency=medium
 
   * Add Portuguese translation
