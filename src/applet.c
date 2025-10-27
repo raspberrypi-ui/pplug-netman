@@ -2590,7 +2590,14 @@ foo_set_icon (NMApplet *applet, guint32 layer, GdkPixbuf *pixbuf, const char *ic
 		pixbuf = nma_icon_check_and_load ("nm-no-connection", applet);
 
 #ifdef LXPANEL_PLUGIN
-	gtk_image_set_from_pixbuf (GTK_IMAGE (applet->status_icon), pixbuf);
+	int scale = gtk_widget_get_scale_factor (applet->status_icon);
+	if (scale == 1) gtk_image_set_from_pixbuf (GTK_IMAGE (applet->status_icon), pixbuf);
+	else
+	{
+		cairo_surface_t *cr = gdk_cairo_surface_create_from_pixbuf (pixbuf, scale, NULL);
+		gtk_image_set_from_surface (GTK_IMAGE (applet->status_icon), cr);
+		cairo_surface_destroy (cr);
+	}
 #else
 	gtk_status_icon_set_from_pixbuf (applet->status_icon, pixbuf);
 #endif
@@ -3550,7 +3557,11 @@ nma_icon_check_and_load (const char *name, NMApplet *applet)
 	if (g_hash_table_lookup_extended (applet->icon_cache, name, NULL, (gpointer) &icon))
 		return icon;
 
+#ifdef LXPANEL_PLUGIN
+	scale = gtk_widget_get_scale_factor (applet->plugin);
+#else
 	scale = gdk_window_get_scale_factor (gdk_get_default_root_window ());
+#endif
 
 	/* Try to load the icon; if the load fails, log the problem, and set
 	 * the icon to the fallback icon if requested.
