@@ -2590,14 +2590,7 @@ foo_set_icon (NMApplet *applet, guint32 layer, GdkPixbuf *pixbuf, const char *ic
 		pixbuf = nma_icon_check_and_load ("nm-no-connection", applet);
 
 #ifdef LXPANEL_PLUGIN
-	int scale = gtk_widget_get_scale_factor (applet->status_icon);
-	if (scale == 1) gtk_image_set_from_pixbuf (GTK_IMAGE (applet->status_icon), pixbuf);
-	else
-	{
-		cairo_surface_t *cr = gdk_cairo_surface_create_from_pixbuf (pixbuf, scale, NULL);
-		gtk_image_set_from_surface (GTK_IMAGE (applet->status_icon), cr);
-		cairo_surface_destroy (cr);
-	}
+	set_image_from_pixbuf (applet->status_icon, pixbuf);
 #else
 	gtk_status_icon_set_from_pixbuf (applet->status_icon, pixbuf);
 #endif
