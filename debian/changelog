@@ -1,3 +1,9 @@
+pplug-netman (1.8) trixie; urgency=medium
+
+  * Add support for scaling for HiDPI
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 04 Nov 2025 15:34:49 +0000
+
 pplug-netman (1.7) trixie; urgency=medium
 
   * Use full path for rfkill
