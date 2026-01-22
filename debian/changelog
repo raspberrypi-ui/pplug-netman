@@ -1,3 +1,9 @@
+pplug-netman (1.9) trixie; urgency=medium
+
+  * Update rpcc calling syntax
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 22 Jan 2026 12:00:31 +0000
+
 pplug-netman (1.8) trixie; urgency=medium
 
   * Add support for scaling for HiDPI
