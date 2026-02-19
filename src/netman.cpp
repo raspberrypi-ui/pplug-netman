@@ -45,7 +45,6 @@ void WayfireNetman::command (const char *cmd)
 
 bool WayfireNetman::set_icon (void)
 {
-    nm->icon_size = wrap_icon_size (nm);
     netman_update_display (nm);
     return false;
 }
