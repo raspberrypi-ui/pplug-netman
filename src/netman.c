@@ -88,8 +88,7 @@ static void netman_button_clicked (GtkWidget *, NMApplet *nm)
 /* Handler for system config changed message from panel */
 void netman_update_display (NMApplet *nm)
 {
-    nm->icon_size = wrap_icon_size (nm);
-    status_icon_size_changed_cb (NULL, nm->icon_size, nm);
+    status_icon_size_changed_cb (NULL, wrap_icon_size (nm), nm);
 }
 
 /* Handler for control message */
