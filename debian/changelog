@@ -1,3 +1,9 @@
+pplug-netman (1.10) trixie; urgency=medium
+
+  * Tidy icon loading; rebuild against latest APIs
+
+ -- Simon Long <simon@raspberrypi.com>  Fri, 20 Feb 2026 10:02:09 +0000
+
 pplug-netman (1.9) trixie; urgency=medium
 
   * Update rpcc calling syntax
