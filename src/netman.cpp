@@ -26,7 +26,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ============================================================================*/
 
 #include <glibmm.h>
-#include "gtk-utils.hpp"
 #include "netman.hpp"
 
 extern "C" {
@@ -60,9 +59,6 @@ void WayfireNetman::init (Gtk::HBox *container)
     nm = (NMApplet *) g_object_new (NM_TYPE_APPLET, NULL);
     nm->plugin = (GtkWidget *)((*plugin).gobj());
     icon_timer = Glib::signal_idle().connect (sigc::mem_fun (*this, &WayfireNetman::set_icon));
-
-    /* Add long press for right click */
-    gesture = add_longpress_default (*plugin);
 
     /* Initialise the plugin */
     netman_init (nm);
