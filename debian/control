@@ -23,7 +23,7 @@ Description: Network Manager plugin for lxpanel-pi
 Package: wfplug-netman
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},
- wf-panel-pi (>=1.10), pplug-netman-schema, lp-connection-editor, rfkill
+ wf-panel-pi (>=1.18), pplug-netman-schema, lp-connection-editor, rfkill
 Description: Network Manager plugin for wf-panel-pi
  Plugin for wf-panel-pi to control Network Manager for wired and wireless networking.
  Based on GNOME's network-manager-applet.
