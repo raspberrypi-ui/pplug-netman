@@ -29,26 +29,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "netman.hpp"
 
 extern "C" {
-    WayfireWidget *create () { return new WayfireNetman; }
-    void destroy (WayfireWidget *w) { delete w; }
+    PanelWidget *create () { return new WidgetNetman; }
+    void destroy (PanelWidget *w) { delete w; }
 
     const conf_table_t *config_params (void) { return conf_table; };
     const char *display_name (void) { return PLUGIN_TITLE; };
     const char *package_name (void) { return GETTEXT_PACKAGE; };
 }
 
-void WayfireNetman::command (const char *cmd)
+void WidgetNetman::command (const char *cmd)
 {
     netman_control_msg (nm, cmd);
 }
 
-bool WayfireNetman::set_icon (void)
+bool WidgetNetman::set_icon (void)
 {
     netman_update_display (nm);
     return false;
 }
 
-void WayfireNetman::init (Gtk::HBox *container)
+void WidgetNetman::init (Gtk::HBox *container)
 {
     /* Create the button */
     plugin = std::make_unique <Gtk::Button> ();
@@ -58,13 +58,13 @@ void WayfireNetman::init (Gtk::HBox *container)
     /* Setup structure */
     nm = (NMApplet *) g_object_new (NM_TYPE_APPLET, NULL);
     nm->plugin = (GtkWidget *)((*plugin).gobj());
-    icon_timer = Glib::signal_idle().connect (sigc::mem_fun (*this, &WayfireNetman::set_icon));
+    icon_timer = Glib::signal_idle().connect (sigc::mem_fun (*this, &WidgetNetman::set_icon));
 
     /* Initialise the plugin */
     netman_init (nm);
 }
 
-WayfireNetman::~WayfireNetman()
+WidgetNetman::~WidgetNetman()
 {
     icon_timer.disconnect ();
     netman_destructor (nm);

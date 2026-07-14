@@ -36,7 +36,7 @@ extern "C" {
 #include "netman.h"
 }
 
-class WayfireNetman : public WayfireWidget
+class WidgetNetman : public PanelWidget
 {
     std::unique_ptr <Gtk::Button> plugin;
 
@@ -49,7 +49,7 @@ class WayfireNetman : public WayfireWidget
 
     void init (Gtk::HBox *container) override;
     void command (const char *cmd) override;
-    virtual ~WayfireNetman ();
+    virtual ~WidgetNetman ();
     bool set_icon (void);
 };
 
