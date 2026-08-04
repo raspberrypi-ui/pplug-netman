@@ -72,6 +72,3 @@ shared_module('lib' + meson.project_name(), [ lsources, wsources ],
         include_directories : incdirs,
         name_prefix: ''
 )
-
-metadata = files()
-install_data(metadata, install_dir: metadata_dir)
