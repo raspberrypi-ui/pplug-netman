@@ -111,6 +111,8 @@ static gboolean start_applet (gpointer data)
 {
     NMApplet *nm = (NMApplet *) data;
 
+    nm->startup_id = 0;
+
     nm->country_set = wifi_country_set ();
 
     applet_startup (nm);
@@ -139,7 +141,7 @@ void netman_init (NMApplet *nm)
     /* Set up variables */
     nm->icon_cache = NULL;
 
-    g_idle_add (start_applet, nm);
+    nm->startup_id = g_idle_add (start_applet, nm);
 
     /* Show the widget and return */
     gtk_widget_show_all (nm->plugin);
@@ -148,6 +150,12 @@ void netman_init (NMApplet *nm)
 void netman_destructor (gpointer user_data)
 {
     NMApplet *nm = (NMApplet *) user_data;
+
+    if (nm->startup_id)
+    {
+        g_source_remove (nm->startup_id);
+        nm->startup_id = 0;
+    }
 
     applet_finalize (nm);
 
