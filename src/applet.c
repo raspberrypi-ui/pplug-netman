@@ -3644,7 +3644,9 @@ static void nma_icons_init (NMApplet *applet)
 	}
 #endif
 
+#ifndef LXPANEL_PLUGIN
 	g_signal_connect (applet->icon_theme, "changed", G_CALLBACK (nma_icon_theme_changed), applet);
+#endif
 
 	nma_icons_reload (applet);
 }
