@@ -62,6 +62,7 @@ static void activate_hotspot_cb (GObject *client, GAsyncResult *result, gpointer
 {
 	GError *error = NULL;
 	NMActiveConnection *active;
+	NMApplet *applet;
 
 	active = nm_client_activate_connection_finish (NM_CLIENT (client), result, &error);
 	g_clear_object (&active);
@@ -75,7 +76,11 @@ static void activate_hotspot_cb (GObject *client, GAsyncResult *result, gpointer
 		g_free (err_text);
 		g_error_free (error);
 	}
-	applet_schedule_update_icon (NM_APPLET (user_data));
+
+	applet = applet_weak_ref_resolve (user_data);
+	if (!applet) return;
+	applet_schedule_update_icon (applet);
+	g_object_unref (applet);
 }
 
 static void activate_hotspot (GtkMenuItem *item, gpointer user_data)
@@ -101,7 +106,7 @@ static void activate_hotspot (GtkMenuItem *item, gpointer user_data)
 	if (!dev) return;
 
 	// activate the connection with the found device - ap is NULL, as already in the connection
-	nm_client_activate_connection_async (applet->nm_client, con, dev, NULL, NULL, activate_hotspot_cb, applet);
+	nm_client_activate_connection_async (applet->nm_client, con, dev, NULL, NULL, activate_hotspot_cb, applet_weak_ref_new (applet));
 }
 
 static int add_hotspots (const GPtrArray *all_devices, const GPtrArray *all_connections, GtkWidget *menu, NMApplet *applet)
@@ -805,7 +810,7 @@ add_and_activate_cb (GObject *client,
                      GAsyncResult *result,
                      gpointer user_data)
 {
-	NMApplet *applet = NM_APPLET (user_data);
+	NMApplet *applet;
 	GError *error = NULL;
 	NMActiveConnection *active;
 
@@ -820,8 +825,11 @@ add_and_activate_cb (GObject *client,
 		g_error_free (error);
 	}
 
+	applet = applet_weak_ref_resolve (user_data);
+	if (!applet) return;
 	applet_schedule_update_icon (applet);
 	applet_schedule_update_menu (applet);
+	g_object_unref (applet);
 }
 
 static void
@@ -848,7 +856,7 @@ applet_menu_item_activate_helper_new_connection (NMConnection *connection,
 	                                             info->specific_object,
 	                                             NULL,
 	                                             add_and_activate_cb,
-	                                             info->applet);
+	                                             applet_weak_ref_new (info->applet));
 
 	applet_item_activate_info_destroy (info);
 }
@@ -859,7 +867,7 @@ disconnect_cb (GObject *device,
                gpointer user_data)
 
 {
-	NMApplet *applet = NM_APPLET (user_data);
+	NMApplet *applet;
 	GError *error = NULL;
 
 	nm_device_disconnect_finish (NM_DEVICE (device), result, &error);
@@ -871,8 +879,11 @@ disconnect_cb (GObject *device,
 		g_error_free (error);
 	}
 
+	applet = applet_weak_ref_resolve (user_data);
+	if (!applet) return;
 	applet_schedule_update_icon (applet);
 	applet_schedule_update_menu (applet);
+	g_object_unref (applet);
 }
 
 void
@@ -881,7 +892,7 @@ applet_menu_item_disconnect_helper (NMDevice *device,
 {
 	g_return_if_fail (NM_IS_DEVICE (device));
 
-	nm_device_disconnect_async (device, NULL, disconnect_cb, applet);
+	nm_device_disconnect_async (device, NULL, disconnect_cb, applet_weak_ref_new (applet));
 }
 
 static void
@@ -891,6 +902,8 @@ activate_connection_cb (GObject *client,
 {
 	GError *error = NULL;
 	NMActiveConnection *active;
+
+	NMApplet *applet;
 
 	active = nm_client_activate_connection_finish (NM_CLIENT (client), result, &error);
 	g_clear_object (&active);
@@ -903,7 +916,10 @@ activate_connection_cb (GObject *client,
 		g_error_free (error);
 	}
 
-	applet_schedule_update_icon (NM_APPLET (user_data));
+	applet = applet_weak_ref_resolve (user_data);
+	if (!applet) return;
+	applet_schedule_update_icon (applet);
+	g_object_unref (applet);
 }
 
 void
@@ -926,7 +942,7 @@ applet_menu_item_activate_helper (NMDevice *device,
 		                                     specific_object,
 		                                     NULL,
 		                                     activate_connection_cb,
-		                                     applet);
+		                                     applet_weak_ref_new (applet));
 		return;
 	}
 
@@ -1323,7 +1339,7 @@ vpn_active_connection_state_changed (NMVpnConnection *vpn,
 }
 
 typedef struct {
-	NMApplet *applet;
+	gpointer applet_wr;
 	char *vpn_name;
 } VPNActivateInfo;
 
@@ -1333,12 +1349,15 @@ activate_vpn_cb (GObject *client,
                  gpointer user_data)
 {
 	VPNActivateInfo *info = (VPNActivateInfo *) user_data;
+	NMApplet *applet;
 	NMActiveConnection *active;
 	char *title, *msg, *name;
 	GError *error = NULL;
 
 	active = nm_client_activate_connection_finish (NM_CLIENT (client), result, &error);
 	g_clear_object (&active);
+
+	applet = applet_weak_ref_resolve (info->applet_wr);
 
 	if (error) {
 		if (applet) clear_animation_timeout (applet);
@@ -1354,16 +1373,20 @@ activate_vpn_cb (GObject *client,
 			                       info->vpn_name, error->message);
 		}
 
-		applet_do_notify (info->applet, title, msg, "gnome-lockscreen",
-		                  PREF_DISABLE_VPN_NOTIFICATIONS);
+		if (applet)
+			applet_do_notify (applet, title, msg, "gnome-lockscreen",
+			                  PREF_DISABLE_VPN_NOTIFICATIONS);
 		g_warning ("VPN Connection activation failed: (%s) %s", name, error->message);
 		g_free (msg);
 		g_free (name);
 		g_error_free (error);
 	}
 
-	applet_schedule_update_icon (info->applet);
-	applet_schedule_update_menu (info->applet);
+	if (applet) {
+		applet_schedule_update_icon (applet);
+		applet_schedule_update_menu (applet);
+		g_object_unref (applet);
+	}
 	g_free (info->vpn_name);
 	g_free (info);
 }
@@ -1400,7 +1423,7 @@ nma_menu_vpn_item_clicked (GtkMenuItem *item, gpointer user_data)
 	}
 
 	info = g_malloc0 (sizeof (VPNActivateInfo));
-	info->applet = applet;
+	info->applet_wr = applet_weak_ref_new (applet);
 	info->vpn_name = g_strdup (nm_connection_get_id (connection));
 
 	/* Connection inactive, activate */
@@ -3294,6 +3317,32 @@ applet_schedule_update_icon (NMApplet *applet)
 #endif
 	if (!applet->update_icon_id)
 		applet->update_icon_id = g_idle_add (applet_update_icon, applet);
+}
+
+/* Helpers for passing "applet" as the user_data of an async NM/GIO
+ * operation safely. wf-panel-pi can destroy an NMApplet (config reload,
+ * plugin unload) while such an operation is still in flight; a raw applet
+ * pointer captured as user_data would then be dangling by the time the
+ * completion callback runs. applet_weak_ref_new() boxes a GWeakRef instead;
+ * applet_weak_ref_resolve() turns it back into a strong reference (which the
+ * caller must g_object_unref()), or NULL if the applet is already gone. */
+
+gpointer
+applet_weak_ref_new (NMApplet *applet)
+{
+	GWeakRef *wr = g_new (GWeakRef, 1);
+	g_weak_ref_init (wr, applet);
+	return wr;
+}
+
+NMApplet *
+applet_weak_ref_resolve (gpointer weak_ref)
+{
+	GWeakRef *wr = weak_ref;
+	NMApplet *applet = g_weak_ref_get (wr);
+	g_weak_ref_clear (wr);
+	g_free (wr);
+	return applet;
 }
 
 /*****************************************************************************/

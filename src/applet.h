@@ -254,6 +254,9 @@ NMApplet *nm_applet_new (void);
 void applet_schedule_update_icon (NMApplet *applet);
 void applet_schedule_update_menu (NMApplet *applet);
 
+gpointer applet_weak_ref_new (NMApplet *applet);
+NMApplet *applet_weak_ref_resolve (gpointer weak_ref);
+
 NMClient *applet_get_settings (NMApplet *applet);
 
 GPtrArray *applet_get_all_connections (NMApplet *applet);

@@ -1448,6 +1448,7 @@ activate_existing_cb (GObject *client,
 {
 	GError *error = NULL;
 	NMActiveConnection *active;
+	NMApplet *applet;
 
 	active = nm_client_activate_connection_finish (NM_CLIENT (client), result, &error);
 	g_clear_object (&active);
@@ -1458,7 +1459,10 @@ activate_existing_cb (GObject *client,
 		utils_show_error_dialog (_("Connection failure"), text, err_text, FALSE, NULL);
 		g_error_free (error);
 	}
-	applet_schedule_update_icon (NM_APPLET (user_data));
+	applet = applet_weak_ref_resolve (user_data);
+	if (!applet) return;
+	applet_schedule_update_icon (applet);
+	g_object_unref (applet);
 }
 
 static void
@@ -1468,6 +1472,7 @@ activate_new_cb (GObject *client,
 {
 	GError *error = NULL;
 	NMActiveConnection *active;
+	NMApplet *applet;
 
 	active = nm_client_add_and_activate_connection_finish (NM_CLIENT (client), result, &error);
 	g_clear_object (&active);
@@ -1478,7 +1483,10 @@ activate_new_cb (GObject *client,
 		utils_show_error_dialog (_("Connection failure"), text, err_text, FALSE, NULL);
 		g_error_free (error);
 	}
-	applet_schedule_update_icon (NM_APPLET (user_data));
+	applet = applet_weak_ref_resolve (user_data);
+	if (!applet) return;
+	applet_schedule_update_icon (applet);
+	g_object_unref (applet);
 }
 
 static void
@@ -1523,7 +1531,7 @@ wifi_dialog_response_cb (GtkDialog *foo,
 		                                     ap ? nm_object_get_path (NM_OBJECT (ap)) : NULL,
 		                                     NULL,
 		                                     activate_existing_cb,
-		                                     applet);
+		                                     applet_weak_ref_new (applet));
 	} else {
 		NMSetting *s_con;
 		NMSettingWireless *s_wifi = NULL;
@@ -1550,7 +1558,7 @@ wifi_dialog_response_cb (GtkDialog *foo,
 		                                             ap ? nm_object_get_path (NM_OBJECT (ap)) : NULL,
 		                                             NULL,
 		                                             activate_new_cb,
-		                                             applet);
+		                                             applet_weak_ref_new (applet));
 	}
 
 	/* Balance nma_wifi_dialog_get_connection() */
