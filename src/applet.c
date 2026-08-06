@@ -4092,6 +4092,8 @@ static void finalize (GObject *object)
 	nm_clear_g_source (&applet->wifi_scan_id);
 	nm_clear_g_source (&applet->animation_id);
 	nm_clear_g_source (&applet->initial_state_id);
+	nm_clear_g_source (&applet->old_menu_destroy_id);
+	g_clear_object (&applet->old_menu);
 
 #ifdef WITH_APPINDICATOR
 	g_clear_object (&applet->app_indicator);
