@@ -118,6 +118,7 @@ typedef struct {
 
 	/* Data model elements */
 	guint           update_icon_id;
+	guint           initial_state_id;
 	char *          tip;
 
 	/* Animation stuff */

@@ -2847,6 +2847,8 @@ foo_set_initial_state (gpointer data)
 	const GPtrArray *devices;
 	int i;
 
+	applet->initial_state_id = 0;
+
 	devices = nm_client_get_devices (applet->nm_client);
 	for (i = 0; devices && (i < devices->len); i++)
 		foo_device_added_cb (applet->nm_client, NM_DEVICE (g_ptr_array_index (devices, i)), applet);
@@ -2903,7 +2905,7 @@ foo_client_setup (NMApplet *applet)
 	}
 
 	if (nm_client_get_nm_running (applet->nm_client))
-		g_idle_add (foo_set_initial_state, applet);
+		applet->initial_state_id = g_idle_add (foo_set_initial_state, applet);
 
 	applet_schedule_update_icon (applet);
 }
@@ -4001,13 +4003,20 @@ static void finalize (GObject *object)
 {
 #ifdef LXPANEL_PLUGIN
 	applet->killing = TRUE;
+	if (applet->nm_client) {
 	// disconnect all device handlers
 	const GPtrArray *devices = nm_client_get_devices (applet->nm_client);
 	for (int i = 0; devices && (i < devices->len); i++)
 		g_signal_handlers_disconnect_by_data (NM_DEVICE (g_ptr_array_index (devices, i)), applet);
 
+        // disconnect all active connection (VPN) handlers
+        const GPtrArray *active_connections = nm_client_get_active_connections (applet->nm_client);
+        for (int i = 0; active_connections && (i < active_connections->len); i++)
+                g_signal_handlers_disconnect_by_data (G_OBJECT (g_ptr_array_index (active_connections, i)), applet);
+
 	// disconnect all client handlers
 	g_signal_handlers_disconnect_by_data (applet->nm_client, applet);
+	}
 #ifndef LXPLUG
     if (applet->gesture) g_object_unref (applet->gesture);
 #endif
@@ -4024,6 +4033,8 @@ static void finalize (GObject *object)
 
 	nm_clear_g_source (&applet->update_icon_id);
 	nm_clear_g_source (&applet->wifi_scan_id);
+	nm_clear_g_source (&applet->animation_id);
+	nm_clear_g_source (&applet->initial_state_id);
 
 #ifdef WITH_APPINDICATOR
 	g_clear_object (&applet->app_indicator);
