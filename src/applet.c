@@ -1341,7 +1341,7 @@ activate_vpn_cb (GObject *client,
 	g_clear_object (&active);
 
 	if (error) {
-		clear_animation_timeout (info->applet);
+		if (applet) clear_animation_timeout (applet);
 
 		title = _("VPN Connection Failed");
 
