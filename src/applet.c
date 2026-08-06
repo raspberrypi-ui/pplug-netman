@@ -2125,7 +2125,12 @@ static void nma_menu_show_cb (GtkWidget *menu, NMApplet *applet)
 static gboolean
 destroy_old_menu (gpointer user_data)
 {
-	g_object_unref (user_data);
+	NMApplet *applet = user_data;
+
+	/* Source is about to fire and auto-remove itself - clear the id so
+	 * applet_finalize doesn't try to remove an already-gone source. */
+	applet->old_menu_destroy_id = 0;
+	g_clear_object (&applet->old_menu);
 	return FALSE;
 }
 
@@ -2134,10 +2139,13 @@ nma_menu_deactivate_cb (GtkWidget *widget, NMApplet *applet)
 {
 	/* Must punt the destroy to a low-priority idle to ensure that
 	 * the menu items don't get destroyed before any 'activate' signal
-	 * fires for an item.
+	 * fires for an item. Track it on applet (rather than passing the menu
+	 * widget as the idle's user_data) so applet_finalize can cancel it and
+	 * free the widget itself if the applet is torn down first.
 	 */
 	g_signal_handlers_disconnect_by_func (applet->menu, G_CALLBACK (nma_menu_deactivate_cb), applet);
-	g_idle_add_full (G_PRIORITY_LOW, destroy_old_menu, applet->menu, NULL);
+	applet->old_menu = applet->menu;
+	applet->old_menu_destroy_id = g_idle_add_full (G_PRIORITY_LOW, destroy_old_menu, applet, NULL);
 	applet->menu = NULL;
 #ifdef LXPANEL_PLUGIN
 	applet->vpn_menu = NULL;
