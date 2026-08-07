@@ -37,18 +37,17 @@ extern "C" {
     const char *package_name (void) { return GETTEXT_PACKAGE; };
 }
 
-void WidgetNetman::command (const char *cmd)
+void WidgetNetman::widget_command (const char *cmd)
 {
     netman_control_msg (nm, cmd);
 }
 
-bool WidgetNetman::set_icon (void)
+void WidgetNetman::widget_set_icon (void)
 {
     netman_update_display (nm);
-    return false;
 }
 
-void WidgetNetman::init (Gtk::HBox *container)
+void WidgetNetman::widget_init (Gtk::HBox *container)
 {
     /* Create the button */
     plugin = std::make_unique <Gtk::Button> ();
@@ -58,7 +57,6 @@ void WidgetNetman::init (Gtk::HBox *container)
     /* Setup structure */
     nm = (NMApplet *) g_object_new (NM_TYPE_APPLET, NULL);
     nm->plugin = (GtkWidget *)((*plugin).gobj());
-    icon_timer = Glib::signal_idle().connect (sigc::mem_fun (*this, &WidgetNetman::set_icon));
 
     /* Initialise the plugin */
     netman_init (nm);
@@ -66,7 +64,6 @@ void WidgetNetman::init (Gtk::HBox *container)
 
 WidgetNetman::~WidgetNetman()
 {
-    icon_timer.disconnect ();
     netman_destructor (nm);
 }
 
