@@ -4074,9 +4074,6 @@ static void finalize (GObject *object)
 	// disconnect all client handlers
 	g_signal_handlers_disconnect_by_data (applet->nm_client, applet);
 	}
-#ifndef LXPLUG
-    if (applet->gesture) g_object_unref (applet->gesture);
-#endif
 #else
 	NMApplet *applet = NM_APPLET (object);
 #endif

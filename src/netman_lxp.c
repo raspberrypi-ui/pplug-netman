@@ -1,5 +1,5 @@
 /*============================================================================
-Copyright (c) 2024 Raspberry Pi
+Copyright (c) 2022-2025 Raspberry Pi
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,32 +25,59 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ============================================================================*/
 
-#ifndef WIDGETS_NETMAN_HPP
-#define WIDGETS_NETMAN_HPP
+#include <locale.h>
+#include <glib/gi18n.h>
 
-#include <widget.hpp>
-#include <gtkmm/button.h>
-
-extern "C" {
 #include "plugin.h"
+
 #include "netman.h"
+
+/*----------------------------------------------------------------------------*/
+/* LXPanel plugin functions                                                   */
+/*----------------------------------------------------------------------------*/
+
+static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
+{
+    /* Allocate and initialize plugin context */
+    NMApplet *nm = (NMApplet *) g_object_new (NM_TYPE_APPLET, NULL);
+
+    /* Allocate top level widget and set into plugin widget pointer. */
+    nm->panel = panel;
+    nm->settings = settings;
+    nm->plugin = gtk_button_new ();
+    lxpanel_plugin_set_data (nm->plugin, nm, netman_destructor);
+
+    netman_init (nm);
+
+    return nm->plugin;
 }
 
-class WidgetNetman : public PanelWidget
+/* Handler for system config changed message from panel */
+static void nm_configuration_changed (LXPanel *, GtkWidget *plugin)
 {
-    NMApplet *nm;
+    NMApplet *nm = lxpanel_plugin_get_data (plugin);
+    netman_update_display (nm);
+}
 
-    std::unique_ptr <Gtk::Button> plugin;
+/* Handler for control message */
+static gboolean nm_control (GtkWidget *plugin, const char *cmd)
+{
+    NMApplet *nm = lxpanel_plugin_get_data (plugin);
+    return netman_control_msg (nm, cmd);
+}
 
-  public:
+int module_lxpanel_gtk_version = 1;
+char module_name[] = PLUGIN_NAME;
 
-    void widget_init (Gtk::HBox *container) override;
-    virtual ~WidgetNetman ();
-    void widget_command (const char *cmd) override;
-    void widget_set_icon (void);
+/* Plugin descriptor */
+LXPanelPluginInit fm_module_init_lxpanel_gtk = {
+    .name = PLUGIN_TITLE,
+    .description = N_("Controller for Network Manager"),
+    .new_instance = nm_constructor,
+    .reconfigure = nm_configuration_changed,
+    .control = nm_control,
+    .gettext_package = GETTEXT_PACKAGE
 };
-
-#endif /* end of include guard: WIDGETS_NETMAN_HPP */
 
 /* End of file */
 /*----------------------------------------------------------------------------*/

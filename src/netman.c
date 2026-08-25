@@ -28,11 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <locale.h>
 #include <glib/gi18n.h>
 
-#ifdef LXPLUG
 #include "plugin.h"
-#else
-#include "lxutils.h"
-#endif
 
 #include "netman.h"
 
@@ -53,6 +49,7 @@ conf_table_t conf_table[1] = {
 /*----------------------------------------------------------------------------*/
 
 static int wifi_country_set (void);
+static gboolean start_applet (gpointer data);
 static void netman_button_clicked (GtkWidget *, NMApplet *nm);
 
 /*----------------------------------------------------------------------------*/
@@ -72,6 +69,16 @@ static int wifi_country_set (void)
     if (pclose (fp)) return 0;
 
     return 1;
+}
+
+static gboolean start_applet (gpointer data)
+{
+    NMApplet *nm = (NMApplet *) data;
+
+    nm->startup_id = 0;
+    applet_startup (nm);
+
+    return FALSE;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -107,19 +114,6 @@ gboolean netman_control_msg (NMApplet *nm, const char *cmd)
     return TRUE;
 }
 
-static gboolean start_applet (gpointer data)
-{
-    NMApplet *nm = (NMApplet *) data;
-
-    nm->startup_id = 0;
-
-    nm->country_set = wifi_country_set ();
-
-    applet_startup (nm);
-
-    return FALSE;
-}
-
 void netman_init (NMApplet *nm)
 {
     setlocale (LC_ALL, "");
@@ -133,14 +127,14 @@ void netman_init (NMApplet *nm)
 
     /* Set up button */
     gtk_button_set_relief (GTK_BUTTON (nm->plugin), GTK_RELIEF_NONE);
-#ifndef LXPLUG
     g_signal_connect (nm->plugin, "clicked", G_CALLBACK (netman_button_clicked), nm);
-    nm->gesture = add_long_press (nm->plugin, NULL, NULL);
-#endif
+    wrap_add_longpress (nm->gesture, nm->plugin, NULL, NULL);
 
     /* Set up variables */
     nm->icon_cache = NULL;
+    nm->country_set = wifi_country_set ();
 
+    /* Start the applet on idle */
     nm->startup_id = g_idle_add (start_applet, nm);
 
     /* Show the widget and return */
@@ -157,72 +151,12 @@ void netman_destructor (gpointer user_data)
         nm->startup_id = 0;
     }
 
+    wrap_free_gesture (nm->gesture);
+
     applet_finalize (nm);
 
     g_object_unref (nm);
 }
-
-/*----------------------------------------------------------------------------*/
-/* LXPanel plugin functions                                                   */
-/*----------------------------------------------------------------------------*/
-#ifdef LXPLUG
-
-static GtkWidget *nm_constructor (LXPanel *panel, config_setting_t *settings)
-{
-    /* Allocate and initialize plugin context */
-    NMApplet *nm = (NMApplet *) g_object_new (NM_TYPE_APPLET, NULL);
-
-    /* Allocate top level widget and set into plugin widget pointer. */
-    nm->panel = panel;
-    nm->settings = settings;
-    nm->plugin = gtk_button_new ();
-    lxpanel_plugin_set_data (nm->plugin, nm, netman_destructor);
-
-    netman_init (nm);
-
-    return nm->plugin;
-}
-
-/* Handler for button press */
-static gboolean nm_button_press_event (GtkWidget *plugin, GdkEventButton *event, LXPanel *)
-{
-    NMApplet *nm = lxpanel_plugin_get_data (plugin);
-    if (event->button == 1)
-    {
-        netman_button_clicked (plugin, nm);
-        return TRUE;
-    }
-    else return FALSE;
-}
-
-/* Handler for system config changed message from panel */
-static void nm_configuration_changed (LXPanel *, GtkWidget *plugin)
-{
-    NMApplet *nm = lxpanel_plugin_get_data (plugin);
-    netman_update_display (nm);
-}
-
-/* Handler for control message */
-static gboolean nm_control (GtkWidget *plugin, const char *cmd)
-{
-    NMApplet *nm = lxpanel_plugin_get_data (plugin);
-    return netman_control_msg (nm, cmd);
-}
-
-int module_lxpanel_gtk_version = 1;
-char module_name[] = PLUGIN_NAME;
-
-/* Plugin descriptor */
-LXPanelPluginInit fm_module_init_lxpanel_gtk = {
-    .name = PLUGIN_TITLE,
-    .description = N_("Controller for Network Manager"),
-    .new_instance = nm_constructor,
-    .reconfigure = nm_configuration_changed,
-    .button_press_event = nm_button_press_event,
-    .control = nm_control,
-    .gettext_package = GETTEXT_PACKAGE
-};
-#endif
 
 /* End of file */
 /*----------------------------------------------------------------------------*/

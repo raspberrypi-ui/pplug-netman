@@ -6,7 +6,7 @@ netman = dependency('libnm')
 nma = dependency('libnma')
 secret = dependency('libsecret-1')
 
-lsources = files(
+sources = files(
   'netman.c',
   'ap-menu-item.c',
   'applet.c',
@@ -36,17 +36,21 @@ incdirs = include_directories('utils', 'wireless-security', 'nm-utils')
 
 gnome = import('gnome')
 
-lsources += gnome.compile_resources(
+sources += gnome.compile_resources(
   'applet-resources',
   'applet.gresource.xml',
   dependencies: resource_data
+)
+
+lsources = files(
+  'netman_lxp.c'
 )
 
 ldeps = [ gtk, lxpanel, netman, nma, secret ]
 
 largs = [ '-DPACKAGE_DATA_DIR="' + lresource_dir + '"', '-DGETTEXT_PACKAGE="lpplug_' + meson.project_name() + '"', '-DENABLE_GTK3', '-DVERSION=0.1', '-D___CONFIG_H__', '-DBINDIR="/usr/bin"', '-DG_DISABLE_ASSERT', '-DG_DISABLE_CHECKS', '-DG_DISABLE_CAST_CHECKS' ]
 
-shared_module(meson.project_name(), lsources,
+shared_module(meson.project_name(), [ sources, lsources ],
         dependencies: ldeps,
         install: true,
         install_dir: get_option('libdir') / 'lxpanel-pi',
@@ -63,7 +67,7 @@ wdeps = [ gtkmm, wfpanel, netman, nma, secret ]
 
 wargs = [ '-DPACKAGE_DATA_DIR="' + wresource_dir + '"', '-DGETTEXT_PACKAGE="wfplug_' + meson.project_name() +'"', '-DENABLE_GTK3', '-DVERSION=0.1', '-D___CONFIG_H__', '-DBINDIR="/usr/bin"' ]
 
-shared_module('lib' + meson.project_name(), [ lsources, wsources ],
+shared_module('lib' + meson.project_name(), [ sources, wsources ],
         dependencies: wdeps,
         install: true,
         install_dir: get_option('libdir') / 'wf-panel-pi',
