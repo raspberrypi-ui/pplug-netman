@@ -2732,6 +2732,9 @@ foo_device_state_changed_cb (NMDevice *device,
 #endif
 		}
 
+#ifdef LXPANEL_PLUGIN
+		if (!applet->reloading)
+#endif
 		dclass->notify_connected (device, str, applet);
 		g_free (str);
 	}
@@ -2888,6 +2891,9 @@ foo_set_initial_state (gpointer data)
 
 	applet_schedule_update_icon (applet);
 
+#ifdef LXPANEL_PLUGIN
+	applet->reloading = FALSE;
+#endif
 	return FALSE;
 }
 

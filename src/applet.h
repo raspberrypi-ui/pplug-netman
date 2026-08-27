@@ -81,6 +81,7 @@ typedef struct {
 	gboolean country_set;
 	int notification;
 	guint startup_id;
+	gboolean reloading;
 #ifdef LXPLUG
 	LXPanel *panel;                 /* Back pointer to panel */
 	config_setting_t *settings;     /* Plugin settings */

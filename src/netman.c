@@ -133,6 +133,7 @@ void netman_init (NMApplet *nm)
     /* Set up variables */
     nm->icon_cache = NULL;
     nm->country_set = wifi_country_set ();
+    nm->reloading = reload;
 
     /* Start the applet on idle */
     nm->startup_id = g_idle_add (start_applet, nm);
