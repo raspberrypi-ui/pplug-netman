@@ -76,18 +76,14 @@ typedef struct {
 	GApplication parent;
 #ifdef LXPANEL_PLUGIN
 	GtkWidget *plugin;
+    GtkGesture *gesture;
 	GtkWidget *vpn_menu;
 	gboolean killing;
 	gboolean country_set;
 	int notification;
 	guint startup_id;
 	gboolean reloading;
-#ifdef LXPLUG
-	LXPanel *panel;                 /* Back pointer to panel */
-	config_setting_t *settings;     /* Plugin settings */
-#else
-    GtkGesture *gesture;
-#endif
+    LXPLUG_VARS
 #endif
 
 	NMClient *nm_client;
