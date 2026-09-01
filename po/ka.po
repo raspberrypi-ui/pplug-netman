@@ -1,0 +1,1211 @@
+# Georgian translation for lpplug_netman.
+# Copyright (C) 2026 lpplug_netman's authors.
+# This file is distributed under the same license as the lpplug_netman package.
+# Ekaterine Papava <papava.e@gtu.ge>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: lpplug_netman\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-19 18:37+0100\n"
+"PO-Revision-Date: 2026-08-29 18:24+0200\n"
+"Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
+"Language-Team: Georgian <(nothing)>\n"
+"Language: ka\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.9\n"
+
+#: src/ap-menu-item.c:78
+msgid "ad-hoc"
+msgstr "ad-hoc"
+
+#: src/ap-menu-item.c:83
+msgid "secure."
+msgstr "დაცული."
+
+#: src/ap-menu-item.c:87
+msgid "insecure."
+msgstr "დაუცველი."
+
+#: src/applet.c:70 src/applet-device-wifi.c:1455
+msgid "Failed to activate connection"
+msgstr "შეერთების აქტივაციის შეცდომა"
+
+#: src/applet.c:71 src/applet.c:817 src/applet.c:868 src/applet.c:900
+#: src/applet-device-wifi.c:1456 src/applet-device-wifi.c:1476
+msgid "Unknown error"
+msgstr "უცნობი შეცდომა"
+
+#: src/applet.c:74 src/applet.c:819 src/applet.c:902
+#: src/applet-device-wifi.c:538 src/applet-device-wifi.c:1458
+#: src/applet-device-wifi.c:1478
+msgid "Connection failure"
+msgstr "შეერთების შეცდომა"
+
+#: src/applet.c:182
+msgid "_Turn Off Wireless LAN"
+msgstr "უსადენო LAN-ის გამორთვ_ა"
+
+#: src/applet.c:182
+msgid "_Turn On Wireless LAN"
+msgstr "უსადენო LAN-ის ჩართვ_ა"
+
+#: src/applet.c:207 src/applet.c:220
+#, c-format
+msgid "IP : %s"
+msgstr "IP : %s"
+
+#: src/applet.c:439
+#, c-format
+msgid "Do you want to disconnect from the wireless network '%s'?"
+msgstr "გნებავთ გათიშვა უსადენო ქსელიდან '%s'?"
+
+#: src/applet.c:816
+msgid "Failed to add/activate connection"
+msgstr "კავშირის დამატება/გააქტიურება ჩავარდა"
+
+#: src/applet.c:867
+msgid "Device disconnect failed"
+msgstr "მოწყობილობის გათიშვა ჩავარდა"
+
+#: src/applet.c:870
+msgid "Disconnect failure"
+msgstr "გათიშვის შეცდომა"
+
+#: src/applet.c:899
+msgid "Connection activation failed"
+msgstr "შეერთების აქტივაციის შეცდომა"
+
+#: src/applet.c:1141
+msgid "Don’t show this message again"
+msgstr "მეტჯერ აღარ მაჩვენო ეს გაფრთხილება"
+
+#: src/applet.c:1246
+#, c-format
+msgid ""
+"\n"
+"The VPN connection “%s” disconnected because the network connection was "
+"interrupted."
+msgstr ""
+"\n"
+"VPN კავშირი “%s” გაითიშა, რადგან ქსელური კავშირი გაწყდა."
+
+#: src/applet.c:1248
+#, c-format
+msgid ""
+"\n"
+"The VPN connection “%s” failed because the network connection was "
+"interrupted."
+msgstr ""
+"\n"
+"VPN კავშირი “%s” ჩავარდა, რადგან ქსელური კავშირი გაწყდა."
+
+#: src/applet.c:1250
+#, c-format
+msgid ""
+"\n"
+"The VPN connection “%s” failed because the VPN service stopped unexpectedly."
+msgstr ""
+"\n"
+"VPN კავშირი “%s” ჩავარდა, რადგან VPN-ის სერვისი მოულოდნელად გაჩერდა."
+
+#: src/applet.c:1252
+#, c-format
+msgid ""
+"\n"
+"The VPN connection “%s” failed because the VPN service returned invalid "
+"configuration."
+msgstr ""
+"\n"
+"VPN კავშირი “%s” ჩავარდა, რადგან VPN-ის სერვისმა არასწორი კონფიგურაცია "
+"დააბრუნა."
+
+#: src/applet.c:1254
+#, c-format
+msgid ""
+"\n"
+"The VPN connection “%s” failed because the connection attempt timed out."
+msgstr ""
+"\n"
+"VPN კავშირი “%s” ჩავარდა, რადგან დაკავშირების მცდელობის ვადა ამოიწურა."
+
+#: src/applet.c:1256
+#, c-format
+msgid ""
+"\n"
+"The VPN connection “%s” failed because the VPN service did not start in time."
+msgstr ""
+"\n"
+"VPN კავშირი “%s” ჩავარდა, რადგან VPN-ის სერვისი დროულად არ გაეშვა."
+
+#: src/applet.c:1258
+#, c-format
+msgid ""
+"\n"
+"The VPN connection “%s” failed because the VPN service failed to start."
+msgstr ""
+"\n"
+"VPN კავშირი “%s” ჩავარდა, რადგან VPN-ის სერვისის გაშვება ჩავარდა."
+
+#: src/applet.c:1260
+#, c-format
+msgid ""
+"\n"
+"The VPN connection “%s” failed because there were no valid VPN secrets."
+msgstr ""
+"\n"
+"VPN კავშირი “%s” ჩავარდა, რადგან სწორი VPN-ის საიდუმლოები აღმოჩენილი არაა."
+
+#: src/applet.c:1262
+#, c-format
+msgid ""
+"\n"
+"The VPN connection “%s” failed because of invalid VPN secrets."
+msgstr ""
+"\n"
+"VPN კავშირი “%s” ჩავარდა, არასწორი VPN-ის საიდუმლოების გამო."
+
+#: src/applet.c:1267
+#, c-format
+msgid ""
+"\n"
+"The VPN connection “%s” failed."
+msgstr ""
+"\n"
+"VPN კავშირი “%s” ჩავარდა."
+
+#: src/applet.c:1294
+#, c-format
+msgid ""
+"VPN connection has been successfully established.\n"
+"\n"
+"%s\n"
+msgstr ""
+"VPN კავშირი წარმატებით დამყარდა.\n"
+"\n"
+"%s\n"
+
+#: src/applet.c:1296
+msgid "VPN connection has been successfully established.\n"
+msgstr "VPN კავშირი წარმატებით დამყარდა.\n"
+
+#: src/applet.c:1298
+msgid "VPN Login Message"
+msgstr "VPN-ზე შესვლის შეტყობინება"
+
+#: src/applet.c:1306 src/applet.c:1346
+msgid "VPN Connection Failed"
+msgstr "VPN თან დაკავშირება ვერ მოხერხდა"
+
+#: src/applet.c:1350
+#, c-format
+msgid ""
+"\n"
+"The VPN connection “%s” failed because the VPN service failed to start.\n"
+"\n"
+"%s"
+msgstr ""
+"\n"
+"VPN კავშირი “%s” ჩავარდა, რადგან VPN-ის სერვისის გაშვება ჩავარდა.\n"
+"\n"
+"%s"
+
+#: src/applet.c:1353
+#, c-format
+msgid ""
+"\n"
+"The VPN connection “%s” failed to start.\n"
+"\n"
+"%s"
+msgstr ""
+"\n"
+"VPN კავშირის “%s” გაშვება ჩავარდა.\n"
+"\n"
+"%s"
+
+#: src/applet.c:1677
+msgid "device not ready (firmware missing)"
+msgstr "მოწყობილობა მზად არაა (მიკროკოდი აღმოჩენილი არაა)"
+
+#: src/applet.c:1679
+msgid "device not ready"
+msgstr "მოწყობილობა მზად არაა"
+
+#. Notify user of unmanaged or unavailable device
+#: src/applet.c:1689 src/applet-device-ethernet.c:99
+msgid "disconnected"
+msgstr "გათიშულია"
+
+#: src/applet.c:1705
+msgid "Disconnect"
+msgstr "გათიშვა"
+
+#: src/applet.c:1719
+msgid "device not managed"
+msgstr "მოწყობილობა მართული არაა"
+
+#: src/applet.c:1800
+msgid "No network devices available"
+msgstr "ქსელური მოწყობილობები არაა ხელმისაწვდომი"
+
+#: src/applet.c:1853
+msgid "_Advanced Options"
+msgstr "დ_ამატებითი პარამეტრები"
+
+#: src/applet.c:1855
+msgid "_VPN Connections"
+msgstr "_VPN შეერთებები"
+
+#: src/applet.c:1909
+msgid "_Configure VPN…"
+msgstr "VPN-ის მორგება…"
+
+#: src/applet.c:1913
+msgid "_Add a VPN connection…"
+msgstr "VPN კავშირის დამატებ_ა…"
+
+#. 'Connection Information' item
+#: src/applet.c:1925 src/applet.c:2347
+msgid "Connection _Information"
+msgstr "შეერთების _ინფორმაცია"
+
+#. 'Edit Connections...' item
+#: src/applet.c:1933 src/applet.c:2355
+msgid "Edit Connections…"
+msgstr "შეერთების ჩასწორება…"
+
+#: src/applet.c:2056
+msgid "NetworkManager is not running…"
+msgstr "NetworkManager გაშვებული არაა…"
+
+#: src/applet.c:2061 src/applet.c:3191
+msgid "Networking disabled"
+msgstr "ქსელი გამორთულია"
+
+#: src/applet.c:2070
+msgid "Click here to set Wi-Fi country"
+msgstr "დააწკაპუნეთ აქ Wi-Fi-ის ქვეყნის დასაყენებლად"
+
+#: src/applet.c:2072
+msgid "Wi-Fi country must be set to connect to Wi-Fi networks"
+msgstr ""
+"Wi-fi ქსელებთან დასაკავშირებლად აუცილებელია Wi-Fi ბარათის ქვეყნის დაყენება"
+
+#. 'Enable Networking' item
+#: src/applet.c:2305
+msgid "Enable _Networking"
+msgstr "_ქსელის ჩართვა"
+
+#. 'Enable Wi-Fi' item
+#: src/applet.c:2314
+msgid "Enable _Wi-Fi"
+msgstr "Wi-Fi-ის ჩართვა"
+
+#. 'Enable Mobile Broadband' item
+#: src/applet.c:2323
+msgid "Enable _Mobile Broadband"
+msgstr "_მობილური ინტერნეტის ჩართვა"
+
+#. Toggle notifications item
+#: src/applet.c:2335
+msgid "Enable N_otifications"
+msgstr "გა_ფრთხილებების ჩართვა"
+
+#: src/applet.c:2369
+msgid "_About"
+msgstr "_შესახებ"
+
+#: src/applet.c:2690
+#, c-format
+msgid "You are now connected to “%s”."
+msgstr "დაკავშირებული ბრძანდებით “%s”-სთან."
+
+#: src/applet.c:2740
+msgid "Disconnected"
+msgstr "გათიშულია"
+
+#: src/applet.c:2741
+msgid "The network connection has been disconnected."
+msgstr "თქვენი ქსელური კავშირი გაითიშა."
+
+#: src/applet.c:3043
+#, c-format
+msgid "Preparing network connection “%s”…"
+msgstr "მიმდინარეობს ქსელის კავშირის “%s” მომზადება…"
+
+#: src/applet.c:3046
+#, c-format
+msgid "User authentication required for network connection “%s”…"
+msgstr "ქსელის კავშირისთვის “%s” აუცილებელია მომხმარებლის ავთენტიკაცია…"
+
+#: src/applet.c:3049 src/applet-device-bt.c:113 src/mobile-helpers.c:597
+#, c-format
+msgid "Requesting a network address for “%s”…"
+msgstr "ქსელის მისამართის მოთხოვნა “%s”-ისთვის…"
+
+#: src/applet.c:3052
+#, c-format
+msgid "Network connection “%s” active"
+msgstr "ქსელური კავშირი “%s” აქტიურია"
+
+#: src/applet.c:3129
+#, c-format
+msgid "Starting VPN connection “%s”…"
+msgstr "VPN კავშირის “%s” გაშვება…"
+
+#: src/applet.c:3132
+#, c-format
+msgid "User authentication required for VPN connection “%s”…"
+msgstr "VPN კავშირისთვის \"%s\" აუცილებელია მომხმარებლის ავთენტიკაცია…"
+
+#: src/applet.c:3135
+#, c-format
+msgid "Requesting a VPN address for “%s”…"
+msgstr "VPN-ის მისამართის მოთხოვნა “%s”…"
+
+#: src/applet.c:3138
+#, c-format
+msgid "VPN connection active"
+msgstr "VPN კავშირი აქტიურია"
+
+#: src/applet.c:3195
+msgid "No network connection"
+msgstr "ქსელური შეერთების გარეშე"
+
+#. ----------------------------------------------------------------------------
+#. Typedefs and macros
+#. ----------------------------------------------------------------------------
+#: src/applet.c:3772 src/applet-dialogs.c:724 src/netman.h:34
+msgid "Network"
+msgstr "ქსელი"
+
+#: src/applet.c:3912
+msgid "NetworkManager Applet"
+msgstr "NetworkManager-ის აპლეტი"
+
+#: src/applet-device-broadband.c:147
+msgid "Wrong PUK code; please contact your provider."
+msgstr "არასწორი PUK კოდი. დაუკავშირდით პროვაიდერს."
+
+#: src/applet-device-broadband.c:189
+msgid "Wrong PIN code; please contact your provider."
+msgstr "არასწორი PIN კოდი. დაუკავშირდით პროვაიდერს."
+
+#. Start the spinner to show the progress of the unlock
+#: src/applet-device-broadband.c:240
+msgid "Sending unlock code…"
+msgstr "განბლოკვის კოდის გაგზავნა…"
+
+#: src/applet-device-broadband.c:729 src/applet-dialogs.c:521
+#, c-format
+msgid "Mobile Broadband (%s)"
+msgstr "მობილური ინტერნეტი (%s)"
+
+#: src/applet-device-broadband.c:731
+msgid "Mobile Broadband"
+msgstr "მობილური ინტერნეტი"
+
+#: src/applet-device-broadband.c:784 src/applet-device-bt.c:61
+#: src/applet-device-ethernet.c:107
+msgid "Available"
+msgstr "ხელმისაწვდომია"
+
+#. Default connection item
+#: src/applet-device-broadband.c:797
+msgid "New Mobile Broadband connection…"
+msgstr "ახალი მობილური ინტერნეტ-კავშირი…"
+
+#: src/applet-device-broadband.c:813 src/applet-device-bt.c:75
+#: src/applet-device-ethernet.c:124 src/applet-device-wifi.c:1371
+msgid "Connection Established"
+msgstr "კავშირი დამყარებულია"
+
+#: src/applet-device-broadband.c:814
+msgid "You are now connected to the Mobile Broadband network."
+msgstr "ახლა მიერთებული ბრძანდებით მობილურ ინტერნეტთან."
+
+#: src/applet-device-broadband.c:954 src/applet-device-broadband.c:960
+msgid "Mobile Broadband network."
+msgstr "მობილური ფართოზოლოვანი ინტერნეტი."
+
+#: src/applet-device-broadband.c:955
+msgid "You are now registered on the home network."
+msgstr "ახლა მიერთებული ბრძანდებით სახლის ინტერნეტთან."
+
+#: src/applet-device-broadband.c:961
+msgid "You are now registered on a roaming network."
+msgstr "ახლა მიერთებული ბრძანდებით როუმინგის ქსელში."
+
+#: src/applet-device-bt.c:76
+msgid "You are now connected to the mobile broadband network."
+msgstr "ახლა მიერთებული ბრძანდებით მობილურ ინტერნეტთან."
+
+#: src/applet-device-bt.c:104 src/mobile-helpers.c:588
+#, c-format
+msgid "Preparing mobile broadband connection “%s”…"
+msgstr "მობილური ინტერნეტკავშირის \"%s\" მომზადება…"
+
+#: src/applet-device-bt.c:107 src/mobile-helpers.c:591
+#, c-format
+msgid "Configuring mobile broadband connection “%s”…"
+msgstr "მობილური ინტერნეტკავშირის \"%s\" მორგება…"
+
+#: src/applet-device-bt.c:110 src/mobile-helpers.c:594
+#, c-format
+msgid "User authentication required for mobile broadband connection “%s”…"
+msgstr ""
+"მობილური ინტერნეტკავშირისთვის \"%s\" აუცილებელია მომხმარებლის ავთენტიკაცია…"
+
+#: src/applet-device-bt.c:117 src/mobile-helpers.c:616
+#, c-format
+msgid "Mobile broadband connection “%s” active"
+msgstr "მობილური ინტერნეტი “%s” აქტიურია"
+
+#: src/applet-device-ethernet.c:16
+msgid "Auto Ethernet"
+msgstr "ავტომატური Ethernet"
+
+#: src/applet-device-ethernet.c:72
+#, c-format
+msgid "Ethernet Networks (%s)"
+msgstr "Ethernet ქსელები (%s)"
+
+#: src/applet-device-ethernet.c:74
+#, c-format
+msgid "Ethernet Network (%s)"
+msgstr "Ethernet ქსელი (%s)"
+
+#: src/applet-device-ethernet.c:77
+msgid "Ethernet Networks"
+msgstr "Ethernet ქსელები"
+
+#: src/applet-device-ethernet.c:79
+msgid "Ethernet Network"
+msgstr "Ethernet ქსელი"
+
+#: src/applet-device-ethernet.c:125
+msgid "You are now connected to the ethernet network."
+msgstr "ახლა მიერთებული ბრძანდებით ethernet ქსელთან."
+
+#: src/applet-device-ethernet.c:153
+#, c-format
+msgid "Preparing ethernet network connection “%s”…"
+msgstr "მიმდინარეობს ethernet ქსელის კავშირის “%s” მომზადება…"
+
+#: src/applet-device-ethernet.c:156
+#, c-format
+msgid "Configuring ethernet network connection “%s”…"
+msgstr "მიმდინარეობს ethernet ქსელის კავშირის \"%s\" მომზადება…"
+
+#: src/applet-device-ethernet.c:159
+#, c-format
+msgid "User authentication required for ethernet network connection “%s”…"
+msgstr ""
+"ethernet ქსელის კავშირისთვის “%s” აუცილებელია მომხმარებლის ავთენტიკაცია…"
+
+#: src/applet-device-ethernet.c:162
+#, c-format
+msgid "Requesting an ethernet network address for “%s”…"
+msgstr "ethernet ქსელის მისამართის გამოთხოვა ინტერფეისისთვის \"%s\"…"
+
+#: src/applet-device-ethernet.c:166
+#, c-format
+msgid "Ethernet network connection “%s” active"
+msgstr "Ethernet ქსელური კავშირი “%s” აქტიურია"
+
+#: src/applet-device-ethernet.c:338
+msgid "DSL authentication"
+msgstr "DSL ავთენტიკაცია"
+
+#: src/applet-device-ethernet.c:341 src/applet-dialogs.c:1179
+#: src/mobile-helpers.c:455 src/8021x.ui:31 src/gsm-unlock.ui:28
+#: data/lxplug-netman.ui:58
+msgid "_Cancel"
+msgstr "გაუ_ქმება"
+
+#: src/applet-device-ethernet.c:342 src/applet-dialogs.c:1180
+#: src/mobile-helpers.c:456 data/lxplug-netman.ui:73
+msgid "_OK"
+msgstr "_დიახ"
+
+#: src/applet-device-wifi.c:208
+msgid "_Connect to Hidden Wi-Fi Network…"
+msgstr "და_კავშირება დამალულ Wi-Fi ქსელთან…"
+
+#: src/applet-device-wifi.c:266
+msgid "Create Wi-Fi _Hotspot…"
+msgstr "Wi-Fi _ჰოტსპოტის შექმნა…"
+
+#: src/applet-device-wifi.c:268
+msgid "Create _New Wi-Fi Network…"
+msgstr "ახალი Wi-Fi ქსელის შექმ_ნა…"
+
+#: src/applet-device-wifi.c:351
+msgid "(none)"
+msgstr "(არცერთი)"
+
+#: src/applet-device-wifi.c:535 src/applet-device-wifi.c:1475
+msgid "Failed to add new connection"
+msgstr "ახალი შეერთების დამატების შეცდომა"
+
+#: src/applet-device-wifi.c:536
+msgid "Insufficient privileges."
+msgstr "არასაკმარისი პრივილეგიები."
+
+#: src/applet-device-wifi.c:861
+#, c-format
+msgid "Wi-Fi Networks (%s)"
+msgstr "Wi-Fi ქსელები (%s)"
+
+#: src/applet-device-wifi.c:863
+#, c-format
+msgid "Wi-Fi Network (%s)"
+msgstr "Wi-Fi ქსელები (%s)"
+
+#: src/applet-device-wifi.c:865
+msgid "Wi-Fi Network"
+msgid_plural "Wi-Fi Networks"
+msgstr[0] "Wi-Fi ქსელი"
+msgstr[1] "Wi-Fi ქსელები"
+
+#: src/applet-device-wifi.c:914
+msgid "Wi-Fi is disabled"
+msgstr "Wi-Fi გამორთულია"
+
+#: src/applet-device-wifi.c:915
+msgid "Wi-Fi is disabled by hardware switch"
+msgstr "Wi-Fi აპარატურული გადამრთველითაა გამორთული"
+
+#: src/applet-device-wifi.c:978
+msgid "More networks"
+msgstr "მეტი ქსელი"
+
+#: src/applet-device-wifi.c:996
+msgid "_Available networks"
+msgstr "_ხელმისაწვდომი ქსელები"
+
+#: src/applet-device-wifi.c:1176
+msgid "Wi-Fi Networks Available"
+msgstr "ხელმისაწვდომი Wi-Fi ქსელები"
+
+#: src/applet-device-wifi.c:1177
+msgid "Use the network menu to connect to a Wi-Fi network"
+msgstr "Wi-Fi ქსელთან დასაკავშირებლად გამოიყენეთ მენიუ 'ქსელი'"
+
+#: src/applet-device-wifi.c:1359
+#, c-format
+msgid "You are now connected to the Wi-Fi network “%s”."
+msgstr "თქვენ ახლა დაკავშირებული ბრძანდებით Wi-Fi ქსელთან '%s'."
+
+#: src/applet-device-wifi.c:1406
+#, c-format
+msgid "Preparing Wi-Fi network connection “%s”…"
+msgstr "მიმდინარეობს Wi-Fi ქსელური კავშირის \"%s\" მომზადება…"
+
+#: src/applet-device-wifi.c:1409
+#, c-format
+msgid "Configuring Wi-Fi network connection “%s”…"
+msgstr "მიმდინარეობს Wi-Fi ქსელური კავშირის \"%s\" მორგება…"
+
+#: src/applet-device-wifi.c:1412
+#, c-format
+msgid "User authentication required for Wi-Fi network “%s”…"
+msgstr "Wi-Fi ქსელისთვის \"%s\" აუცილებელია მომხმარებლის ავთენტიკაცია…"
+
+#: src/applet-device-wifi.c:1415
+#, c-format
+msgid "Requesting a Wi-Fi network address for “%s”…"
+msgstr "Wi-Fi ქსელის მისამართის მოთხოვნა “%s”-ისთვის…"
+
+#: src/applet-device-wifi.c:1429
+#, c-format
+msgid "Wi-Fi network connection “%s” active: %s (hotspot)"
+msgstr "Wi-Fi ქსელური კავშირი “%s” აქტიურია: %s (ჰოტსპოტი)"
+
+#: src/applet-device-wifi.c:1432
+#, c-format
+msgid "Wi-Fi network connection “%s” active: %s (%d%%)"
+msgstr "Wi-Fi ქსელური კავშირი “%s” აქტიურია: %s (%d%%)"
+
+#: src/applet-device-wifi.c:1436
+#, c-format
+msgid "Wi-Fi network connection “%s” active"
+msgstr "Wi-Fi ქსელური კავშირი “%s” აქტიურია"
+
+#: src/applet-dialogs.c:28
+msgid "Error displaying connection information:"
+msgstr "კავშირის ინფორმაციის გამოტანის შეცდომა:"
+
+#: src/applet-dialogs.c:60
+msgid "LEAP"
+msgstr "LEAP"
+
+#: src/applet-dialogs.c:62
+msgid "Dynamic WEP"
+msgstr "დინამიკური WEP"
+
+#: src/applet-dialogs.c:64 src/applet-dialogs.c:226
+msgid "WPA/WPA2"
+msgstr "WPA/WPA2"
+
+#. Create the expander
+#: src/applet-dialogs.c:163
+msgid "More addresses"
+msgstr "მეტი მისამართი"
+
+#: src/applet-dialogs.c:224
+msgid "WEP"
+msgstr "WEP"
+
+#: src/applet-dialogs.c:228
+msgid "WPA/WPA2/WPA3"
+msgstr "WPA/WPA2/WPA3"
+
+#: src/applet-dialogs.c:230
+msgid "WPA3"
+msgstr "WPA3"
+
+#: src/applet-dialogs.c:234 src/applet-dialogs.c:243
+msgctxt "Wi-Fi/Ethernet security"
+msgid "None"
+msgstr "არცერთი"
+
+#: src/applet-dialogs.c:313 src/applet-dialogs.c:586
+#, c-format
+msgid "%u Mb/s"
+msgstr "%u მბ/წმ"
+
+#: src/applet-dialogs.c:315 src/applet-dialogs.c:588
+msgctxt "Speed"
+msgid "Unknown"
+msgstr "უცნობი"
+
+#. Address
+#: src/applet-dialogs.c:330 src/applet-dialogs.c:352
+msgctxt "Address"
+msgid "Unknown"
+msgstr "უცნობი"
+
+#: src/applet-dialogs.c:331 src/applet-dialogs.c:404
+msgid "IP Address"
+msgstr "IP მისამართი"
+
+#: src/applet-dialogs.c:353
+msgid "Broadcast Address"
+msgstr "ტრანსლირების მისამართი"
+
+#. Prefix
+#: src/applet-dialogs.c:365
+msgctxt "Subnet Mask"
+msgid "Unknown"
+msgstr "უცნობი"
+
+#: src/applet-dialogs.c:366
+msgid "Subnet Mask"
+msgstr "ქვექსელის ნიღაბი"
+
+#: src/applet-dialogs.c:428
+msgid "Primary DNS"
+msgstr "ძირითადი DNS"
+
+#: src/applet-dialogs.c:428
+msgid "Secondary DNS"
+msgstr "მეორადი DNS"
+
+#: src/applet-dialogs.c:428
+msgid "Tertiary DNS"
+msgstr "მესამეული DNS"
+
+#: src/applet-dialogs.c:507
+#, c-format
+msgid "Ethernet (%s)"
+msgstr "Ethernet (%s)"
+
+#: src/applet-dialogs.c:510
+#, c-format
+msgid "802.11 Wi-Fi (%s)"
+msgstr "802.11 Wi-Fi (%s)"
+
+#: src/applet-dialogs.c:517
+#, c-format
+msgid "GSM (%s)"
+msgstr "GSM (%s)"
+
+#: src/applet-dialogs.c:519
+#, c-format
+msgid "CDMA (%s)"
+msgstr "CDMA (%s)"
+
+#. --- General ---
+#: src/applet-dialogs.c:527 src/applet-dialogs.c:861
+msgid "General"
+msgstr "ზოგადი"
+
+#: src/applet-dialogs.c:530
+msgid "Interface"
+msgstr "ინტერფეისი"
+
+#: src/applet-dialogs.c:545
+msgid "Hardware Address"
+msgstr "აპარატურული მისამართი"
+
+#. Driver
+#: src/applet-dialogs.c:558
+msgid "Driver"
+msgstr "დრაივერი"
+
+#: src/applet-dialogs.c:591
+msgid "Speed"
+msgstr "სიჩქარე"
+
+#: src/applet-dialogs.c:604
+msgid "Security"
+msgstr "უსაფრთხოება"
+
+#. --- IPv4 ---
+#: src/applet-dialogs.c:629 src/applet-dialogs.c:891
+msgid "IPv4"
+msgstr "IPv4"
+
+#: src/applet-dialogs.c:648 src/applet-dialogs.c:696
+msgid "Default Route"
+msgstr "ნაგულისხმევი რაუტი"
+
+#: src/applet-dialogs.c:676 src/applet-dialogs.c:918
+msgid "IPv6"
+msgstr "IPv6"
+
+#: src/applet-dialogs.c:717
+msgid "Hotspot"
+msgstr "ჰოტსპოტი"
+
+#: src/applet-dialogs.c:735
+msgid "Password"
+msgstr "პაროლი"
+
+#: src/applet-dialogs.c:865
+msgid "VPN Type"
+msgstr "VPN-ის ტიპი"
+
+#: src/applet-dialogs.c:870
+msgid "VPN Gateway"
+msgstr "VPN მარშრუტიზატორი"
+
+#: src/applet-dialogs.c:874
+msgid "VPN Username"
+msgstr "VPN მომხმარებელი"
+
+#: src/applet-dialogs.c:878
+msgid "VPN Banner"
+msgstr "VPN ბანერი"
+
+#: src/applet-dialogs.c:882
+msgid "Base Connection"
+msgstr "საბაზისო შეერთება"
+
+#: src/applet-dialogs.c:883
+msgid "Unknown"
+msgstr "უცნობი"
+
+#. Shouldn't really happen but ...
+#: src/applet-dialogs.c:1080
+msgid "No valid active connections found!"
+msgstr "სწორი აქტიური კავშირები აღმოჩენილი არაა!"
+
+#: src/applet-dialogs.c:1128
+msgid ""
+"Copyright © 2004-2017 Red Hat, Inc.\n"
+"Copyright © 2005-2008 Novell, Inc.\n"
+"and many other community contributors and translators"
+msgstr ""
+"საავტორო უფლებები დაცულია © 2004-2017 Red Hat, Inc.\n"
+"საავტორო უფლებები დაცულია © 2005-2008 Novell, Inc.\n"
+"და კიდევ ბევრი მოხალისე და მთარგმნელი"
+
+#: src/applet-dialogs.c:1131
+msgid ""
+"Notification area applet for managing your network devices and connections."
+msgstr ""
+"გაფრთხილების არეს აპლეტი თქვენი ქსელური მოწყობილობებისა და კავშირების "
+"სამართავად."
+
+#: src/applet-dialogs.c:1133
+msgid "NetworkManager Website"
+msgstr "NetworkManager -ის ვებგვერდი"
+
+#: src/applet-dialogs.c:1137
+msgid "translator-credits"
+msgstr "ეკატერინე პაპავა"
+
+#: src/applet-dialogs.c:1147
+msgid ""
+"The NetworkManager Applet could not find some required resources (the .ui "
+"file was not found)."
+msgstr ""
+"NetworkManager-ის აპლეტმა ზოგიერთი აუცილებელი რესურსი ვერ იპოვა (.ui ფაილი "
+"აღმოჩენილი არაა)."
+
+#: src/applet-dialogs.c:1152
+msgid "Missing resources"
+msgstr "არასაკმარისი რესურსები"
+
+#: src/applet-dialogs.c:1177
+msgid "Mobile broadband network password"
+msgstr "მობილური ფართოზოლოვანი ინტერნეტის ქსელის პაროლი"
+
+#: src/applet-dialogs.c:1186
+#, c-format
+msgid "A password is required to connect to “%s”."
+msgstr "%s-თან დასაკავშირებლად საჭიროა პაროლი."
+
+#: src/applet-dialogs.c:1201
+msgid "Password:"
+msgstr "პაროლი:"
+
+#: src/applet-dialogs.c:1483
+msgid "SIM PIN unlock required"
+msgstr "საჭიროა SIM PIN-ის განბლოკვა"
+
+#: src/applet-dialogs.c:1484
+msgid "SIM PIN Unlock Required"
+msgstr "საჭიროა SIM PIN-ის განბლოკვა"
+
+#. FIXME: some warning about # of times you can enter incorrect PIN
+#: src/applet-dialogs.c:1486
+#, c-format
+msgid ""
+"The mobile broadband device “%s” requires a SIM PIN code before it can be "
+"used."
+msgstr ""
+"მობილური ინტერნეტის მოწყობილობას \"%s\" გამოყენებამდე სჭირდება SIM PIN კოდი."
+
+#. Translators: PIN code entry label
+#: src/applet-dialogs.c:1488
+msgid "PIN code:"
+msgstr "პინ-კოდი:"
+
+#. Translators: Show/obscure PIN checkbox label
+#: src/applet-dialogs.c:1492
+msgid "Show PIN code"
+msgstr "PIN კოდის ჩვენება"
+
+#: src/applet-dialogs.c:1494
+msgid "SIM PUK unlock required"
+msgstr "საჭიროა SIM PUK განბლოკვა"
+
+#: src/applet-dialogs.c:1495
+msgid "SIM PUK Unlock Required"
+msgstr "საჭიროა SIM PUK განბლოკვა"
+
+#. FIXME: some warning about # of times you can enter incorrect PUK
+#: src/applet-dialogs.c:1497
+#, c-format
+msgid ""
+"The mobile broadband device “%s” requires a SIM PUK code before it can be "
+"used."
+msgstr ""
+"მობილური ინტერნეტის მოწყობილობას \"%s\" გამოყენებამდე სჭირდება SIM PUK კოდი."
+
+#. Translators: PUK code entry label
+#: src/applet-dialogs.c:1499
+msgid "PUK code:"
+msgstr "PUK კოდი:"
+
+#. Translators: New PIN entry label
+#: src/applet-dialogs.c:1502
+msgid "New PIN code:"
+msgstr "ახალი PIN კოდი:"
+
+#. Translators: New PIN verification entry label
+#: src/applet-dialogs.c:1504
+msgid "Re-enter new PIN code:"
+msgstr "ახალი PIN კოდი ხელახლა:"
+
+#. Translators: Show/obscure PIN/PUK checkbox label
+#: src/applet-dialogs.c:1509
+msgid "Show PIN/PUK codes"
+msgstr "PIN/PUK კოდების ჩვენება"
+
+#: src/applet-vpn-request.c:427
+msgid "Connection had no VPN setting"
+msgstr "კავშირს VPN-ის პარამეტრი არ აქვს"
+
+#: src/applet-vpn-request.c:477
+#, c-format
+msgid "Failed to write connection to VPN UI: %s (%d)"
+msgstr "კავშირის VPN UI-ში ჩაწერა ჩავარდა: %s (%d)"
+
+#: src/applet-vpn-request.c:485
+msgid "Failed to write connection to VPN UI: incomplete write"
+msgstr "კავშირის VPN UI-ში ჩაწერა ჩავარდა: დაუსრულებელი ჩაწერა"
+
+#: src/ethernet-dialog.c:90 src/8021x.ui:7
+msgid "802.1X authentication"
+msgstr "802.1X ავთენტიკაცია"
+
+#: src/mb-menu-item.c:36 src/mobile-helpers.c:272
+msgid "CDMA"
+msgstr "CDMA"
+
+#: src/mb-menu-item.c:38
+msgid "EVDO"
+msgstr "EVDO"
+
+#: src/mb-menu-item.c:40 src/mobile-helpers.c:270
+msgid "GSM"
+msgstr "GSM"
+
+#: src/mb-menu-item.c:42
+msgid "GPRS"
+msgstr "GPRS"
+
+#: src/mb-menu-item.c:44
+msgid "EDGE"
+msgstr "EDGE"
+
+#: src/mb-menu-item.c:46
+msgid "UMTS"
+msgstr "UMTS"
+
+#: src/mb-menu-item.c:48
+msgid "HSDPA"
+msgstr "HSDPA"
+
+#: src/mb-menu-item.c:50
+msgid "HSUPA"
+msgstr "HSUPA"
+
+#: src/mb-menu-item.c:52
+msgid "HSPA"
+msgstr "HSPA"
+
+#: src/mb-menu-item.c:54
+msgid "HSPA+"
+msgstr "HSPA+"
+
+#: src/mb-menu-item.c:56
+msgid "LTE"
+msgstr "LTE"
+
+#: src/mb-menu-item.c:103
+msgid "not enabled"
+msgstr "ჩართული არაა"
+
+#: src/mb-menu-item.c:109
+msgid "not registered"
+msgstr "რეგისტრირებული არაა"
+
+#: src/mb-menu-item.c:127
+#, c-format
+msgid "Home network (%s)"
+msgstr "სახლის ქსელი (%s)"
+
+#: src/mb-menu-item.c:129
+#, c-format
+msgid "Home network"
+msgstr "სახლის ქსელი"
+
+#: src/mb-menu-item.c:137
+msgid "searching"
+msgstr "იძებნება"
+
+#: src/mb-menu-item.c:140
+msgid "registration denied"
+msgstr "რეგისტრაცია უარყოფილია"
+
+#: src/mb-menu-item.c:145 src/mb-menu-item.c:151
+#, c-format
+msgid "%s (%s roaming)"
+msgstr "%s (%s როუმინგი)"
+
+#: src/mb-menu-item.c:147 src/mb-menu-item.c:153
+#, c-format
+msgid "%s (roaming)"
+msgstr "%s (როუმინგი)"
+
+#: src/mb-menu-item.c:156
+#, c-format
+msgid "Roaming network (%s)"
+msgstr "როუმინგული ქსელი (%s)"
+
+#: src/mb-menu-item.c:158
+#, c-format
+msgid "Roaming network"
+msgstr "როუმინგული ქსელი"
+
+#: src/mobile-helpers.c:320
+#, c-format
+msgid "PIN code for SIM card “%s” on “%s”"
+msgstr "PIN-კოდი SIM-ბარათისთვის “%s” “%s”-ზე"
+
+#: src/mobile-helpers.c:453
+msgid "PIN code required"
+msgstr "საჭიროა PIN კოდი"
+
+#: src/mobile-helpers.c:461
+msgid "PIN code is needed for the mobile broadband device"
+msgstr "მობილური კავშირის მოწყობილობას სჭირდება PIN კოდი"
+
+#: src/mobile-helpers.c:611
+#, c-format
+msgid "Mobile broadband connection “%s” active: (%d%%%s%s)"
+msgstr "მობილური ინტერნეტი “%s” აქტიურია: (%d%%%s%s)"
+
+#: src/mobile-helpers.c:614
+msgid "roaming"
+msgstr "როუმინგი"
+
+#: src/netman.c:209
+msgid "Controller for Network Manager"
+msgstr "NetworkManager-ის მმართველი"
+
+#: src/nm-utils/nm-shared-utils.c:793
+#, c-format
+msgid "object class '%s' has no property named '%s'"
+msgstr "ობიექტის კლასს '%s ' თვისება სახელით'%s' არ გააჩნია"
+
+#: src/nm-utils/nm-shared-utils.c:800
+#, c-format
+msgid "property '%s' of object class '%s' is not writable"
+msgstr "თვისება '%s' ობიექტის კლასისთვის '%s' ჩაწერადი არაა"
+
+#: src/nm-utils/nm-shared-utils.c:807
+#, c-format
+msgid ""
+"construct property \"%s\" for object '%s' can't be set after construction"
+msgstr ""
+"აგებული თვისების \"%s\" დაყენება ობიექტის (\"%s\") აგების შემდეგ შეუძლებელია"
+
+#: src/nm-utils/nm-shared-utils.c:815
+#, c-format
+msgid "'%s::%s' is not a valid property name; '%s' is not a GObject subtype"
+msgstr ""
+"'%s::%s' თვისების სწორ სახელს არ წარმოადგენს; '%s' GObject-ის ქვეტიპი არაა"
+
+#: src/nm-utils/nm-shared-utils.c:824
+#, c-format
+msgid "unable to set property '%s' of type '%s' from value of type '%s'"
+msgstr ""
+"თვისების (%s) ტიპისთვის '%s' ტიპის '%s' მნიშვნელობიდან დაყენების შეცდომა"
+
+#: src/nm-utils/nm-shared-utils.c:835
+#, c-format
+msgid ""
+"value \"%s\" of type '%s' is invalid or out of range for property '%s' of "
+"type '%s'"
+msgstr ""
+"მნიშვნელობა '%s' ტიპისთვის '%s' არასწორია ან დიაპაზონს გარეთაა თვისებისთვის "
+"'%s' ტიპისთვის '%s'"
+
+#. The %s is a mobile provider name, eg "T-Mobile"
+#: src/utils/utils.c:160
+#, c-format
+msgid "%s connection"
+msgstr "%s შეერთება"
+
+#: src/utils/utils.c:534
+msgid "PEM certificates (*.pem, *.crt, *.cer)"
+msgstr "PEM სერტიფიკატები (*.pem, *.crt, *.cer)"
+
+#: src/utils/utils.c:546
+msgid "DER, PEM, or PKCS#12 private keys (*.der, *.pem, *.p12, *.key)"
+msgstr "DER, PEM, ან PKCS#12 პირადი გასაღებები (*.der, *.pem, *.p12, *.key)"
+
+#: src/8021x.ui:46
+msgid "C_onnect"
+msgstr "დაკავშირება"
+
+#: src/8021x.ui:122
+msgid "_Network name"
+msgstr "ქსელის _სახელი"
+
+#: src/gsm-unlock.ui:42
+msgid "_Unlock"
+msgstr "_განბლოკვა"
+
+#: src/gsm-unlock.ui:253
+msgid "Automatically unlock this device"
+msgstr "ამ მოწყობილობის ავტომატური განბლოკვა"
+
+#: src/info.ui:9
+msgid "Connection Information"
+msgstr "შეერთების ინფორმაცია"
+
+#: src/info.ui:30
+msgid "_Close"
+msgstr "და_ხურვა"
+
+#: src/connection-editor/ce-page-dsl.ui:19
+msgid "_Username"
+msgstr "_მომხმარებელი"
+
+#: src/connection-editor/ce-page-dsl.ui:33
+msgid "Username used to authenticate with the PPPoE service."
+msgstr "მომხმარებლის სახელი PPPoE სერვისთან ავთენტიკაციისთვის."
+
+#: src/connection-editor/ce-page-dsl.ui:46
+msgid ""
+"Only initiate sessions with access concentrators that provide the specified "
+"service. For most providers this should be left blank."
+msgstr ""
+"მხოლოდ, იმ სესიების ინიცირება, რომლების წვდომის კონცეტრატორებიც მითითებულ "
+"სერვისს მოგაწვდით. პროვაიდერების უმრავლესობისთვის ეს ცარიელი უნდა იყოს."
+
+#: src/connection-editor/ce-page-dsl.ui:59
+msgid "_Service"
+msgstr "_სერვისი"
+
+#: src/connection-editor/ce-page-dsl.ui:71
+msgid "Sho_w password"
+msgstr "პაროლის _ჩვენება"
+
+#: src/connection-editor/ce-page-dsl.ui:89
+msgid "Password used to authenticate with the PPPoE service."
+msgstr "პაროლი PPPoE სერვისთან ავთენტიკაციისთვის."
+
+#: src/connection-editor/ce-page-dsl.ui:102
+msgid "_Password"
+msgstr "_პაროლი"
+
+#: src/connection-editor/ce-page-dsl.ui:116
+msgid "PPP _interface"
+msgstr "PPP _ინტერფეისი"
+
+#: src/connection-editor/ce-page-dsl.ui:130
+msgid "P_arent interface"
+msgstr "მშობელი ინტერფეისი"
+
+#: src/connection-editor/ce-page-dsl.ui:144
+msgid "An arbitrary name to assign to the newly created PPP interface."
+msgstr "სასურველი სახელი ახლად შექმნილი PPP ინტერფეისისთვის."
+
+#: src/connection-editor/ce-page-dsl.ui:160
+msgid "The interface on which the PPP connection will be established."
+msgstr "ინტერფეისი, რომელზეც PPP კავშირი დამყარდება."
+
+#: src/connection-editor/ce-page-dsl.ui:171
+msgid "C_laim interface"
+msgstr "ი&ნტერფეისის მოთხოვნა"
+
+#: src/connection-editor/ce-page-dsl.ui:175
+msgid ""
+"If selected, the connection will take exclusive control of the interface and "
+"it won’t be possible to activate another connection on it. Note that the "
+"option can only be used for Ethernet interfaces. nm-applet is able to "
+"activate the connection only if this option is selected."
+msgstr ""
+"თუ არჩეულია, კავშირს ინტერფეისზე ექსკლუზიური კონტროლი იქნება და მასზე სხვა "
+"კავშირს ვერ გაააქტიურებთ. გახსოვდეთ, რომ ეს პარამეტრი, მხოლოდ, Ethernet "
+"ინტერფეისებზე მუშაობს. nm-applet-ს კავშირის გააქტიურება, მხოლოდ, მაშინ "
+"შეუძლია, თუ ეს პარამეტრი ჩართულია."
+
+#: data/lxplug-netman.ui:31
+msgid "label"
+msgstr "ჭდე"
+
+#: data/lxplug-netman.ui:97
+msgid "Disconnecting..."
+msgstr "კავშირის გაწყვეტა..."
