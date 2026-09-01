@@ -37,14 +37,14 @@ extern "C" {
     const char *package_name (void) { return GETTEXT_PACKAGE; };
 }
 
-void WidgetNetman::widget_command (const char *cmd)
-{
-    netman_control_msg (nm, cmd);
-}
-
 void WidgetNetman::widget_set_icon (void)
 {
     netman_update_display (nm);
+}
+
+void WidgetNetman::widget_command (const char *cmd)
+{
+    netman_control_msg (nm, cmd);
 }
 
 void WidgetNetman::widget_init (Gtk::HBox *container)
