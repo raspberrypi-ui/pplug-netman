@@ -1,3 +1,9 @@
+pplug-netman (1.19) trixie; urgency=medium
+
+  * Add tooltip for widget browser
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 21 Sep 2026 09:44:43 +0100
+
 pplug-netman (1.18) trixie; urgency=medium
 
   * Set threshold for 6G correctly

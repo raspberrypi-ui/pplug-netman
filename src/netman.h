@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*----------------------------------------------------------------------------*/
 
 #define PLUGIN_TITLE N_("Network")
+#define PLUGIN_DESC N_("Controller for Network Manager")
 
 extern conf_table_t conf_table[1];
 
